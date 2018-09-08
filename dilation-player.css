@@ -6,7 +6,11 @@ html, body {
 	position: relative;
 }
 
-#dilation-player {
+.hidden-cursor{
+    /*cursor: url("blank.cur"),auto !important;*/
+}
+
+.dilation-player {
 	width: 100%;
 	height: 100%;
 	background-color: #000;
@@ -15,7 +19,7 @@ html, body {
 	z-index: 9999
 }
 
-#dilation-player .dilation-player-video{
+.dilation-player .dilation-player-video{
 	width: 100%;
 	height: 100%;
 	position: absolute;
@@ -23,67 +27,101 @@ html, body {
 }
 
 /* ============ CSS for logo =============== */
-#dilation-player .dilation-player-logo{
+.dilation-player .dilation-player-logo{
 	position: absolute;
 	top: 2%;
 	left: 2%;
-	border: 1px solid #ddd;
-	height: 7%;
+	height: 7vh;
+    width: 7vh;
 	z-index: 9999;
 	opacity: 0.7;
 	cursor: pointer;
+    background-position: left;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
-#dilation-player .dilation-player-logo:hover{
+.dilation-player .dilation-player-logo:hover{
 	opacity: 1
 }
 
-#dilation-player .dilation-player-logo > *{
-	height: 100%
-}
-
 /* ============ CSS for controls =============== */
-#dilation-player .dilation-player-control{
+.dilation-player .dilation-player-control{
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	width: 96%;
-	background-color: rgba(0,0,0,0.5);
+	width: 100%;
 	z-index: 9999;
-	padding-left: 2%;
-	padding-right: 2%;
-	height: 5%;
-	transform: translateY(92%);
-	transition: all 0.5s ease;
+	height: 8%;
+	transform: translateY(85%);
+	transition: all 0.2s ease;
 }
 
-#dilation-player .dilation-player-control.active{
+.dilation-player .dilation-player-control.active{
 	transform: translateY(0);
 }
 
-#dilation-player .dilation-player-control .dilation-player-progress{
-	background-color: rgba(255,255,255, 0.5);
-	width: 100%;
+.dilation-player .dilation-player-control .dilation-player-progress{
+	width: 96%;
 	position: relative;
-	height: 8%;
+    height: 15%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: auto;
 }
 
-#dilation-player .dilation-player-control .dilation-player-progress div{
-	height: 100%;
-	background-color: #f00;
-	width: 50%;
+.dilation-player .dilation-player-control .dilation-player-progress div{
+    height: 50%;
+    width: 50%;
+    transition: all 0.2s ease;
+    position: absolute;
+    bottom: 0;
 }
 
-#dilation-player .dilation-player-control .dilation-player-button{
-	padding: 0.2em;
+.dilation-player .dilation-player-control .dilation-player-progress .load{
+    background-color: #f00;
+    z-index: 2;
 }
 
-#dilation-player .dilation-player-control .dilation-player-button button{
+.dilation-player .dilation-player-control .dilation-player-progress .full{
+    background-color: rgba(255,255,255, 0.5);
+    width: 100%;
+    z-index: 1;
+}
+
+.dilation-player .dilation-player-control.progress-hover .dilation-player-progress .full,
+.dilation-player .dilation-player-control.progress-hover .dilation-player-progress .load{
+    height: 100%;
+    transition: all 0.2s ease;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button{
+    height: 85%;
+    position: relative;
+    clear: both;
+    transition: all 0.2s ease;
+    background-color: rgba(0,0,0,0.5);
+    width: 96%;
+    margin: auto;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button button{
 	background-color: transparent;
 	color: #fff;
 	border: none;
 	outline: 0;
-	padding: 0.3em;
-	font-size: 1.5em;
+	padding: 1%;
+	font-size: 3.5vh;
 	cursor: pointer;
-}	
+    height: 100%;
+    transition: opacity .1s cubic-bezier(0.4,0.0,1,1);
+    line-height: inherit;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button button.dilation-player-btn-play{
+    float: left;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button button.dilation-player-btn-fullscreen{
+    float: right;
+}
