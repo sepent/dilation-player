@@ -53,7 +53,7 @@ html, body {
 	width: 100%;
 	z-index: 9999;
 	height: 8%;
-	transform: translateY(85%);
+	transform: translateY(80%);
 	transition: all 0.2s ease;
 }
 
@@ -64,39 +64,40 @@ html, body {
 .dilation-player .dilation-player-control .dilation-player-progress{
 	width: 96%;
 	position: relative;
-    height: 15%;
+    height: 20%;
     cursor: pointer;
     transition: all 0.2s ease;
     margin: auto;
+	z-index: 9999;
 }
 
 .dilation-player .dilation-player-control .dilation-player-progress div{
-    height: 50%;
-    width: 50%;
+    height: 25%;
+    width: 25%;
     transition: all 0.2s ease;
     position: absolute;
     bottom: 0;
 }
 
-.dilation-player .dilation-player-control .dilation-player-progress .load{
+.dilation-player .dilation-player-control .dilation-player-progress .playing{
     background-color: #f00;
     z-index: 2;
 }
 
-.dilation-player .dilation-player-control .dilation-player-progress .full{
+.dilation-player .dilation-player-control .dilation-player-progress .loading{
     background-color: rgba(255,255,255, 0.5);
     width: 100%;
     z-index: 1;
 }
 
-.dilation-player .dilation-player-control.progress-hover .dilation-player-progress .full,
-.dilation-player .dilation-player-control.progress-hover .dilation-player-progress .load{
-    height: 100%;
+.dilation-player .dilation-player-control .dilation-player-progress:hover .playing,
+.dilation-player .dilation-player-control .dilation-player-progress:hover .loading{
+    height: 80%;
     transition: all 0.2s ease;
 }
 
 .dilation-player .dilation-player-control .dilation-player-button{
-    height: 85%;
+    height: 80%;
     position: relative;
     clear: both;
     transition: all 0.2s ease;
@@ -110,7 +111,7 @@ html, body {
 	color: #fff;
 	border: none;
 	outline: 0;
-	padding: 1%;
+	padding: 0.5%;
 	font-size: 3.5vh;
 	cursor: pointer;
     height: 100%;
@@ -124,4 +125,8 @@ html, body {
 
 .dilation-player .dilation-player-control .dilation-player-button button.dilation-player-btn-fullscreen{
     float: right;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button button.dilation-player-timer{
+    font-size: 2.5vh
 }
