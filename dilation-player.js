@@ -22,9 +22,7 @@ class DilationPlayerConfig {
 
         // Init config for config data
         this.config = {
-            elements: {
-                controls: {}
-            }
+            elements: {}
         };
 
         // Config for elements
@@ -32,12 +30,15 @@ class DilationPlayerConfig {
         this.config.elements.video = this.or(config.elements.video, '.dilation-player-video');
         this.config.elements.logo = this.or(config.elements.logo, '.dilation-player-logo');
         this.config.elements.progress = this.or(config.elements.progress, '.dilation-player-progress');
+		this.config.elements.progress_hover_tooltip_text = this.or(config.elements.progress_hover_tooltip_text, '.dilation-player-progress-tooltip-text');
+		this.config.elements.progress_hover_tooltip_image = this.or(config.elements.progress_hover_tooltip_image, '.dilation-player-progress-tooltip-image');
+		
         this.config.elements.control = this.or(config.elements.control, '.dilation-player-control');
         this.config.elements.button = this.or(config.elements.button, '.dilation-player-button');
-        this.config.elements.controls.playPause = this.or(config.elements.controls.playPause, '.dilation-player-btn-play');
-        this.config.elements.controls.fullscreen = this.or(config.elements.controls.fullscreen, '.dilation-player-btn-fullscreen');
-        this.config.elements.controls.volume = this.or(config.elements.controls.volume, '.dilation-player-btn-volume');
-        this.config.elements.controls.timer = this.or(config.elements.controls.timer, '.dilation-player-timer');
+        this.config.elements.control_playPause = this.or(config.elements.control_playPause, '.dilation-player-btn-play');
+        this.config.elements.control_fullscreen = this.or(config.elements.control_fullscreen, '.dilation-player-btn-fullscreen');
+        this.config.elements.control_volume = this.or(config.elements.control_volume, '.dilation-player-btn-volume');
+        this.config.elements.control_timer = this.or(config.elements.control_timer, '.dilation-player-timer');
 
         // Config default
         this.config.volume = this.or(config.volume, true);
@@ -145,7 +146,7 @@ class DilationPlayer {
     playPause() {
         // Defined elements
         let video = this.config.get('elements.video', true);
-        let btn = this.config.get('elements.controls.playPause', true);
+        let btn = this.config.get('elements.control_playPause', true);
         let icon = btn.find('i');
 
         // Method to call as common
@@ -194,7 +195,7 @@ class DilationPlayer {
     fullscreen() {
         // Defined elements
         let element = this.config.get('elements.container', true).get(0);
-        let btn = this.config.get('elements.controls.fullscreen', true);
+        let btn = this.config.get('elements.control_fullscreen', true);
         let icon = btn.find('i');
 
         // Method handle fullscreen
@@ -242,13 +243,36 @@ class DilationPlayer {
         let video = this.config.get('elements.video', true);
         let progressBar = this.config.get('elements.progress', true);
         let progress = progressBar.find('.playing');
-        let timer = this.config.get('elements.controls.timer', true);
+        let timer = this.config.get('elements.control_timer', true);
+		let progressTimerTooltipText = this.config.get('elements.progress_hover_tooltip_text', true);
+		let progressTimerTooltipImage = this.config.get('elements.progress_hover_tooltip_image', true);
+		let tooltipCanvas = progressTimerTooltipImage.find('canvas').get(0);
+		tooltipCanvas.width = 90;
+		tooltipCanvas.height = 70;
 
         function pad(n, width, z) {
             z = z || '0';
             n = n + '';
             return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
         }
+		
+		function setLoaded (current, duration) {
+			progress.width((current / duration*100) + '%');
+		}
+		
+		function setTimer(current, duration){
+			let hours = Math.floor(current / 3600);
+			let minutes = Math.floor((current - hours * 3600) / 60);
+			let seconds = Math.floor(current - (minutes * 60 + hours * 3600));
+			let currentTime = (hours > 0 ? (pad(hours, 2) + ':') : '') + pad(minutes, 2) + ':' + pad(seconds, 2);
+
+			hours = Math.floor(duration / 3600);
+			minutes = Math.floor((duration - hours * 3600) / 60);
+			seconds = Math.floor(duration - (minutes * 60 + hours * 3600));
+			let totalTime = (hours > 0 ? (pad(hours, 2) + ':') : '') + pad(minutes, 2) + ':' + pad(seconds, 2);
+
+			timer.html(currentTime + ' / ' + totalTime);
+		}
 
         // Set loaded default is 0
         function resize() {
@@ -256,19 +280,8 @@ class DilationPlayer {
                 let current = video.get(0).currentTime;
                 let duration = video.get(0).duration;
 
-                progress.width((current / duration * 100) + '%');
-
-                let hours = Math.floor(current / 3600);
-                let minutes = Math.floor((current - hours * 3600) / 60);
-                let seconds = Math.floor(current - (minutes * 60 + hours * 3600));
-                let currentTime = (hours > 0 ? (pad(hours, 2) + ':') : '') + pad(minutes, 2) + ':' + pad(seconds, 2);
-
-                hours = Math.floor(duration / 3600);
-                minutes = Math.floor((duration - hours * 3600) / 60);
-                seconds = Math.floor(duration - (minutes * 60 + hours * 3600));
-                let totalTime = (hours > 0 ? (pad(hours, 2) + ':') : '') + pad(minutes, 2) + ':' + pad(seconds, 2);
-
-                timer.html(currentTime + ' / ' + totalTime);
+                setLoaded(current, duration);
+				setTimer(current, duration);
             }
         }
 
@@ -286,11 +299,31 @@ class DilationPlayer {
             let vidTime = video.get(0).duration * percentage;
             video.get(0).currentTime = vidTime;
         });
+		
+		// Event when hover on progress
+		progressBar.on("mousemove", function (e) {
+            let offset = $(this).offset();
+            let left = (e.pageX - offset.left);
+            let totalWidth = progressBar.width();
+            let percentage = (left / totalWidth);
+			let current = video.get(0).duration * percentage;
+			
+			let hours = Math.floor(current / 3600);
+			let minutes = Math.floor((current - hours * 3600) / 60);
+			let seconds = Math.floor(current - (minutes * 60 + hours * 3600));
+			let currentTime = (hours > 0 ? (pad(hours, 2) + ':') : '') + pad(minutes, 2) + ':' + pad(seconds, 2);
+
+			progressTimerTooltipText.css('left', left+'px').text(currentTime);
+			progressTimerTooltipImage.css('left', left+'px');
+			
+			// Get picture
+			tooltipCanvas.getContext('2d').drawImage(video.get(0), 0, 0, tooltipCanvas.width, tooltipCanvas.height);
+        });
 
         // Event when start load
-        // video.on('loadstart', function (e) {
-        //     resize();
-        // });
+        video.on('loadeddata', function (e) {
+			resize();
+        });
 
         return this;
     }
@@ -303,7 +336,7 @@ class DilationPlayer {
         // Defined elements
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
-        let volume = this.config.get('elements.controls.volume', true);
+        let volume = this.config.get('elements.control_volume', true);
         let volumeRange = this.config.get('volume');
         let icon = volume.find('i');
 

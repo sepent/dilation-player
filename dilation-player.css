@@ -61,7 +61,7 @@ html, body {
 	height: 8%;
     min-height: 50px;
     max-height: 70px;
-	transform: translateY(85%);
+	transform: translateY(88%);
 	transition: all 0.2s ease;
 }
 
@@ -73,38 +73,91 @@ html, body {
 .dilation-player .dilation-player-control .dilation-player-progress{
 	width: 96%;
 	position: relative;
-    height: 15%;
+    height: 12%;
     cursor: pointer;
-    margin: auto;
+    margin: 0 auto;
 	z-index: 9999;
 }
 
-.dilation-player .dilation-player-control .dilation-player-progress div{
-    height: 45%;
+.dilation-player .dilation-player-control .dilation-player-progress .line{
     width: 100%;
+	height: 60%;
     transition: all 0.2s linear;
     position: absolute;
-    bottom: 0;
+    bottom: 0px;
+	left: 0px;
 }
 
-.dilation-player .dilation-player-control .dilation-player-progress:hover > div{
+.dilation-player .dilation-player-control .dilation-player-progress .dilation-player-progress-tooltip-text {
+    display: none;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 1px 5px;
+    position: absolute;
+    z-index: 1;
+    top: -1.6em;
+	transform: translateX(-50%);
+}
+
+.dilation-player .dilation-player-control .dilation-player-progress .dilation-player-progress-tooltip-text::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 4px 5px 0 5px;
+  border-color: black transparent transparent transparent;
+}
+
+.dilation-player .dilation-player-control .dilation-player-progress:hover .dilation-player-progress-tooltip-text {
+    display: inline-block;
+}
+
+.dilation-player .dilation-player-control .dilation-player-progress .dilation-player-progress-tooltip-image {
+    display: none;
+    background-color: red;
+    color: #fff;
+    text-align: center;
+    border: 1px solid #ddd;
+    position: absolute;
+    z-index: 1;
+    top: calc(-48px + -1.8em);
+	transform: translateX(-50%);
+	width: 90px;
+	height: 70px;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.dilation-player .dilation-player-control .dilation-player-progress:hover .dilation-player-progress-tooltip-image {
+    display: inline-block;
+}
+
+.dilation-player .dilation-player-control .dilation-player-progress:hover .line{
     height: 100%;
 }
 
-.dilation-player .dilation-player-control .dilation-player-progress > div div{
+.dilation-player .dilation-player-control .dilation-player-progress .line div{
     height: 100%;
-    width: 25%;
-    transition: all 0.2s linear;
+    width: 100%;
     position: absolute;
-    bottom: 0;
+    bottom: 0px;
+	left: 0px;
 }
 
-.dilation-player .dilation-player-control .dilation-player-progress > div .playing{
+.dilation-player .dilation-player-control .dilation-player-progress .line .playing{
     background-color: #f00;
-    z-index: 2;
+    z-index: 3;
 }
 
-.dilation-player .dilation-player-control .dilation-player-progress > div .loading{
+.dilation-player .dilation-player-control .dilation-player-progress .line .loading{
     background-color: rgba(255,255,255, 0.5);
     width: 100%;
     z-index: 1;
@@ -112,7 +165,7 @@ html, body {
 
 /* CSS for button */
 .dilation-player .dilation-player-control .dilation-player-button{
-    height: 85%;
+    height: 88%;
     background-color: rgba(0,0,0,0.5);
     width: 100%;
     position: relative;
