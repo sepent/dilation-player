@@ -36,8 +36,11 @@ class DilationPlayerConfig {
         this.config.elements.button = this.or(config.elements.button, '.dilation-player-button');
         this.config.elements.controls.playPause = this.or(config.elements.controls.playPause, '.dilation-player-btn-play');
         this.config.elements.controls.fullscreen = this.or(config.elements.controls.fullscreen, '.dilation-player-btn-fullscreen');
-        this.config.elements.controls.sound = this.or(config.elements.controls.playPause, '.dilation-player-btn-sound');
+        this.config.elements.controls.volume = this.or(config.elements.controls.volume, '.dilation-player-btn-volume');
         this.config.elements.controls.timer = this.or(config.elements.controls.timer, '.dilation-player-timer');
+
+        // Config default
+        this.config.volume = this.or(config.volume, true);
 
         // Init cache
         this.cache = {dom: {}, config: {}};
@@ -59,14 +62,6 @@ class DilationPlayerConfig {
      * @return mixed
      */
     get(key, dom) {
-        // Check get dom is true and dom is created
-        // Then return dom in cache
-        if (dom === true) {
-            if (this.cache.dom[key] !== undefined) {
-                return this.cache.dom[key];
-            }
-        }
-
         let config = null;
 
         // Get config cache
@@ -91,8 +86,13 @@ class DilationPlayerConfig {
             this.cache.config[key] = config;
         }
 
-        if (dom === true) {
-            this.cache.dom[key] = $(config);
+        // Check get dom is true and dom is created
+        // Then return dom in cache
+        if (dom === true &&  (typeof config === 'string')) {
+            if (this.cache.dom[key] === undefined) {
+                this.cache.dom[key] = $(config);
+            }
+
             return this.cache.dom[key];
         }
 
@@ -303,20 +303,35 @@ class DilationPlayer {
         // Defined elements
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
+        let volume = this.config.get('elements.controls.volume', true);
+        let volumeRange = this.config.get('volume');
+        let icon = volume.find('i');
 
-        // if (videoDom.muted == false) {
-        //     // Mute the video
-        //     videoDom.muted = true;
-        //
-        //     // Update the button text
-        //     muteButton.innerHTML = "Unmute";
-        // } else {
-        //     // Unmute the video
-        //     video.muted = false;
-        //
-        //     // Update the button text
-        //     muteButton.innerHTML = "Mute";
-        // }
+        function makeIcon(){
+            if (videoDom.muted == true) {
+                icon.attr('class', 'icons icon-volume-off');
+            } else {
+                icon.attr('class', 'icons icon-volume-1');
+            }
+        }
+
+        // Set sound default
+        if (volumeRange === 0) {
+            videoDom.muted = true;
+        }
+
+        makeIcon();
+
+        // Event click on button
+        volume.on('click', function(){
+            if (videoDom.muted == true) {
+                videoDom.muted = false;
+            } else {
+                videoDom.muted = true;
+            }
+
+            makeIcon();
+        });
 
         return this;
     }
