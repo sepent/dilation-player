@@ -74,7 +74,7 @@ html, body {
 .dilation-player .dilation-player-control .dilation-player-progress div{
     height: 25%;
     width: 25%;
-    transition: all 0.2s ease;
+    transition: all 1s ease;
     position: absolute;
     bottom: 0;
 }
