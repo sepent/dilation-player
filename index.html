@@ -10,48 +10,16 @@
     <link rel="stylesheet" type="text/css" href="dilation-player.css">
 </head>
 <body>
-<div style="width: 600px; height: 400px">
-    <div class="dilation-player">
-        <div class="dilation-player-logo"
-             style="background-image: url('https://avatars0.githubusercontent.com/u/22594959?s=460&v=4')"></div>
-        <video class="dilation-player-video">
-            <source src="https://www.sample-videos.com/video/mp4/240/big_buck_bunny_240p_30mb.mp4"
-                    type="video/mp4">
-            <!--<source src="https://www.w3schools.com/Tags/movie.ogg" type="video/ogg">-->
-            Your browser does not support the video tag.
-        </video>
-		<div class="dilation-player-loader">
-			<div class="dilation-player-loader-icon"></div>
-		</div>
-        <div class="dilation-player-control active">
-            <div class="dilation-player-progress">
-				<div class="dilation-player-progress-tooltip-image"><canvas></canvas></div>
-				<span class="dilation-player-progress-tooltip-text"></span>
-                <div class="line">
-                    <div class="playing"></div>
-                    <div class="loading"></div>
-                </div>
-            </div>
-            <div class="dilation-player-button">
-                <div>
-                    <button class="dilation-player-btn-play"></button>
-					<div class="dilation-player-group">
-						<button class="dilation-player-btn-volume"></button>
-						<div class="dilation-player-volume-tooltip">this is</div>
-					</div>
-                    <!--<input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1">-->
-                    <button class="dilation-player-timer"></button>
-                    <button class="dilation-player-btn-fullscreen"></button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<div style="width: 600px; height: 400px" id="dilation-player"></div>
 <script src="http://cdn.lib.cobonla.org/jquery/v3.3.1/jquery.min.js"></script>
 <script type="text/javascript" src="dilation-player.js"></script>
 <script type="text/javascript">
     $(function () {
-        var dilationPlayer = new DilationPlayer();
+        var dilationPlayer = new DilationPlayer('#dilation-player', {
+            view: {
+                import: 'dilation-player.template.html'
+            }
+        });
     });
 </script>
 </body>

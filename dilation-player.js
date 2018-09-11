@@ -7,16 +7,9 @@ class DilationPlayerConfig {
      * @param config
      */
     constructor(config) {
-        // Init config if user pass undefined to
-        if (config == undefined) {
-            config = {};
-        }
-		
 		// Set default
-		config = {
-			elements: this.or(config.elements, {}),
-			icons: this.or(config.icons, {})
-		};
+		config.elements = this.or(config.elements, {});
+		config.icons = this.or(config.icons, {});
 
         // Config for elements
         this.config = {
@@ -53,11 +46,19 @@ class DilationPlayerConfig {
 			},
 			
 			// Config default
-			volume: this.or(config.volume, true)
+			volume: this.or(config.volume, true),
+            object: this.or(config.object, null),
+            view: this.or(config.view, false),
+            resources: this.or(config.resources, {})
 		}
 
         // Init cache
-        this.cache = {dom: {}, config: {}};
+        this.cache = {
+            dom: {
+                object: $(this.config.object)
+            },
+            config: {}
+        };
     }
 
     /**
@@ -104,13 +105,65 @@ class DilationPlayerConfig {
         // Then return dom in cache
         if (dom === true &&  (typeof config === 'string')) {
             if (this.cache.dom[key] === undefined) {
-                this.cache.dom[key] = $(config);
+                this.cache.dom[key] = this.cache.dom['object'].find(config);
             }
 
             return this.cache.dom[key];
         }
 
         return config;
+    }
+}
+
+// ====================================================
+// Class {DilationPlayerView}
+// ====================================================
+class DilationPlayerView {
+    /**
+     * Constructor
+     * @param config
+     */
+    constructor(config) {
+        this.config = config;
+    }
+    
+    async render(){
+        let view = this.config.get('view');
+
+        if (view === false) {
+            return true;
+        }
+
+        let object = this.config.get('object', true);
+
+        // Read content in template
+        if (!view.content) {
+            if (view.import) {
+                let response = await $.ajax({
+                    url: view.import,
+                    data: {},
+                    method: 'GET',
+                    success: function(response){
+                        return response;
+                    },
+                    error: function(){
+                        return null;
+                    }
+                });
+
+                let content = this.replace(response);
+                object.html(content);
+            }
+        } else {
+            let content = this.replace(view.content);
+            object.html(content);
+        }
+
+        return true;
+    }
+
+    replace(content){
+        return content;
     }
 }
 
@@ -122,8 +175,15 @@ class DilationPlayer {
      * Constructor
      * @param config
      */
-    constructor(config) {
+    constructor(object, config) {
+        if (config == undefined) {
+            config = {};
+        }
+
+        config.object = object;
         this.config = new DilationPlayerConfig(config);
+        this.view = new DilationPlayerView(this.config);
+        this.rendered = false;
         this.apply();
     }
 
@@ -142,7 +202,9 @@ class DilationPlayer {
     /**
      * Apply
      */
-    apply() {
+    async apply() {
+        await this.render();
+
         // Regist events
         this.loader(false, true)
 			.control()
@@ -151,6 +213,12 @@ class DilationPlayer {
             .progress()
             .sound()
             .logo();
+    }
+
+    async render() {
+        let rendered = await this.view.render();
+        this.rendered = true;
+        return rendered;
     }
 
     /**
