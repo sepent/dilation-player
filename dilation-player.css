@@ -174,10 +174,23 @@ html, body {
 .dilation-player .dilation-player-control .dilation-player-button > div{
     height: 100%;
     position: relative;
-    clear: both;
     transition: all 0.2s linear;
     width: 96%;
     margin: auto;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button > div:after,
+.dilation-player .dilation-player-control .dilation-player-button .dilation-player-group:after{
+    clear: both;
+	content: "";
+	display: block;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button .dilation-player-group{
+	height: 100%;
+    position: relative;
+    float: left;
+	display: inline-block;
 }
 
 .dilation-player .dilation-player-control .dilation-player-button button{
@@ -201,6 +214,23 @@ html, body {
     font-size: 0.8em;
 }
 
+.dilation-player .dilation-player-control .dilation-player-button .dilation-player-volume-tooltip{
+    display: none;
+    background-color: #ffffff;
+	position: absolute;
+	width: 100px;
+	top: 35%;
+	-webkit-transform: translateY(-30%);
+	-ms-transform: translateY(-30%);
+	transform: translateY(-30%);
+	border-radius: 6px;
+	background-color: #000;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button .dilation-player-group:hover .dilation-player-volume-tooltip{
+    display: inline-block;
+}
+
 /* CSS for loader */
 .dilation-player .dilation-player-loader{
 	position: absolute;
@@ -210,6 +240,11 @@ html, body {
 	height: 100%;
 	background-color: rgba(0,0,0,0.5);
 	z-index: 8;
+	display: none;
+}
+
+.dilation-player .dilation-player-loader.active{
+	display: block;
 }
 
 .dilation-player .dilation-player-loader .dilation-player-loader-icon {

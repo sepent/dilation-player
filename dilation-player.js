@@ -25,16 +25,18 @@ class DilationPlayerConfig {
 				video: this.or(config.elements.video, '.dilation-player-video'),
 				logo: this.or(config.elements.logo, '.dilation-player-logo'),
 				progress: this.or(config.elements.progress, '.dilation-player-progress'),
-				progress_hover_tooltip_text: this.or(config.elements.progress_hover_tooltip_text, '.dilation-player-progress-tooltip-text'),
-				progress_hover_tooltip_image: this.or(config.elements.progress_hover_tooltip_image, '.dilation-player-progress-tooltip-image'),
+				progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dilation-player-progress-tooltip-text'),
+				progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dilation-player-progress-tooltip-image'),
 				control: this.or(config.elements.control, '.dilation-player-control'),
 				button: this.or(config.elements.button, '.dilation-player-button'),
-				control_playPause: this.or(config.elements.control_playPause, '.dilation-player-btn-play'),
-				control_fullscreen: this.or(config.elements.control_fullscreen, '.dilation-player-btn-fullscreen'),
-				control_volume: this.or(config.elements.control_volume, '.dilation-player-btn-volume'),
-				control_timer: this.or(config.elements.control_timer, '.dilation-player-timer'),
+				controlPlayPause: this.or(config.elements.controlPlayPause, '.dilation-player-btn-play'),
+				controlFullscreen: this.or(config.elements.controlFullscreen, '.dilation-player-btn-fullscreen'),
+				controlVolume: this.or(config.elements.controlVolume, '.dilation-player-btn-volume'),
+				controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dilation-player-volume-tooltip'),
+				controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dilation-player-volume-range'),
+				controlTimer: this.or(config.elements.controlTimer, '.dilation-player-timer'),
 				loader: this.or(config.elements.loader, '.dilation-player-loader'),
-				loader_icon: this.or(config.elements.loader_icon, '.dilation-player-loader-icon')
+				loaderIcon: this.or(config.elements.loaderIcon, '.dilation-player-loader-icon')
 			},
 		
 			// Config for icon
@@ -44,10 +46,10 @@ class DilationPlayerConfig {
 				actualscreen: this.or(config.icons.actual, '<i class="icons icon-size-actual"></i>'),
 				pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
 				play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
-				volume_mute: this.or(config.icons.mute, '<i class="icons icon-volume-off"></i>'),
-				volume_1: this.or(config.icons.volume_1, '<i class="icons icon-volume-1"></i>'),
-				volume_2: this.or(config.icons.volume_2, '<i class="icons icon-volume-2"></i>'),
-				volume_3: this.or(config.icons.volume_3, '<i class="icons icon-volume-3"></i>')
+				volumeMute: this.or(config.icons.mute, '<i class="icons icon-volume-off"></i>'),
+				volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
+				volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
+				volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>')
 			},
 			
 			// Config default
@@ -142,7 +144,7 @@ class DilationPlayer {
      */
     apply() {
         // Regist events
-        this.loader(false)
+        this.loader(false, true)
 			.control()
             .playPause()
             .fullscreen()
@@ -158,7 +160,7 @@ class DilationPlayer {
     playPause() {
         // Defined elements
         let video = this.config.get('elements.video', true);
-        let btn = this.config.get('elements.control_playPause', true);
+        let btn = this.config.get('elements.controlPlayPause', true);
 		let icons = this.config.get('icons');
 
         // Method to call as common
@@ -207,7 +209,7 @@ class DilationPlayer {
     fullscreen() {
         // Defined elements
         let element = this.config.get('elements.container', true).get(0);
-        let btn = this.config.get('elements.control_fullscreen', true);
+        let btn = this.config.get('elements.controlFullscreen', true);
 		let icons = this.config.get('icons');
 		
 		// Default
@@ -259,9 +261,9 @@ class DilationPlayer {
         let video = this.config.get('elements.video', true);
         let progressBar = this.config.get('elements.progress', true);
         let progress = progressBar.find('.playing');
-        let timer = this.config.get('elements.control_timer', true);
-		let progressTimerTooltipText = this.config.get('elements.progress_hover_tooltip_text', true);
-		let progressTimerTooltipImage = this.config.get('elements.progress_hover_tooltip_image', true);
+        let timer = this.config.get('elements.controlTimer', true);
+		let progressTimerTooltipText = this.config.get('elements.progressHoverTooltipText', true);
+		let progressTimerTooltipImage = this.config.get('elements.progressToverTooltipImage', true);
 		let tooltipCanvas = progressTimerTooltipImage.find('canvas').get(0);
 		tooltipCanvas.width = 90;
 		tooltipCanvas.height = 70;
@@ -364,20 +366,22 @@ class DilationPlayer {
         // Defined elements
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
-        let volume = this.config.get('elements.control_volume', true);
-        let volumeRange = this.config.get('volume');
+        let volume = this.config.get('elements.controlVolume', true);
+		let volumeTooltip = this.config.get('elements.controlVolumeTooltip', true);
+		let volumeRange = this.config.get('elements.controlVolumeRange', true);
+        let range = this.config.get('volume');
 		let icons = this.config.get('icons');
 
         function makeIcon(){
             if (videoDom.muted == true) {
-                volume.html(icons.volume_mute);
+                volume.html(icons.volumeMute);
             } else {
-                volume.html(icons.volume_1);
+                volume.html(icons.volume1);
             }
         }
 
         // Set sound default
-        if (volumeRange === 0) {
+        if (range === 0) {
             videoDom.muted = true;
         }
 
@@ -391,6 +395,18 @@ class DilationPlayer {
 
             makeIcon();
         });
+		
+		// Event when hover on button volume
+		// Then add class active to tooltip to display
+		volume.on('mouseenter', function(){
+			//volumeTooltip.addClass('active');
+		});
+		
+		// Event when leave on button volume
+		// Then add remove active to tooltip to hidden
+		volume.on('mouseleave', function(){
+			//volumeTooltip.removeClass('active');
+		});
 		
 		makeIcon();
 
@@ -490,16 +506,14 @@ class DilationPlayer {
 		let loader = this.config.get('elements.loader', true);
 		
 		if (refresh === true) {
-			let loaderIcon = this.config.get('elements.loader_icon', true);
+			let loaderIcon = this.config.get('elements.loaderIcon', true);
 			loaderIcon.html(this.config.get('icons.loader'));
 		}
 		
 		if (show === true) {
-			loader.show();
+			loader.addClass('active');
 		} else if (show === false) {
-			loader.hide();
-		} else {
-			loader.toggle();
+			loader.removeClass('active');
 		}
 		
 		return this;
