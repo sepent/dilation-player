@@ -11,37 +11,46 @@ class DilationPlayerConfig {
         if (config == undefined) {
             config = {};
         }
-
-        if (config.elements == undefined) {
-            config.elements = {};
-        }
-
-        if (config.elements.controls == undefined) {
-            config.elements.controls = {};
-        }
-
-        // Init config for config data
-        this.config = {
-            elements: {}
-        };
+		
+		// Set default
+		config = {
+			elements: this.or(config.elements, {}),
+			icons: this.or(config.icons, {})
+		};
 
         // Config for elements
-        this.config.elements.container = this.or(config.elements.container, '.dilation-player');
-        this.config.elements.video = this.or(config.elements.video, '.dilation-player-video');
-        this.config.elements.logo = this.or(config.elements.logo, '.dilation-player-logo');
-        this.config.elements.progress = this.or(config.elements.progress, '.dilation-player-progress');
-		this.config.elements.progress_hover_tooltip_text = this.or(config.elements.progress_hover_tooltip_text, '.dilation-player-progress-tooltip-text');
-		this.config.elements.progress_hover_tooltip_image = this.or(config.elements.progress_hover_tooltip_image, '.dilation-player-progress-tooltip-image');
+        this.config = {
+			elements: {
+				container: this.or(config.elements.container, '.dilation-player'),
+				video: this.or(config.elements.video, '.dilation-player-video'),
+				logo: this.or(config.elements.logo, '.dilation-player-logo'),
+				progress: this.or(config.elements.progress, '.dilation-player-progress'),
+				progress_hover_tooltip_text: this.or(config.elements.progress_hover_tooltip_text, '.dilation-player-progress-tooltip-text'),
+				progress_hover_tooltip_image: this.or(config.elements.progress_hover_tooltip_image, '.dilation-player-progress-tooltip-image'),
+				control: this.or(config.elements.control, '.dilation-player-control'),
+				button: this.or(config.elements.button, '.dilation-player-button'),
+				control_playPause: this.or(config.elements.control_playPause, '.dilation-player-btn-play'),
+				control_fullscreen: this.or(config.elements.control_fullscreen, '.dilation-player-btn-fullscreen'),
+				control_volume: this.or(config.elements.control_volume, '.dilation-player-btn-volume'),
+				control_timer: this.or(config.elements.control_timer, '.dilation-player-timer'),
+				loader: this.or(config.elements.loader, '.dilation-player-loader'),
+				loader_icon: this.or(config.elements.loader_icon, '.dilation-player-loader-icon')
+			},
 		
-        this.config.elements.control = this.or(config.elements.control, '.dilation-player-control');
-        this.config.elements.button = this.or(config.elements.button, '.dilation-player-button');
-        this.config.elements.control_playPause = this.or(config.elements.control_playPause, '.dilation-player-btn-play');
-        this.config.elements.control_fullscreen = this.or(config.elements.control_fullscreen, '.dilation-player-btn-fullscreen');
-        this.config.elements.control_volume = this.or(config.elements.control_volume, '.dilation-player-btn-volume');
-        this.config.elements.control_timer = this.or(config.elements.control_timer, '.dilation-player-timer');
-
-        // Config default
-        this.config.volume = this.or(config.volume, true);
+			// Config for icon
+			icons: {
+				loader: this.or(config.icons.loader, '<i class="fa fa-spin fa-spinner"></i>'),
+				fullscreen: this.or(config.icons.fullscreen, '<i class="fa fa-arrows-alt"></i>'),
+				actualscreen: this.or(config.icons.actual, '<i class="fa-arrows-inwards-alt"></i>'),
+				pause: this.or(config.icons.pause, '<i class="fa fa-pause"></i>'),
+				play: this.or(config.icons.play, '<i class="fa fa-play"></i>'),
+				volume_mute: this.or(config.icons.mute, '<i class="fa fa-volume-off"></i>'),
+				volume_1: this.or(config.icons.mute, '<i class="fa fa-volume-1"></i>')
+			},
+			
+			// Config default
+			volume: this.or(config.volume, true)
+		}
 
         // Init cache
         this.cache = {dom: {}, config: {}};
@@ -131,7 +140,8 @@ class DilationPlayer {
      */
     apply() {
         // Regist events
-        this.control()
+        this.loader(false)
+			.control()
             .playPause()
             .fullscreen()
             .progress()
@@ -147,7 +157,7 @@ class DilationPlayer {
         // Defined elements
         let video = this.config.get('elements.video', true);
         let btn = this.config.get('elements.control_playPause', true);
-        let icon = btn.find('i');
+		let icons = this.config.get('icons');
 
         // Method to call as common
         function toggleIcon() {
@@ -170,19 +180,19 @@ class DilationPlayer {
 
         // Event when video play
         video.on('play', function () {
-            icon.attr('class', 'icons icon-control-pause');
+            btn.html(icons.pause);
         });
 
         // Event when video pause or ended
         video.on('pause ended', function () {
-            icon.attr('class', 'icons icon-control-play');
+            btn.html(icons.play);
         });
 
         // Init display icon in button play/pause
         if (video.get(0).paused) {
-            icon.attr('class', 'icons icon-control-play');
+            btn.html(icons.play);
         } else {
-            icon.attr('class', 'icons icon-control-pause');
+            btn.html(icons.pause);
         }
 
         return this;
@@ -196,18 +206,21 @@ class DilationPlayer {
         // Defined elements
         let element = this.config.get('elements.container', true).get(0);
         let btn = this.config.get('elements.control_fullscreen', true);
-        let icon = btn.find('i');
+		let icons = this.config.get('icons');
+		
+		// Default
+		btn.html(icons.fullscreen);
 
         // Method handle fullscreen
         function request() {
             element.requestFullScreen();
-            icon.attr('class', 'icons icon-size-actual');
+            btn.html(icons.actualscreen);
         }
 
         // Method handle turn off fullscreen
         function cancel() {
             document.cancelFullScreen();
-            icon.attr('class', 'icons icon-size-fullscreen');
+            btn.html(icons.fullscreen);
         }
 
         // Event when click on button fullscreen
@@ -240,6 +253,7 @@ class DilationPlayer {
      */
     progress() {
         // Defined elements
+		let instance = this;
         let video = this.config.get('elements.video', true);
         let progressBar = this.config.get('elements.progress', true);
         let progress = progressBar.find('.playing');
@@ -275,7 +289,7 @@ class DilationPlayer {
 		}
 
         // Set loaded default is 0
-        function resize() {
+        function display() {
             if (!isNaN(video.get(0).duration)) {
                 let current = video.get(0).currentTime;
                 let duration = video.get(0).duration;
@@ -287,10 +301,12 @@ class DilationPlayer {
 
         // Event when timeupdate
         video.on('timeupdate ', function (e) {
-            resize();
+            display();
+			instance.loader(false);
         });
 
         // Event when click on progress bar
+		// Then get position of mouse and count the time go to
         progressBar.on("click", function (e) {
             let offset = $(this).offset();
             let left = (e.pageX - offset.left);
@@ -298,9 +314,12 @@ class DilationPlayer {
             let percentage = (left / totalWidth);
             let vidTime = video.get(0).duration * percentage;
             video.get(0).currentTime = vidTime;
+			setLoaded(left, totalWidth);
+			instance.loader(true);
         });
 		
 		// Event when hover on progress
+		// Then get position of mouse, count the time go to and get information
 		progressBar.on("mousemove", function (e) {
             let offset = $(this).offset();
             let left = (e.pageX - offset.left);
@@ -320,9 +339,16 @@ class DilationPlayer {
 			tooltipCanvas.getContext('2d').drawImage(video.get(0), 0, 0, tooltipCanvas.width, tooltipCanvas.height);
         });
 
-        // Event when start load
+        // Event when loaded data
+		// Then call display information on screen
         video.on('loadeddata', function (e) {
-			resize();
+			display();
+			instance.loader(false);
+        });
+		
+		// Event when start load data
+		video.on('loadstart', function (e) {
+			instance.loader(true);
         });
 
         return this;
@@ -338,13 +364,13 @@ class DilationPlayer {
         let videoDom = video.get(0);
         let volume = this.config.get('elements.control_volume', true);
         let volumeRange = this.config.get('volume');
-        let icon = volume.find('i');
+		let icons = this.config.get('icons');
 
         function makeIcon(){
             if (videoDom.muted == true) {
-                icon.attr('class', 'icons icon-volume-off');
+                volume.html(icons.volume_mute);
             } else {
-                icon.attr('class', 'icons icon-volume-1');
+                volume.html(icons.volume_1);
             }
         }
 
@@ -376,6 +402,7 @@ class DilationPlayer {
     logo() {
         let logo = this.config.get('elements.logo', true);
 
+		// Set size for Logo
         function resizeLogo(){
             let height = logo.height();
             logo.width(height);
@@ -386,6 +413,9 @@ class DilationPlayer {
         });
 
         resizeLogo();
+		
+		// Event when click on logo
+		// Event when hover on logo
 
         return this;
     }
@@ -448,4 +478,28 @@ class DilationPlayer {
 
         return this;
     }
+	
+	/**
+     * Toggle show/hidel loader
+	 * @param disabled
+     * @return {DilationPlayer}
+     */
+	loader(show, refresh){
+		let loader = this.config.get('elements.loader', true);
+		
+		if (refresh === true) {
+			let loaderIcon = this.config.get('elements.loader_icon', true);
+			loaderIcon.html(this.config.get('icons.loader'));
+		}
+		
+		if (show === true) {
+			loader.show();
+		} else if (show === false) {
+			loader.hide();
+		} else {
+			loader.toggle();
+		}
+		
+		return this;
+	}
 }
