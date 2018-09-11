@@ -40,12 +40,14 @@ class DilationPlayerConfig {
 			// Config for icon
 			icons: {
 				loader: this.or(config.icons.loader, '<i class="fa fa-spin fa-spinner"></i>'),
-				fullscreen: this.or(config.icons.fullscreen, '<i class="fa fa-arrows-alt"></i>'),
-				actualscreen: this.or(config.icons.actual, '<i class="fa-arrows-inwards-alt"></i>'),
-				pause: this.or(config.icons.pause, '<i class="fa fa-pause"></i>'),
-				play: this.or(config.icons.play, '<i class="fa fa-play"></i>'),
-				volume_mute: this.or(config.icons.mute, '<i class="fa fa-volume-off"></i>'),
-				volume_1: this.or(config.icons.mute, '<i class="fa fa-volume-1"></i>')
+				fullscreen: this.or(config.icons.fullscreen, '<i class="icons icon-size-fullscreen"></i>'),
+				actualscreen: this.or(config.icons.actual, '<i class="icons icon-size-actual"></i>'),
+				pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
+				play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
+				volume_mute: this.or(config.icons.mute, '<i class="icons icon-volume-off"></i>'),
+				volume_1: this.or(config.icons.volume_1, '<i class="icons icon-volume-1"></i>'),
+				volume_2: this.or(config.icons.volume_2, '<i class="icons icon-volume-2"></i>'),
+				volume_3: this.or(config.icons.volume_3, '<i class="icons icon-volume-3"></i>')
 			},
 			
 			// Config default
@@ -379,8 +381,6 @@ class DilationPlayer {
             videoDom.muted = true;
         }
 
-        makeIcon();
-
         // Event click on button
         volume.on('click', function(){
             if (videoDom.muted == true) {
@@ -391,6 +391,8 @@ class DilationPlayer {
 
             makeIcon();
         });
+		
+		makeIcon();
 
         return this;
     }

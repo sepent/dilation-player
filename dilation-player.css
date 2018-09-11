@@ -185,7 +185,7 @@ html, body {
 	color: #fff;
 	border: none;
 	outline: 0;
-	font-size: .8em;
+	font-size: 1.3em;
 	cursor: pointer;
     height: 100%;
     transition: opacity .1s cubic-bezier(0.4,0.0,1,1);
@@ -193,12 +193,12 @@ html, body {
     float: left;
 }
 
-.dilation-player .dilation-player-control .dilation-player-button button > i{
-    font-size: 1.7em;
-}
-
 .dilation-player .dilation-player-control .dilation-player-button button.dilation-player-btn-fullscreen{
     float: right;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button button.dilation-player-timer{
+    font-size: 0.8em;
 }
 
 /* CSS for loader */
