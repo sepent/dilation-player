@@ -139,6 +139,7 @@ class DilationPlayerView {
         // Read content in template
         if (!view.content) {
             if (view.import) {
+                object.html('Loading ...');
                 let response = await $.ajax({
                     url: view.import,
                     data: {},
