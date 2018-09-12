@@ -299,3 +299,10 @@ html, body {
 	width: 100px;
 	font-size: 2em;
 }
+
+.dp .dp-modal .dp-modal-player-icon > *{
+	padding: 20px 18px 20px 22px;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    background-color: rgba(0,0,0,0.3);
+}
