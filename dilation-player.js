@@ -441,6 +441,7 @@ class DilationPlayer {
         let range = this.config.get('volume');
 		let icons = this.config.get('icons');
 
+		// Make icon for video
         function makeIcon(){
             if (videoDom.muted == true) {
                 volume.html(icons.volumeMute);
@@ -448,11 +449,12 @@ class DilationPlayer {
                 volume.html(icons.volume1);
             }
         }
-
-        // Set sound default
-        if (range === 0) {
-            videoDom.muted = true;
-        }
+		
+		// Set volume for video
+		function setVolume(number) {
+			video.get(0).volume = number/100;
+			makeIcon();
+		}
 
         // Event click on button
         volume.on('click', function(){
@@ -477,7 +479,15 @@ class DilationPlayer {
 			//volumeTooltip.removeClass('active');
 		});
 		
-		makeIcon();
+		// Event when change input of range
+		// Then call change volume and icon
+		volumeRange.on('change', function(){
+			let range = $(this).val();
+			setVolume(range);
+		});
+		
+		// Set volume default
+		setVolume(range);
 
         return this;
     }
