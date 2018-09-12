@@ -28,6 +28,7 @@ class DilationPlayerConfig {
                 controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dp-volume-tooltip'),
                 controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dp-volume-range'),
                 controlTimer: this.or(config.elements.controlTimer, '.dp-timer'),
+                modal: this.or(config.elements.modal, '.dp-modal'),
                 loaderModal: this.or(config.elements.loaderModal, '.dp-modal-loader'),
                 loaderModalIcon: this.or(config.elements.loaderModalIcon, '.dp-modal-loader-icon'),
                 playerModal: this.or(config.elements.playerModal, '.dp-modal-player'),
@@ -210,8 +211,7 @@ class DilationPlayer {
         await this.render();
 
         // Regist events
-        this.loader(false, true)
-            .control()
+        this.control()
             .playPause()
             .fullScreen()
             .progress()
@@ -240,7 +240,8 @@ class DilationPlayer {
         let player = this.config.get('elements.playerModal', true);
         let btn = this.config.get('elements.controlPlayPause', true);
         let icons = this.config.get('icons');
-        let playerIcon = this.config.get('elements.playerModalIcon', true);
+        let videoDom = video.get(0);
+        let instance = this;
 
         /**
          * Helper
@@ -251,10 +252,12 @@ class DilationPlayer {
              * Toggle play or pause
              */
             toggle: function () {
-                if (video.get(0).paused) {
-                    video.get(0).play();
-                } else {
-                    video.get(0).pause();
+                if (!isNaN(videoDom.duration)) {
+                    if (videoDom.paused) {
+                        videoDom.play();
+                    } else {
+                        videoDom.pause();
+                    }
                 }
             },
 
@@ -262,13 +265,13 @@ class DilationPlayer {
              * Make icon
              */
             makeIcon: function () {
-                if (video.get(0).paused) {
+                if (videoDom.paused) {
                     btn.html(icons.play);
-                    player.addClass('active');
                 } else {
                     btn.html(icons.pause);
-                    player.removeClass('active');
                 }
+
+                instance.modal();
             }
         };
 
@@ -298,7 +301,6 @@ class DilationPlayer {
 
         // Init display icon in button play/pause
         helper.makeIcon();
-        playerIcon.html(icons.playerModal);
 
         return this;
     }
@@ -383,6 +385,7 @@ class DilationPlayer {
     progress() {
         let instance = this;
         let video = this.config.get('elements.video', true);
+        let videoDom = video.get(0);
         let progressBar = this.config.get('elements.progress', true);
         let progress = progressBar.find('.playing');
         let timer = this.config.get('elements.controlTimer', true);
@@ -442,9 +445,9 @@ class DilationPlayer {
              * Display
              */
             display: function () {
-                if (!isNaN(video.get(0).duration)) {
-                    let current = video.get(0).currentTime;
-                    let duration = video.get(0).duration;
+                if (!isNaN(videoDom.duration)) {
+                    let current = videoDom.currentTime;
+                    let duration = videoDom.duration;
 
                     helper.setLoaded(current, duration);
                     helper.setTimer(current, duration);
@@ -455,53 +458,63 @@ class DilationPlayer {
         // Event when timeupdate
         video.on('timeupdate ', function (e) {
             helper.display();
-            instance.loader(false);
+            instance.modal({loader: false});
         });
 
         // Event when click on progress bar
         // Then get position of mouse and count the time go to
         progressBar.on("click", function (e) {
-            let offset = $(this).offset();
-            let left = (e.pageX - offset.left);
-            let totalWidth = progressBar.width();
-            let percentage = (left / totalWidth);
-            let vidTime = video.get(0).duration * percentage;
-            video.get(0).currentTime = vidTime;
-            helper.setLoaded(left, totalWidth);
-            instance.loader(true);
+            if (!isNaN(videoDom.duration)) {
+                let offset = $(this).offset();
+                let left = (e.pageX - offset.left);
+                let totalWidth = progressBar.width();
+                let percentage = (left / totalWidth);
+                let vidTime = videoDom.duration * percentage;
+                videoDom.currentTime = vidTime;
+                helper.setLoaded(left, totalWidth);
+                instance.modal({loader: true});
+            }
         });
 
         // Event when hover on progress
         // Then get position of mouse, count the time go to and get information
         progressBar.on("mousemove", function (e) {
-            let offset = $(this).offset();
-            let left = (e.pageX - offset.left);
-            let totalWidth = progressBar.width();
-            let percentage = (left / totalWidth);
-            let current = video.get(0).duration * percentage;
+            if (!isNaN(videoDom.duration)) {
+                progressTimerTooltipText.show();
+                progressTimerTooltipImage.show();
 
-            let hours = Math.floor(current / 3600);
-            let minutes = Math.floor((current - hours * 3600) / 60);
-            let seconds = Math.floor(current - (minutes * 60 + hours * 3600));
-            let currentTime = (hours > 0 ? (helper.pad(hours, 2) + ':') : '') + helper.pad(minutes, 2) + ':' + helper.pad(seconds, 2);
+                let offset = $(this).offset();
+                let left = (e.pageX - offset.left);
+                let totalWidth = progressBar.width();
+                let percentage = (left / totalWidth);
+                let current = videoDom.duration * percentage;
 
-            progressTimerTooltipText.css('left', left + 'px').text(currentTime);
-            progressTimerTooltipImage.css('left', left + 'px');
+                let hours = Math.floor(current / 3600);
+                let minutes = Math.floor((current - hours * 3600) / 60);
+                let seconds = Math.floor(current - (minutes * 60 + hours * 3600));
+                let currentTime = (hours > 0 ? (helper.pad(hours, 2) + ':') : '') + helper.pad(minutes, 2) + ':' + helper.pad(seconds, 2);
 
-            // Get picture
-            tooltipCanvas.getContext('2d').drawImage(video.get(0), 0, 0, tooltipCanvas.width, tooltipCanvas.height);
+                progressTimerTooltipText.css('left', left + 'px').text(currentTime);
+                progressTimerTooltipImage.css('left', left + 'px');
+
+                // Get picture
+                tooltipCanvas.getContext('2d').drawImage(videoDom, 0, 0, tooltipCanvas.width, tooltipCanvas.height);
+            } else {
+                progressTimerTooltipText.hide();
+                progressTimerTooltipImage.hide();
+            }
         });
 
         // Event when loaded data
         // Then call display information on screen
         video.on('loadeddata', function (e) {
             helper.display();
-            instance.loader(false);
+            instance.modal({loader: false});
         });
 
         // Event when start load data
         video.on('loadstart', function (e) {
-            instance.loader(true);
+            instance.modal({loader: true});
         });
 
         return this;
@@ -702,19 +715,41 @@ class DilationPlayer {
      * @param disabled
      * @return {DilationPlayer}
      */
-    loader(show, refresh) {
+    modal(config) {
         let loader = this.config.get('elements.loaderModal', true);
+        let loaderIcon = this.config.get('elements.loaderModalIcon', true);
+        let player = this.config.get('elements.playerModal', true);
+        let playerIcon = this.config.get('elements.playerModalIcon', true);
+        let modal = this.config.get('elements.modal', true);
+        let videoDom = this.config.get('elements.video', true).get(0);
 
-        if (refresh === true) {
-            let loaderIcon = this.config.get('elements.loaderModalIcon', true);
-            loaderIcon.html(this.config.get('icons.loaderModal'));
+        let icons = this.config.get('icons');
+
+        modal.removeClass('active');
+
+        if (config === undefined) {
+            if (!isNaN(videoDom.duration)) {
+                if (videoDom.paused) {
+                    player.addClass('active');
+                } else {
+                    player.removeClass('active');
+                }
+            } else {
+                loader.addClass('active');
+            }
+        } else {
+            if (config.loader !== undefined) {
+                loader.addClass('active');
+            }
+
+            if (config.player !== undefined) {
+                player.addClass('active');
+            }
         }
 
-        if (show === true) {
-            loader.addClass('active');
-        } else if (show === false) {
-            loader.removeClass('active');
-        }
+        // default
+        playerIcon.html(icons.playerModal);
+        loaderIcon.html(icons.loaderModal);
 
         return this;
     }
