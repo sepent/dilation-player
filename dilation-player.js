@@ -14,32 +14,34 @@ class DilationPlayerConfig {
         // Config for elements
         this.config = {
             elements: {
-                container: this.or(config.elements.container, '.dilation-player'),
-                video: this.or(config.elements.video, '.dilation-player-video'),
-                logo: this.or(config.elements.logo, '.dilation-player-logo'),
-                progress: this.or(config.elements.progress, '.dilation-player-progress'),
-                progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dilation-player-progress-tooltip-text'),
-                progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dilation-player-progress-tooltip-image'),
-                control: this.or(config.elements.control, '.dilation-player-control'),
-                button: this.or(config.elements.button, '.dilation-player-button'),
-                controlPlayPause: this.or(config.elements.controlPlayPause, '.dilation-player-btn-play'),
-                controlFullscreen: this.or(config.elements.controlFullscreen, '.dilation-player-btn-fullscreen'),
-                controlVolume: this.or(config.elements.controlVolume, '.dilation-player-btn-volume'),
-                controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dilation-player-volume-tooltip'),
-                controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dilation-player-volume-range'),
-                controlTimer: this.or(config.elements.controlTimer, '.dilation-player-timer'),
-                loader: this.or(config.elements.loader, '.dilation-player-loader'),
-                loaderIcon: this.or(config.elements.loaderIcon, '.dilation-player-loader-icon')
+                container: this.or(config.elements.container, '.dp'),
+                video: this.or(config.elements.video, '.dp-video'),
+                logo: this.or(config.elements.logo, '.dp-logo'),
+                progress: this.or(config.elements.progress, '.dp-progress'),
+                progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
+                progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
+                control: this.or(config.elements.control, '.dp-control'),
+                button: this.or(config.elements.button, '.dp-button'),
+                controlPlayPause: this.or(config.elements.controlPlayPause, '.dp-btn-play'),
+                controlFullscreen: this.or(config.elements.controlFullscreen, '.dp-btn-fullscreen'),
+                controlVolume: this.or(config.elements.controlVolume, '.dp-btn-volume'),
+                controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dp-volume-tooltip'),
+                controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dp-volume-range'),
+                controlTimer: this.or(config.elements.controlTimer, '.dp-timer'),
+                loaderModal: this.or(config.elements.loaderModal, '.dp-modal-loader'),
+                loaderModalIcon: this.or(config.elements.loaderModalIcon, '.dp-modal-loader-icon'),
+                playerModal: this.or(config.elements.playerModal, '.dp-modal-player'),
+                playerModalIcon: this.or(config.elements.playerModalIcon, '.dp-modal-player-icon'),
             },
 
             // Config for icon
             icons: {
-                loader: this.or(config.icons.loader, '<i class="fa fa-spin fa-spinner"></i>'),
-                fullscreen: this.or(config.icons.fullscreen, '<i class="icons icon-size-fullscreen"></i>'),
-                actualscreen: this.or(config.icons.actual, '<i class="icons icon-size-actual"></i>'),
+                loaderModal: this.or(config.icons.loaderModal, '<i class="fa fa-spin fa-spinner"></i>'),
+                fullScreen: this.or(config.icons.fullScreen, '<i class="icons icon-size-fullscreen"></i>'),
+                actualScreen: this.or(config.icons.actualScreen, '<i class="icons icon-size-actual"></i>'),
                 pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
                 play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
-                volumeMute: this.or(config.icons.mute, '<i class="icons icon-volume-off"></i>'),
+                volumeMute: this.or(config.icons.volumeMute, '<i class="icons icon-volume-off"></i>'),
                 volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
                 volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
                 volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>')
@@ -210,7 +212,7 @@ class DilationPlayer {
         this.loader(false, true)
             .control()
             .playPause()
-            .fullscreen()
+            .fullScreen()
             .progress()
             .sound()
             .logo();
@@ -295,7 +297,7 @@ class DilationPlayer {
      * Toggle full screen event
      * @return {DilationPlayer}
      */
-    fullscreen() {
+    fullScreen() {
         // Defined elements
         let element = this.config.get('elements.container', true).get(0);
         let btn = this.config.get('elements.controlFullscreen', true);
@@ -312,9 +314,9 @@ class DilationPlayer {
              */
             makeIcon: function (isFull) {
                 if (isFull) {
-                    btn.html(icons.actualscreen);
+                    btn.html(icons.actualScreen);
                 } else {
-                    btn.html(icons.fullscreen);
+                    btn.html(icons.fullScreen);
                 }
             },
 
@@ -638,9 +640,10 @@ class DilationPlayer {
                 window.clearTimeout(controlTime);
                 control.addClass('active');
                 container.removeClass('hidden-cursor');
+                let inst = this;
 
                 controlTime = window.setTimeout(function () {
-                    hidden();
+                    inst.hidden();
                 }, 2000);
             }
         };
@@ -690,11 +693,11 @@ class DilationPlayer {
      * @return {DilationPlayer}
      */
     loader(show, refresh) {
-        let loader = this.config.get('elements.loader', true);
+        let loader = this.config.get('elements.loaderModal', true);
 
         if (refresh === true) {
-            let loaderIcon = this.config.get('elements.loaderIcon', true);
-            loaderIcon.html(this.config.get('icons.loader'));
+            let loaderIcon = this.config.get('elements.loaderModalIcon', true);
+            loaderIcon.html(this.config.get('icons.loaderModal'));
         }
 
         if (show === true) {
