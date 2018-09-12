@@ -282,18 +282,22 @@ class DilationPlayer {
 		let icons = this.config.get('icons');
 		
 		// Default
-		btn.html(icons.fullscreen);
+		function makeIcon(isFull) {
+            if (isFull) {
+                btn.html(icons.actualscreen);
+            } else {
+                btn.html(icons.fullscreen);
+            }
+        }
 
         // Method handle fullscreen
         function request() {
             element.requestFullScreen();
-            btn.html(icons.actualscreen);
         }
 
         // Method handle turn off fullscreen
         function cancel() {
             document.cancelFullScreen();
-            btn.html(icons.fullscreen);
         }
 
         // Event when click on button fullscreen
@@ -316,6 +320,18 @@ class DilationPlayer {
 
             isFullscreen ? cancel() : request();
         });
+
+		// Event when change screen
+        // Then get status and change icon
+        $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function(){
+            var fullscreenElement = document.fullscreenElement
+                || document.mozFullScreenElement
+                || document.webkitFullscreenElement;
+
+            makeIcon(fullscreenElement ? true : false);
+        });
+
+        makeIcon(false);
 
         return this;
     }
