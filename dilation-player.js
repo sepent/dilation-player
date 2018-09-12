@@ -445,9 +445,13 @@ class DilationPlayer {
         function makeIcon(){
             if (videoDom.muted == true || videoDom.volume == 0) {
                 volume.html(icons.volumeMute);
-            } else {
+            } else if (videoDom.volume <= 0.33){
                 volume.html(icons.volume1);
-            }
+            } else if (videoDom.volume <= 0.66)
+				volume.html(icons.volume2);
+			} else {
+				volume.html(icons.volume3);
+			}
         }
 		
 		// Set volume for video
