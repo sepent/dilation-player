@@ -471,12 +471,10 @@ class DilationPlayer {
 		// Set volume for video
 		function setVolume(number) {
 			videoDom.volume = number/100;
-			
+
 			if (videoDom.volume > 0) {
                 videoDom.muted = false;
             }
-
-			makeIcon();
 		}
 
         // Event click on button
@@ -486,8 +484,6 @@ class DilationPlayer {
             } else if(videoDom.volume > 0) {
                 videoDom.muted = true;
             }
-
-            makeIcon();
         });
 		
 		// Event when hover on button volume
@@ -508,6 +504,11 @@ class DilationPlayer {
 			let range = $(this).val();
 			setVolume(range);
 		});
+
+		// Event when volume change
+        video.on('volumechange', function(){
+            makeIcon();
+        });
 		
 		// Set volume default
 		setVolume(range);
