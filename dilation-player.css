@@ -215,20 +215,32 @@ html, body {
 }
 
 .dilation-player .dilation-player-control .dilation-player-button .dilation-player-volume-tooltip{
-    display: none;
     background-color: #ffffff;
-	position: absolute;
-	width: 100px;
-	top: 35%;
-	-webkit-transform: translateY(-30%);
-	-ms-transform: translateY(-30%);
-	transform: translateY(-30%);
-	border-radius: 6px;
 	background-color: #000;
+	transition: all 0.2s linear;
+	opacity: 0;
+	width: 0;
+	display: inline-block;
+	padding-right: 5px;
+	border-right: 1px solid #eee;
+	height: 100%;
+	position: absolute;
+	overflow: hidden
 }
 
 .dilation-player .dilation-player-control .dilation-player-button .dilation-player-group:hover .dilation-player-volume-tooltip{
-    display: inline-block;
+    width: 100px;
+	opacity: 1;
+	box-sizing: border-box;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button .dilation-player-group .dilation-player-volume-range{
+    width: 95px;
+	top: 35%;
+	position: absolute;
+	-webkit-transform: translateY(-30%);
+	-ms-transform: translateY(-30%);
+	transform: translateY(-30%);
 }
 
 /* CSS for loader */

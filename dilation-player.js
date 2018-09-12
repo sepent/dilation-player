@@ -443,7 +443,7 @@ class DilationPlayer {
 
 		// Make icon for video
         function makeIcon(){
-            if (videoDom.muted == true) {
+            if (videoDom.muted == true || videoDom.volume == 0) {
                 volume.html(icons.volumeMute);
             } else {
                 volume.html(icons.volume1);
@@ -452,7 +452,7 @@ class DilationPlayer {
 		
 		// Set volume for video
 		function setVolume(number) {
-			video.get(0).volume = number/100;
+			videoDom.volume = number/100;
 			makeIcon();
 		}
 
@@ -460,7 +460,7 @@ class DilationPlayer {
         volume.on('click', function(){
             if (videoDom.muted == true) {
                 videoDom.muted = false;
-            } else {
+            } else if(videoDom.volume > 0) {
                 videoDom.muted = true;
             }
 
