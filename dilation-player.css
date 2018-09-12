@@ -234,13 +234,41 @@ html, body {
 	box-sizing: border-box;
 }
 
+/* Custom range */
 .dilation-player .dilation-player-control .dilation-player-button .dilation-player-group .dilation-player-volume-range{
     width: 95px;
-	top: 35%;
+	top: 40%;
 	position: absolute;
 	-webkit-transform: translateY(-30%);
 	-ms-transform: translateY(-30%);
 	transform: translateY(-30%);
+	opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+	height: 7%;
+	background: #fff;
+    outline: none;
+	-webkit-appearance: none;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button .dilation-player-group .dilation-player-volume-range:hover {
+    opacity: 1;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button .dilation-player-group .dilation-player-volume-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 7px;
+    height: 7px;
+    background: #46d2e0;
+    cursor: pointer;
+}
+
+.dilation-player .dilation-player-control .dilation-player-button .dilation-player-group .dilation-player-volume-range::-moz-range-thumb {
+    width: 7px;
+    height: 7%;
+    background: #46d2e0;
+    cursor: pointer;
 }
 
 /* CSS for loader */
