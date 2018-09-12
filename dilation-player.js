@@ -447,7 +447,7 @@ class DilationPlayer {
                 volume.html(icons.volumeMute);
             } else if (videoDom.volume <= 0.33){
                 volume.html(icons.volume1);
-            } else if (videoDom.volume <= 0.66)
+            } else if (videoDom.volume <= 0.66){
 				volume.html(icons.volume2);
 			} else {
 				volume.html(icons.volume3);
