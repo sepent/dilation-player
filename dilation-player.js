@@ -471,6 +471,11 @@ class DilationPlayer {
 		// Set volume for video
 		function setVolume(number) {
 			videoDom.volume = number/100;
+			
+			if (videoDom.volume > 0) {
+                videoDom.muted = false;
+            }
+
 			makeIcon();
 		}
 
