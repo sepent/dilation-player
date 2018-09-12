@@ -226,7 +226,15 @@ class DilationPlayer {
     async render() {
         let rendered = await this.view.render();
         this.rendered = true;
-
+		
+		let icons = this.config.get('icons');
+        let loaderIcon = this.config.get('elements.loaderModalIcon', true);
+		let playerIcon = this.config.get('elements.playerModalIcon', true);
+		
+		// default
+        playerIcon.html(icons.playerModal);
+        loaderIcon.html(icons.loaderModal);
+		
         return rendered;
     }
 
@@ -717,14 +725,9 @@ class DilationPlayer {
      */
     modal(config) {
         let loader = this.config.get('elements.loaderModal', true);
-        let loaderIcon = this.config.get('elements.loaderModalIcon', true);
         let player = this.config.get('elements.playerModal', true);
-        let playerIcon = this.config.get('elements.playerModalIcon', true);
         let modal = this.config.get('elements.modal', true);
         let videoDom = this.config.get('elements.video', true).get(0);
-
-        let icons = this.config.get('icons');
-
         modal.removeClass('active');
 
         if (config === undefined) {
@@ -738,18 +741,12 @@ class DilationPlayer {
                 loader.addClass('active');
             }
         } else {
-            if (config.loader !== undefined) {
+            if (config.loader === true) {
                 loader.addClass('active');
-            }
-
-            if (config.player !== undefined) {
+            } else if (config.player === true || videoDom.paused) {
                 player.addClass('active');
             }
         }
-
-        // default
-        playerIcon.html(icons.playerModal);
-        loaderIcon.html(icons.loaderModal);
 
         return this;
     }
