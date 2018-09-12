@@ -562,6 +562,19 @@ class DilationPlayer {
         video.on('pause ended', function () {
             control.addClass('active');
         });
+		
+		// Default
+		video.get(0).controls = false;
+		
+		// Event when right click or open menu
+		container.mousedown(function(event) {
+			if(event.which === 3) {
+				container.bind('contextmenu',function () { return false; });
+			}
+			else {
+				container.unbind('contextmenu');
+			}
+		});
 
         return this;
     }
