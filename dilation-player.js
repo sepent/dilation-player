@@ -37,6 +37,7 @@ class DilationPlayerConfig {
             // Config for icon
             icons: {
                 loaderModal: this.or(config.icons.loaderModal, '<i class="fa fa-spin fa-spinner"></i>'),
+                playerModal: this.or(config.icons.loaderModal, '<i class="icons icon-control-play"></i>'),
                 fullScreen: this.or(config.icons.fullScreen, '<i class="icons icon-size-fullscreen"></i>'),
                 actualScreen: this.or(config.icons.actualScreen, '<i class="icons icon-size-actual"></i>'),
                 pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
@@ -236,8 +237,10 @@ class DilationPlayer {
     playPause() {
         // Defined elements
         let video = this.config.get('elements.video', true);
+        let player = this.config.get('elements.playerModal', true);
         let btn = this.config.get('elements.controlPlayPause', true);
         let icons = this.config.get('icons');
+        let playerIcon = this.config.get('elements.playerModalIcon', true);
 
         /**
          * Helper
@@ -261,14 +264,20 @@ class DilationPlayer {
             makeIcon: function () {
                 if (video.get(0).paused) {
                     btn.html(icons.play);
+                    player.addClass('active');
                 } else {
                     btn.html(icons.pause);
+                    player.removeClass('active');
                 }
             }
         };
 
         // Event when click on button play/pause
         btn.click(function () {
+            helper.toggle();
+        });
+
+        player.click(function () {
             helper.toggle();
         });
 
@@ -289,6 +298,7 @@ class DilationPlayer {
 
         // Init display icon in button play/pause
         helper.makeIcon();
+        playerIcon.html(icons.playerModal);
 
         return this;
     }

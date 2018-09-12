@@ -292,7 +292,7 @@ html, body {
 .dp .dp-modal .dp-modal-icon {
 	text-align: center;
 	position: relative;
-	top: 40%;
+	top: 45%;
 	-webkit-transform: translateY(-50%);
 	-ms-transform: translateY(-50%);
 	transform: translateY(-50%);
