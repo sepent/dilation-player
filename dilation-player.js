@@ -46,7 +46,7 @@ class DilationPlayerConfig {
 			},
 			
 			// Config default
-			volume: this.or(config.volume, true),
+			volume: this.or(config.volume, 5),
             object: this.or(config.object, null),
             view: this.or(config.view, false),
             resources: this.or(config.resources, {})
