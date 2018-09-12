@@ -258,16 +258,16 @@ html, body {
 .dilation-player .dilation-player-control .dilation-player-button .dilation-player-group .dilation-player-volume-range::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 7px;
-    height: 7px;
+    width: 10px;
+    height: 10px;
     background: #46d2e0;
     cursor: pointer;
 	border-radius: 50%;
 }
 
 .dilation-player .dilation-player-control .dilation-player-button .dilation-player-group .dilation-player-volume-range::-moz-range-thumb {
-    width: 7px;
-    height: 7%;
+    width: 10px;
+    height: 10px;
     background: #46d2e0;
     cursor: pointer;
 	border-radius: 50%;
