@@ -236,7 +236,7 @@ html, body {
 
 /* Custom range */
 .dilation-player .dilation-player-control .dilation-player-button .dilation-player-group .dilation-player-volume-range{
-    width: 95px;
+    width: 90px;
 	top: 40%;
 	position: absolute;
 	-webkit-transform: translateY(-30%);
