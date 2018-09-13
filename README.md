@@ -16,32 +16,38 @@ var player = new DilationPlayer('#your_container_id', config);
 Then it auto apply to your elements. If you want to custom, then change **config** value bellow.
 
 ```
-{
-	// Config elements
+this.config = {
 	elements: {
-		container: '.dilation-player',
-		video: '.dilation-player-video',
-		logo: '.dilation-player-logo',
-		progress: '.dilation-player-progress',
-		progressHoverTooltipText: '.dilation-player-progress-tooltip-text',
-		progressToverTooltipImage: '.dilation-player-progress-tooltip-image',
-		control: '.dilation-player-control',
-		button: '.dilation-player-button',
-		controlPlayPause: '.dilation-player-btn-play',
-		controlFullscreen: '.dilation-player-btn-fullscreen',
-		controlVolume: '.dilation-player-btn-volume',
-		controlVolumeTooltip: '.dilation-player-volume-tooltip',
-		controlVolumeRange: '.dilation-player-volume-range',
-		controlTimer: '.dilation-player-timer',
-		loader: '.dilation-player-loader',
-		loaderIcon: '.dilation-player-loader-icon'
+		container: '.dp',
+		video: '.dp-video',
+		logo: '.dp-logo',
+		progress: '.dp-progress',
+		progressHoverTooltipText: '.dp-progress-tooltip-text',
+		progressToverTooltipImage: '.dp-progress-tooltip-image',
+		control: '.dp-control',
+		button: '.dp-button',
+		controlPlayPause: '.dp-btn-play',
+		controlFullScreen: '.dp-btn-fullscreen',
+		controlLargeScreen: '.dp-btn-largescreen',
+		controlVolume: '.dp-btn-volume',
+		controlVolumeTooltip: '.dp-volume-tooltip',
+		controlVolumeRange: '.dp-volume-range',
+		controlTimer: '.dp-timer',
+		modal: '.dp-modal',
+		loaderModal: '.dp-modal-loader',
+		loaderModalIcon: '.dp-modal-loader-icon',
+		playerModal: '.dp-modal-player',
+		playerModalIcon: '.dp-modal-player-icon',
 	},
 
 	// Config for icon
 	icons: {
-		loader: '<i class="fa fa-spin fa-spinner"></i>',
-		fullscreen: '<i class="icons icon-size-fullscreen"></i>',
-		actualscreen: '<i class="icons icon-size-actual"></i>',
+		loaderModal: '<i class="fa fa-spin fa-spinner"></i>',
+		playerModal: '<i class="icons icon-control-play"></i>',
+		fullScreen: '<i class="icons icon-size-fullscreen"></i>',
+		actualScreen: '<i class="icons icon-size-actual"></i>',
+		largeScreen: '<i class="icons icon-frame"></i>',
+		smallScreen: '<i class="icons icon-frame"></i>',
 		pause: '<i class="icons icon-control-pause"></i>',
 		play: '<i class="icons icon-control-play"></i>',
 		volumeMute: '<i class="icons icon-volume-off"></i>',
@@ -49,11 +55,17 @@ Then it auto apply to your elements. If you want to custom, then change **config
 		volume2: '<i class="icons icon-volume-2"></i>',
 		volume3: '<i class="icons icon-volume-3"></i>'
 	},
-	
+
 	// Config default
-	volume: 5,
+	volume: 100,
 	view: false,
-	resources: {}
+	resources: {},
+	logo: {},
+	size: {
+	   width: '900px',
+	   height: '507px'
+	},
+	largeScreen: false
 }
 ```
 
