@@ -63,7 +63,8 @@ class DilationPlayerConfig {
 			size: {
 				width: this.or(config.size.width, '900px'),
 				height: this.or(config.size.height, '507px')
-			}
+			},
+			largeScreen: this.or(config.largeScreen, false)
         }
 
         // Init cache
@@ -336,13 +337,15 @@ class DilationPlayer {
 		let object = this.config.get('object', true);
 		let configSize = this.config.get('size');
 		let defaultSize = null;
-		let isLarge = false;
+		let largeScreen = this.config.get('largeScreen');
 		
         /**
          * Helper
          * @type {{makeIcon: makeIcon, request: request, cancel: cancel}}
          */
         let helper = {
+			isLarge: false,
+			
 			/**
              * Default screen
              */
@@ -365,7 +368,7 @@ class DilationPlayer {
 			rateScreenSize: function(){
 				let videoSize = 0;
 				
-				if (isLarge) {
+				if (this.isLarge) {
 					videoSize = $(window).width();
 					object.width(videoSize);
 				} else {
@@ -422,15 +425,7 @@ class DilationPlayer {
              */
 			makeIconForLargeScreen: function(isLg){
 				if (isLg === undefined) {
-					let videoSize = object.width();
-					let parentSize = $(window).width();
-					
-					// Check if is fulling
-					if (videoSize === parentSize) {
-						isLg = true;
-					} else {
-						isLg = false;
-					}
+					isLg = this.isLarge;
 				}
 				
 				if (isLg) {
@@ -445,15 +440,13 @@ class DilationPlayer {
              * @param event
              */
 			toggleLargeScreen: function(){
-				if (isLarge) {
+				if (this.isLarge) {
+					this.isLarge = false;
 					this.defaultScreen();
-					isLarge = false;
 				} else {
+					this.isLarge = true;
 					this.rateScreenSize();
-					isLarge = true;
 				}
-				
-				return isLarge;
 			}
         };
 
@@ -467,8 +460,8 @@ class DilationPlayer {
 		// Event when click on button large
         // Then call to check large or cancel
         btnLarge.on('click', function (event) {
-            let isLarge = helper.toggleLargeScreen();
-			helper.makeIconForLargeScreen(isLarge);
+            helper.toggleLargeScreen();
+			helper.makeIconForLargeScreen();
         });
 
         // Event when change screen
@@ -484,7 +477,12 @@ class DilationPlayer {
 
 		helper.defaultScreen();
         helper.makeIconForFullScreen(false);
-		helper.makeIconForLargeScreen(isLarge);
+		
+		if (largeScreen) {
+			helper.toggleLargeScreen();
+		}
+		
+		helper.makeIconForLargeScreen();
 		
         return this;
     }
