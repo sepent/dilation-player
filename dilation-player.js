@@ -367,15 +367,24 @@ class DilationPlayer {
              */
 			rateScreenSize: function(){
 				let videoSize = 0;
+				let h = 0;
 				
 				if (this.isLarge) {
 					videoSize = $(window).width();
+					
 					object.width(videoSize);
+					h = (videoSize*defaultSize.height/defaultSize.width);
+					let windowH = $(window).height()*85/100;
+					
+					if (h > windowH) {
+						h = windowH;
+					}
 				} else {
 					videoSize = object.width();
+					h = (videoSize*defaultSize.height/defaultSize.width);
 				}
 				
-				object.css({height: (videoSize*defaultSize.height/defaultSize.width)+'px'});
+				object.css({height: h+'px'});
 			},
 			
             /**
