@@ -66,7 +66,8 @@ class DilationPlayerConfig {
 				width: this.or(config.size.width, '900px'),
 				height: this.or(config.size.height, '507px')
 			},
-			largeScreen: this.or(config.largeScreen, false)
+			largeScreen: this.or(config.largeScreen, false),
+			language: this.or(config.language, 'en'),
         }
 
         // Init cache
@@ -186,6 +187,76 @@ class DilationPlayerView {
 }
 
 // ====================================================
+// Class {DilationPlayerTranslate}
+// ====================================================
+class DilationPlayerTranslate {
+	/**
+     * Constructor
+     * @param config
+     */
+    constructor(config) {
+		this.config = config;
+		
+		if (typeof DilationPlayerTranslateData !== 'undefined') {
+			this.languages = DilationPlayerTranslateData;
+		}
+    }
+	
+	/**
+     * Get translate
+     * @param key
+     * @param attributes
+     * @return mixed
+     */
+	get(key, attributes){
+        if (attributes == undefined) {
+            attributes = {};
+        }
+
+        var keys = key.split('.');
+        var messages = this.or(this.languages[this.config.get('language')], {});
+		let message = messages;
+		
+        // Get message format
+        for (var i in keys) {
+            if (message[keys[i]] == undefined) {
+                return key;
+            }
+
+            message = message[keys[i]];
+        }
+
+        // Get attribute in message format
+        for (var attrKey in attributes) {
+            if (messages[keys[0]].attributes == undefined) {
+                return message;
+            }
+
+            if (messages[keys[0]].attributes[attrKey] == undefined) {
+                return message;
+            }
+
+            var fields = messages[keys[0]].attributes[attrKey];
+            var attr = (fields[attributes[attrKey]] != undefined ? fields[attributes[attrKey]] : attributes[attrKey]);
+            var regex = new RegExp(':'+attrKey, 'g');
+            message = message.replace(regex, attr);
+        }
+
+        return message;
+    }
+	
+	/**
+     * Check if value is undefined then return or
+     * @param value
+     * @param or
+     * @return mixed
+     */
+    or(value, or) {
+        return value === undefined ? or : value;
+    }
+}
+
+// ====================================================
 // Class {DilationPlayer}
 // ====================================================
 class DilationPlayer {
@@ -201,6 +272,7 @@ class DilationPlayer {
         config.object = object;
         this.config = new DilationPlayerConfig(config);
         this.view = new DilationPlayerView(this.config);
+		this.translate = new DilationPlayerTranslate(this.config);
         this.rendered = false;
         this.apply();
     }
@@ -816,6 +888,10 @@ class DilationPlayer {
             helper.open();
             isMouseIn = true;
         });
+		
+		$(window).scroll(function(){
+			helper.open();
+		});
 
         // Event when out on video/container/control
         $(this.config.get('elements.container')
@@ -904,6 +980,10 @@ class DilationPlayer {
 			
 			closeMenu: function(){
 				menu.removeClass('active');
+			},
+			
+			generateMenu: function(){
+				
 			}
 		};
 		
@@ -941,6 +1021,8 @@ class DilationPlayer {
 				helper.closeMenu();
 			}
 		});
+		
+		helper.generateMenu();
 		
 		return this;
 	}

@@ -75,6 +75,9 @@ html, body {
 	height: 100px;
 	width: 100px;
 	position: absolute;
+}
+
+.dp-menu-list > div{
 	padding: 10px;
 }
 
@@ -148,7 +151,7 @@ html, body {
 
 .dp .dp-control .dp-progress .dp-progress-tooltip-image {
     display: none;
-    background-color: red;
+    background-color: rgba(0,0,0,0.6);
     color: #fff;
     text-align: center;
     border: 1px solid #ddd;
