@@ -11,7 +11,7 @@ class DilationPlayerConfig {
         config.elements = this.or(config.elements, {});
         config.icons = this.or(config.icons, {});
 		config.logo = this.or(config.logo, {});
-		config.size = this.or(config.logo, {});
+		config.size = this.or(config.size, {});
 
         // Config for elements
         this.config = {
