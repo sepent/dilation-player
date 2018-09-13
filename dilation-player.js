@@ -8,54 +8,14 @@ class DilationPlayerConfig {
      */
     constructor(config) {
         // Set default
-        config.elements = this.or(config.elements, {});
-        config.icons = this.or(config.icons, {});
 		config.logo = this.or(config.logo, {});
 		config.size = this.or(config.size, {});
 
         // Config for elements
         this.config = {
-            elements: {
-                container: this.or(config.elements.container, '.dp'),
-                video: this.or(config.elements.video, '.dp-video'),
-                logo: this.or(config.elements.logo, '.dp-logo'),
-                progress: this.or(config.elements.progress, '.dp-progress'),
-                progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
-                progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
-                control: this.or(config.elements.control, '.dp-control'),
-                button: this.or(config.elements.button, '.dp-button'),
-                controlPlayPause: this.or(config.elements.controlPlayPause, '.dp-btn-play'),
-                controlFullScreen: this.or(config.elements.controlFullScreen, '.dp-btn-fullscreen'),
-				controlLargeScreen: this.or(config.elements.controlLargeScreen, '.dp-btn-largescreen'),
-                controlVolume: this.or(config.elements.controlVolume, '.dp-btn-volume'),
-                controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dp-volume-tooltip'),
-                controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dp-volume-range'),
-                controlTimer: this.or(config.elements.controlTimer, '.dp-timer'),
-                modal: this.or(config.elements.modal, '.dp-modal'),
-                loaderModal: this.or(config.elements.loaderModal, '.dp-modal-loader'),
-                loaderModalIcon: this.or(config.elements.loaderModalIcon, '.dp-modal-loader-icon'),
-                playerModal: this.or(config.elements.playerModal, '.dp-modal-player'),
-                playerModalIcon: this.or(config.elements.playerModalIcon, '.dp-modal-player-icon'),
-				menu: this.or(config.elements.menu, '.dp-menu'),
-				menuList: this.or(config.elements.menuList, '.dp-menu-list'),
-            },
-
+            elements: this.convertElements(config),
             // Config for icon
-            icons: {
-                loaderModal: this.or(config.icons.loaderModal, '<i class="fa fa-spin fa-spinner"></i>'),
-                playerModal: this.or(config.icons.loaderModal, '<i class="icons icon-control-play"></i>'),
-                fullScreen: this.or(config.icons.fullScreen, '<i class="icons icon-size-fullscreen"></i>'),
-                actualScreen: this.or(config.icons.actualScreen, '<i class="icons icon-size-actual"></i>'),
-				largeScreen: this.or(config.icons.largeScreen, '<i class="icons icon-frame"></i>'),
-				smallScreen: this.or(config.icons.smallScreen, '<i class="icons icon-frame"></i>'),
-                pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
-                play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
-                volumeMute: this.or(config.icons.volumeMute, '<i class="icons icon-volume-off"></i>'),
-                volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
-                volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
-                volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>')
-            },
-
+            icons: this.convertIcons(config),
             // Config default
             volume: this.or(config.volume, 100),
             object: this.or(config.object, null),
@@ -68,7 +28,10 @@ class DilationPlayerConfig {
 			},
 			largeScreen: this.or(config.largeScreen, false),
 			language: this.or(config.language, 'en'),
+			menu: this.convertMenu(config)
         }
+		
+		// Function
 
         // Init cache
         this.cache = {
@@ -78,8 +41,77 @@ class DilationPlayerConfig {
             config: {}
         };
     }
+	
+	/**
+	 * convertMenu
+	 */
+	convertMenu(config){
+		let rs = this.or(config.menu, {});
+		
+		rs.loop = this.or(rs.loop, {
+			text: 'menu.loop',
+			element: 'menuLoop'
+		});
+		
+		return rs;
+	}
 
-    /**
+	/**
+	 * convertElements
+	 */
+	convertElements(config){
+		config.elements = this.or(config.elements, {});
+		
+		return {
+			container: this.or(config.elements.container, '.dp'),
+			video: this.or(config.elements.video, '.dp-video'),
+			logo: this.or(config.elements.logo, '.dp-logo'),
+			progress: this.or(config.elements.progress, '.dp-progress'),
+			progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
+			progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
+			control: this.or(config.elements.control, '.dp-control'),
+			button: this.or(config.elements.button, '.dp-button'),
+			controlPlayPause: this.or(config.elements.controlPlayPause, '.dp-btn-play'),
+			controlFullScreen: this.or(config.elements.controlFullScreen, '.dp-btn-fullscreen'),
+			controlLargeScreen: this.or(config.elements.controlLargeScreen, '.dp-btn-largescreen'),
+			controlVolume: this.or(config.elements.controlVolume, '.dp-btn-volume'),
+			controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dp-volume-tooltip'),
+			controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dp-volume-range'),
+			controlTimer: this.or(config.elements.controlTimer, '.dp-timer'),
+			modal: this.or(config.elements.modal, '.dp-modal'),
+			loaderModal: this.or(config.elements.loaderModal, '.dp-modal-loader'),
+			loaderModalIcon: this.or(config.elements.loaderModalIcon, '.dp-modal-loader-icon'),
+			playerModal: this.or(config.elements.playerModal, '.dp-modal-player'),
+			playerModalIcon: this.or(config.elements.playerModalIcon, '.dp-modal-player-icon'),
+			menu: this.or(config.elements.menu, '.dp-menu'),
+			menuList: this.or(config.elements.menuList, '.dp-menu-list'),
+			menuLoop: this.or(config.elements.menuLoop, '.dp-menu-loop'),
+		};
+	}
+	
+	/**
+	 * convertIcons
+	 */
+	convertIcons(config){
+		config.icons = this.or(config.icons, {});
+		
+		return {
+			loaderModal: this.or(config.icons.loaderModal, '<i class="fa fa-spin fa-spinner"></i>'),
+			playerModal: this.or(config.icons.loaderModal, '<i class="icons icon-control-play"></i>'),
+			fullScreen: this.or(config.icons.fullScreen, '<i class="icons icon-size-fullscreen"></i>'),
+			actualScreen: this.or(config.icons.actualScreen, '<i class="icons icon-size-actual"></i>'),
+			largeScreen: this.or(config.icons.largeScreen, '<i class="icons icon-frame"></i>'),
+			smallScreen: this.or(config.icons.smallScreen, '<i class="icons icon-frame"></i>'),
+			pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
+			play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
+			volumeMute: this.or(config.icons.volumeMute, '<i class="icons icon-volume-off"></i>'),
+			volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
+			volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
+			volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>')
+		};
+	}
+    
+	/**
      * Check if value is undefined then return or
      * @param value
      * @param or
@@ -141,8 +173,8 @@ class DilationPlayerView {
      * Constructor
      * @param config
      */
-    constructor(config) {
-        this.config = config;
+    constructor(app) {
+        this.config = app.config;
     }
 
     async render() {
@@ -194,11 +226,13 @@ class DilationPlayerTranslate {
      * Constructor
      * @param config
      */
-    constructor(config) {
-		this.config = config;
+    constructor(app) {
+		this.config = app.config;
 		
 		if (typeof DilationPlayerTranslateData !== 'undefined') {
 			this.languages = DilationPlayerTranslateData;
+		} else {
+			this.languages = {};
 		}
     }
 	
@@ -257,6 +291,137 @@ class DilationPlayerTranslate {
 }
 
 // ====================================================
+// Class {DilationPlayerMenu}
+// ====================================================
+class DilationPlayerMenu {
+	/**
+     * Constructor
+     * @param config
+     */
+    constructor(app) {
+        this.config = app.config;
+		this.translate = app.translate;
+    }
+	
+	/**
+     * Render menu
+     * @param config
+	 * @return {DilationPlayerMenu}
+     */
+	render(){
+		let container = this.config.get('elements.container', true);
+		let menu = this.config.get('elements.menu', true);
+		let menuList = this.config.get('elements.menuList', true);
+		let enableMenuList = this.config.get('menu');
+
+		for (var name in enableMenuList) {
+			let div = document.createElement('div');
+			$(div).attr('dp-bind', name)
+				.html(this.translate.get(enableMenuList[name].text));
+				
+			menuList.append(div);
+		}
+		
+		return this;
+	}
+	
+	/**
+     * Open menu
+     * @param config
+	 * @return {DilationPlayerMenu}
+     */
+	openMenu(event){
+		let container = this.config.get('elements.container', true);
+		let menu = this.config.get('elements.menu', true);
+		let menuList = this.config.get('elements.menuList', true);
+		
+		menu.addClass('active');
+		
+		let height = menuList.height();
+		let width = menuList.width();
+		
+		let cheight = container.height();
+		let cwidth = container.width();
+		
+		let offset = container.offset();
+		let left = (event.pageX - offset.left);
+		let top = (event.pageY - offset.top);
+		
+		if ((cheight - top) < height) {
+			top = cheight - height;
+		}
+
+		if ((cwidth - left) < width) {
+			left = cwidth - width;
+		}
+		
+		menuList.css({left: left + 'px', top: top + 'px'});
+		
+		return this;
+	}
+	
+	/**
+     * Close menu
+     * @param config
+	 * @return {DilationPlayerMenu}
+     */
+	closeMenu(){
+		let menu = this.config.get('elements.menu', true);
+		menu.removeClass('active');
+		
+		return this;
+	}
+	
+	/**
+     * Event menu
+     * @param config
+	 * @return {DilationPlayerMenu}
+     */
+	events(){
+		let instance = this;
+		let container = this.config.get('elements.container', true);
+		let menuList = this.config.get('elements.menuList', true);
+		
+		// Event when right click or open menu
+        container.mousedown(function (event) {
+			var isRightMB;
+			event = event || window.event;
+		
+            if (event.which === 3) {
+                container.bind('contextmenu', function () {
+                    return false;
+                });
+            }
+            else {
+                container.unbind('contextmenu');
+            }
+			
+			// Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+			if ("which" in event)  
+				isRightMB = event.which == 3; 
+			// IE, Opera 
+			else if ("button" in event)
+				isRightMB = event.button == 2; 
+			
+			// Open menu
+			if (isRightMB) {
+				instance.openMenu(event);
+			}
+        });
+		
+		// Event when click out menu
+		$(window).click(function(event){
+			if (menuList.has(event.target).length == 0
+				&& !menuList.is(event.target)){
+				instance.closeMenu();
+			}
+		});
+		
+		return this;
+	}
+}
+
+// ====================================================
 // Class {DilationPlayer}
 // ====================================================
 class DilationPlayer {
@@ -271,8 +436,9 @@ class DilationPlayer {
 
         config.object = object;
         this.config = new DilationPlayerConfig(config);
-        this.view = new DilationPlayerView(this.config);
-		this.translate = new DilationPlayerTranslate(this.config);
+		this.translate = new DilationPlayerTranslate(this);
+        this.view = new DilationPlayerView(this);
+		this.menu = new DilationPlayerMenu(this);
         this.rendered = false;
         this.apply();
     }
@@ -303,7 +469,7 @@ class DilationPlayer {
             .progress()
             .sound()
             .logo()
-			.menu();
+			.contextMenu();
     }
 
     /**
@@ -949,81 +1115,8 @@ class DilationPlayer {
      * Menu
      * @return {DilationPlayer}
      */
-	menu() {
-		let container = this.config.get('elements.container', true);
-		let menu = this.config.get('elements.menu', true);
-		let menuList = this.config.get('elements.menuList', true);
-		
-		let helper = {
-			openMenu: function(event){
-				menu.addClass('active');
-				let height = menuList.height();
-				let width = menuList.width();
-				
-				let cheight = container.height();
-				let cwidth = container.width();
-				
-				let offset = container.offset();
-                let left = (event.pageX - offset.left);
-				let top = (event.pageY - offset.top);
-				
-				if ((cheight - top) < height) {
-					top = cheight - height;
-				}
-
-				if ((cwidth - left) < width) {
-					left = cwidth - width;
-				}
-				
-				menuList.css({left: left + 'px', top: top + 'px'});
-			},
-			
-			closeMenu: function(){
-				menu.removeClass('active');
-			},
-			
-			generateMenu: function(){
-				
-			}
-		};
-		
-		// Event when right click or open menu
-        container.mousedown(function (event) {
-			var isRightMB;
-			event = event || window.event;
-		
-            if (event.which === 3) {
-                container.bind('contextmenu', function () {
-                    return false;
-                });
-            }
-            else {
-                container.unbind('contextmenu');
-            }
-			
-			// Gecko (Firefox), WebKit (Safari/Chrome) & Opera
-			if ("which" in event)  
-				isRightMB = event.which == 3; 
-			// IE, Opera 
-			else if ("button" in event)
-				isRightMB = event.button == 2; 
-			
-			// Open menu
-			if (isRightMB) {
-				helper.openMenu(event);
-			}
-        });
-		
-		// Event when click out menu
-		$(window).click(function(event){
-			if (menuList.has(event.target).length == 0
-				&& !menuList.is(event.target)){
-				helper.closeMenu();
-			}
-		});
-		
-		helper.generateMenu();
-		
+	contextMenu() {
+		this.menu.render().events();
 		return this;
 	}
 }

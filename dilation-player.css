@@ -61,7 +61,7 @@ html, body {
 	z-index: 10;
 	visibility: hidden;
 	opacity: 0;
-	transition: visibility 0.2s, opacity 0.2s linear;
+	transition: visibility 0.1s, opacity 0.1s, background-color 0.2s linear;
 }
 
 .dp-menu.active{
@@ -72,13 +72,18 @@ html, body {
 .dp-menu-list{
 	background-color: rgba(0,0,0,0.6);
 	color: #fff;
-	height: 100px;
-	width: 100px;
+	min-width: 100px;
+	max-width: 200px;
 	position: absolute;
 }
 
 .dp-menu-list > div{
 	padding: 10px;
+	cursor: pointer
+}
+
+.dp-menu-list > div:hover{
+	background-color: rgba(255,255,255,0.2);
 }
 
 /* ============ CSS for controls =============== */
