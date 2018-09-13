@@ -351,22 +351,27 @@ class DilationPlayer {
              */
 			defaultScreen: function(){
 				// Set to small
-				object.css({
-					width: configSize.width,
-					height: configSize.height,
-					maxWidth: '100%'
-				});
+				object.css({width: configSize.width, height: configSize.height});
 				
-				defaultSize = {
-					width: object.width(),
-					height: object.height()
-				};
+				if (!defaultSize) {
+					defaultSize = {
+						width: object.width(),
+						height: object.height()
+					};
+				}
+				
+				object.css({maxWidth: '100%'});
+				this.rateScreenSize();
 			},
 			
 			/**
              * Rate screen size
              */
-			rateScreenSize: function(){
+			rateScreenSize: function(isLg){
+				if (isLg == undefined) {
+					isLg = this.isLarge;
+				}
+				
 				let videoSize = 0;
 				let h = 0;
 				
