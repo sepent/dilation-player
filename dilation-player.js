@@ -10,6 +10,7 @@ class DilationPlayerConfig {
         // Set default
         config.elements = this.or(config.elements, {});
         config.icons = this.or(config.icons, {});
+		config.logo = this.or(config.logo, {});
 
         // Config for elements
         this.config = {
@@ -50,10 +51,13 @@ class DilationPlayerConfig {
             },
 
             // Config default
-            volume: this.or(config.volume, 5),
+            volume: this.or(config.volume, 100),
             object: this.or(config.object, null),
             view: this.or(config.view, false),
-            resources: this.or(config.resources, {})
+            resources: this.or(config.resources, {}),
+			logo: this.or(config.logo === false ? false : undefined, {
+				
+			})
         }
 
         // Init cache
@@ -72,7 +76,7 @@ class DilationPlayerConfig {
      * @return mixed
      */
     or(value, or) {
-        return value == undefined ? or : value;
+        return value === undefined ? or : value;
     }
 
     /**
@@ -603,6 +607,8 @@ class DilationPlayer {
 
         // Set volume default
         helper.setVolume(range);
+		volumeRange.val(range);
+		helper.makeIcon();
 
         return this;
     }
@@ -613,18 +619,26 @@ class DilationPlayer {
      */
     logo() {
         let logo = this.config.get('elements.logo', true);
+		let logoConfig = this.config.get('logo');
+		let helper = {
+			resizeLogo: function(){
+				let height = logo.height();
+				logo.width(height);
+			}
+		};
+		
+		// Check if logo is hidden
+		if (logoConfig === false) {
+			logo.hide();
+		}
 
-        // Set size for Logo
-        function resizeLogo() {
-            let height = logo.height();
-            logo.width(height);
-        }
-
+		// Event when resize window
         $(window).resize(function () {
-            resizeLogo();
+            helper.resizeLogo();
         });
 
-        resizeLogo();
+		// Default
+        helper.resizeLogo();
 
         // Event when click on logo
         // Event when hover on logo
