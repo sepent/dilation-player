@@ -353,7 +353,8 @@ class DilationPlayer {
 				// Set to small
 				object.css({
 					width: configSize.width,
-					height: configSize.height
+					height: configSize.height,
+					max-width: '100%'
 				});
 				
 				defaultSize = {
