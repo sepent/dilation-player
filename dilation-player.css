@@ -69,21 +69,33 @@ html, body {
 	opacity: 1;
 }
 
-.dp-menu-list{
-	background-color: rgba(0,0,0,0.6);
+.dp-menu .dp-menu-list{
+	background-color: rgba(51, 47, 47, 0.75);
 	color: #fff;
 	min-width: 100px;
-	max-width: 200px;
 	position: absolute;
 }
 
-.dp-menu-list > div{
-	padding: 10px;
+.dp-menu .dp-menu-list .dp-menu-item{
+	padding: 10px 10px 10px 20px;
 	cursor: pointer
 }
 
-.dp-menu-list > div:hover{
-	background-color: rgba(255,255,255,0.2);
+.dp-menu .dp-menu-list .dp-menu-item:hover{
+	background-color: rgba(95, 95, 95, 0.3);
+}
+
+.dp-menu .dp-menu-list .dp-menu-item:before{
+	content: "✓";
+    color: #fff;
+    margin-left: -15px;
+    margin-right: 10px;
+    font-size: 0.8em;
+	visibility: hidden;
+}
+
+.dp-menu .dp-menu-list .dp-menu-item.active:before{
+	visibility: visible;
 }
 
 /* ============ CSS for controls =============== */

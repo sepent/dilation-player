@@ -50,7 +50,18 @@ class DilationPlayerConfig {
 		
 		rs.loop = this.or(rs.loop, {
 			text: 'menu.loop',
-			element: 'menuLoop'
+			element: 'menuItemLoop',
+			execute: function(item, menu, config){
+				menu.execLoop(item, config);
+			}
+		});
+		
+		rs.copyUrl = this.or(rs.copyUrl, {
+			text: 'menu.copy_url',
+			element: 'menuItemCopyUrl',
+			execute: function(item, menu, config){
+				menu.execCopyUrl(item, config);
+			}
 		});
 		
 		return rs;
@@ -85,7 +96,9 @@ class DilationPlayerConfig {
 			playerModalIcon: this.or(config.elements.playerModalIcon, '.dp-modal-player-icon'),
 			menu: this.or(config.elements.menu, '.dp-menu'),
 			menuList: this.or(config.elements.menuList, '.dp-menu-list'),
-			menuLoop: this.or(config.elements.menuLoop, '.dp-menu-loop'),
+			menuItem: this.or(config.elements.menuItem, '.dp-menu-item'),
+			menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
+			menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
 		};
 	}
 	
@@ -312,11 +325,13 @@ class DilationPlayerMenu {
 		let container = this.config.get('elements.container', true);
 		let menu = this.config.get('elements.menu', true);
 		let menuList = this.config.get('elements.menuList', true);
+		let menuItemClass = this.config.get('elements.menuItem').replace('.', '');
 		let enableMenuList = this.config.get('menu');
 
 		for (var name in enableMenuList) {
 			let div = document.createElement('div');
-			$(div).attr('dp-bind', name)
+			$(div).addClass(menuItemClass)
+				.attr('dp-menu:name', name)
 				.html(this.translate.get(enableMenuList[name].text));
 				
 			menuList.append(div);
@@ -381,6 +396,7 @@ class DilationPlayerMenu {
 		let instance = this;
 		let container = this.config.get('elements.container', true);
 		let menuList = this.config.get('elements.menuList', true);
+		let menuItem = this.config.get('elements.menuItem', true);
 		
 		// Event when right click or open menu
         container.mousedown(function (event) {
@@ -416,6 +432,59 @@ class DilationPlayerMenu {
 				instance.closeMenu();
 			}
 		});
+		
+		// Event when click menu item
+		menuItem.click(function(){
+			let name = $(this).attr('dp-menu:name');
+			instance.execute(this, name);
+		});
+		
+		return this;
+	}
+
+	/**
+     * execute
+     * @param name
+	 * @return {DilationPlayerMenu}
+     */
+	execute(item, name){
+		let config = this.config.get('menu.'+name);
+		
+		if (config.execute !== undefined) {
+			config.execute(item, this, config);
+		}
+		
+		return this;
+	}
+	
+	/**
+     * Exec Loop
+	 * @return {DilationPlayerMenu}
+     */
+	execLoop(item, config) {
+		let video = this.config.get('elements.video', true).get(0);
+
+		if (video.loop) {
+			video.loop = false;
+			$(item).removeClass('active');
+		} else {
+			video.loop = true;
+			$(item).addClass('active');
+		}
+		
+		this.closeMenu();
+		
+		return this;
+	}
+	
+	/**
+     * Exec Copy Video Url
+	 * @return {DilationPlayerMenu}
+     */
+	execCopyUrl(item, config) {
+		let video = this.config.get('elements.video', true).get(0);
+
+		this.closeMenu();
 		
 		return this;
 	}
