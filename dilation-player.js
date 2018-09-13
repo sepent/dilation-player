@@ -354,7 +354,7 @@ class DilationPlayer {
 				object.css({
 					width: configSize.width,
 					height: configSize.height,
-					max-width: '100%'
+					maxWidth: '100%'
 				});
 				
 				defaultSize = {
