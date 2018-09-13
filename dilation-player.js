@@ -11,6 +11,7 @@ class DilationPlayerConfig {
         config.elements = this.or(config.elements, {});
         config.icons = this.or(config.icons, {});
 		config.logo = this.or(config.logo, {});
+		config.size = this.or(config.logo, {});
 
         // Config for elements
         this.config = {
@@ -24,7 +25,8 @@ class DilationPlayerConfig {
                 control: this.or(config.elements.control, '.dp-control'),
                 button: this.or(config.elements.button, '.dp-button'),
                 controlPlayPause: this.or(config.elements.controlPlayPause, '.dp-btn-play'),
-                controlFullscreen: this.or(config.elements.controlFullscreen, '.dp-btn-fullscreen'),
+                controlFullScreen: this.or(config.elements.controlFullScreen, '.dp-btn-fullscreen'),
+				controlLargeScreen: this.or(config.elements.controlLargeScreen, '.dp-btn-largescreen'),
                 controlVolume: this.or(config.elements.controlVolume, '.dp-btn-volume'),
                 controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dp-volume-tooltip'),
                 controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dp-volume-range'),
@@ -42,6 +44,8 @@ class DilationPlayerConfig {
                 playerModal: this.or(config.icons.loaderModal, '<i class="icons icon-control-play"></i>'),
                 fullScreen: this.or(config.icons.fullScreen, '<i class="icons icon-size-fullscreen"></i>'),
                 actualScreen: this.or(config.icons.actualScreen, '<i class="icons icon-size-actual"></i>'),
+				largeScreen: this.or(config.icons.largeScreen, '<i class="icons icon-frame"></i>'),
+				smallScreen: this.or(config.icons.smallScreen, '<i class="icons icon-frame"></i>'),
                 pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
                 play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
                 volumeMute: this.or(config.icons.volumeMute, '<i class="icons icon-volume-off"></i>'),
@@ -55,9 +59,11 @@ class DilationPlayerConfig {
             object: this.or(config.object, null),
             view: this.or(config.view, false),
             resources: this.or(config.resources, {}),
-			logo: this.or(config.logo === false ? false : undefined, {
-				
-			})
+			logo: this.or(config.logo === false ? false : undefined, {}),
+			size: {
+				width: this.or(config.size.width, '900px'),
+				height: this.or(config.size.height, '507px')
+			}
         }
 
         // Init cache
@@ -324,23 +330,66 @@ class DilationPlayer {
     fullScreen() {
         // Defined elements
         let element = this.config.get('elements.container', true).get(0);
-        let btn = this.config.get('elements.controlFullscreen', true);
+        let btnFull = this.config.get('elements.controlFullScreen', true);
+		let btnLarge = this.config.get('elements.controlLargeScreen', true);
         let icons = this.config.get('icons');
-
+		let object = this.config.get('object', true);
+		let configSize = this.config.get('size');
+		let defaultSize = null;
+		let isLarge = false;
+		
         /**
          * Helper
          * @type {{makeIcon: makeIcon, request: request, cancel: cancel}}
          */
         let helper = {
+			/**
+             * Default screen
+             */
+			defaultScreen: function(){
+				// Set to small
+				object.css({
+					width: configSize.width,
+					height: configSize.height
+				});
+				
+				defaultSize = {
+					width: object.width(),
+					height: object.height()
+				};
+			},
+			
+			/**
+             * Rate screen size
+             */
+			rateScreenSize: function(){
+				let videoSize = 0;
+				
+				if (isLarge) {
+					videoSize = $(window).width();
+					object.width(videoSize);
+				} else {
+					videoSize = object.width();
+				}
+				
+				object.css({height: (videoSize*defaultSize.height/defaultSize.width)+'px'});
+			},
+			
             /**
              * Make icon
              * @param isFull
              */
-            makeIcon: function (isFull) {
+            makeIconForFullScreen: function (isFull) {
+				if (isFull === undefined) {
+					isFull = document.fullscreenElement
+					|| document.mozFullScreenElement
+					|| document.webkitFullscreenElement;
+				}
+				
                 if (isFull) {
-                    btn.html(icons.actualScreen);
+                    btnFull.html(icons.actualScreen);
                 } else {
-                    btn.html(icons.fullScreen);
+                    btnFull.html(icons.fullScreen);
                 }
             },
 
@@ -348,11 +397,11 @@ class DilationPlayer {
              * Toggle
              * @param event
              */
-            toggle: function (event) {
+            toggleFullScreen: function () {
                 // Check if event is html element
-                if (event instanceof HTMLElement) {
-                    element = event;
-                }
+                // if (event instanceof HTMLElement) {
+                //     element = event;
+                // }
 
                 var isFullscreen = document.webkitIsFullScreen || document.mozFullScreen || false;
 
@@ -365,28 +414,78 @@ class DilationPlayer {
                 };
 
                 isFullscreen ? document.cancelFullScreen() : element.requestFullScreen();
-            }
+            },
+			
+			/**
+             * Make icon
+             * @param isFull
+             */
+			makeIconForLargeScreen: function(isLg){
+				if (isLg === undefined) {
+					let videoSize = object.width();
+					let parentSize = $(window).width();
+					
+					// Check if is fulling
+					if (videoSize === parentSize) {
+						isLg = true;
+					} else {
+						isLg = false;
+					}
+				}
+				
+				if (isLg) {
+                    btnLarge.html(icons.smallScreen);
+                } else {
+                    btnLarge.html(icons.largeScreen);
+                }
+			},
+			
+			/**
+             * Toggle
+             * @param event
+             */
+			toggleLargeScreen: function(){
+				if (isLarge) {
+					this.defaultScreen();
+					isLarge = false;
+				} else {
+					this.rateScreenSize();
+					isLarge = true;
+				}
+				
+				return isLarge;
+			}
         };
 
 
         // Event when click on button fullscreen
         // Then call to check full or cancel
-        btn.on('click', function (event) {
-            helper.toggle(event);
+        btnFull.on('click', function (event) {
+            helper.toggleFullScreen();
+        });
+		
+		// Event when click on button large
+        // Then call to check large or cancel
+        btnLarge.on('click', function (event) {
+            let isLarge = helper.toggleLargeScreen();
+			helper.makeIconForLargeScreen(isLarge);
         });
 
         // Event when change screen
         // Then get status and change icon
         $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
-            var fullscreenElement = document.fullscreenElement
-                || document.mozFullScreenElement
-                || document.webkitFullscreenElement;
-
-            helper.makeIcon(fullscreenElement ? true : false);
+            helper.makeIconForFullScreen();
         });
+		
+		// Event when window resize
+		$(window).resize(function(){
+			helper.rateScreenSize();
+		});
 
-        helper.makeIcon(false);
-
+		helper.defaultScreen();
+        helper.makeIconForFullScreen(false);
+		helper.makeIconForLargeScreen(isLarge);
+		
         return this;
     }
 

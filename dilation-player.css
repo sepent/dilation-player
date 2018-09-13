@@ -206,6 +206,7 @@ html, body {
     float: left;
 }
 
+.dp .dp-control .dp-button button.dp-btn-largescreen,
 .dp .dp-control .dp-button button.dp-btn-fullscreen{
     float: right;
 }
