@@ -36,6 +36,8 @@ class DilationPlayerConfig {
                 loaderModalIcon: this.or(config.elements.loaderModalIcon, '.dp-modal-loader-icon'),
                 playerModal: this.or(config.elements.playerModal, '.dp-modal-player'),
                 playerModalIcon: this.or(config.elements.playerModalIcon, '.dp-modal-player-icon'),
+				menu: this.or(config.elements.menu, '.dp-menu'),
+				menuList: this.or(config.elements.menuList, '.dp-menu-list'),
             },
 
             // Config for icon
@@ -208,11 +210,12 @@ class DilationPlayer {
      * @param resources
      */
     load(resources) {
-        if (resources !== undefined) {
-            this.config.resources(resources);
-        }
-
-        this.apply();
+		if (this.rendered) {
+			let video = this.config.get('video', true);
+			var source = document.createElement('source');
+			source.setAttribute('src', resources);
+			video.appendChild(source);
+		}
     }
 
     /**
@@ -227,7 +230,8 @@ class DilationPlayer {
             .fullScreen()
             .progress()
             .sound()
-            .logo();
+            .logo()
+			.menu();
     }
 
     /**
@@ -826,18 +830,6 @@ class DilationPlayer {
             control.addClass('active');
         });
 
-        // Event when right click or open menu
-        container.mousedown(function (event) {
-            if (event.which === 3) {
-                container.bind('contextmenu', function () {
-                    return false;
-                });
-            }
-            else {
-                container.unbind('contextmenu');
-            }
-        });
-
         // Default
         video.get(0).controls = false;
 
@@ -876,4 +868,80 @@ class DilationPlayer {
 
         return this;
     }
+
+	/**
+     * Menu
+     * @return {DilationPlayer}
+     */
+	menu() {
+		let container = this.config.get('elements.container', true);
+		let menu = this.config.get('elements.menu', true);
+		let menuList = this.config.get('elements.menuList', true);
+		
+		let helper = {
+			openMenu: function(event){
+				menu.addClass('active');
+				let height = menuList.height();
+				let width = menuList.width();
+				
+				let cheight = container.height();
+				let cwidth = container.width();
+				
+				let offset = container.offset();
+                let left = (event.pageX - offset.left);
+				let top = (event.pageY - offset.top);
+				
+				if ((cheight - top) < height) {
+					top = cheight - height;
+				}
+
+				if ((cwidth - left) < width) {
+					left = cwidth - width;
+				}
+				
+				menuList.css({left: left + 'px', top: top + 'px'});
+			},
+			
+			closeMenu: function(){
+				menu.removeClass('active');
+			}
+		};
+		
+		// Event when right click or open menu
+        container.mousedown(function (event) {
+			var isRightMB;
+			event = event || window.event;
+		
+            if (event.which === 3) {
+                container.bind('contextmenu', function () {
+                    return false;
+                });
+            }
+            else {
+                container.unbind('contextmenu');
+            }
+			
+			// Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+			if ("which" in event)  
+				isRightMB = event.which == 3; 
+			// IE, Opera 
+			else if ("button" in event)
+				isRightMB = event.button == 2; 
+			
+			// Open menu
+			if (isRightMB) {
+				helper.openMenu(event);
+			}
+        });
+		
+		// Event when click out menu
+		$(window).click(function(event){
+			if (menuList.has(event.target).length == 0
+				&& !menuList.is(event.target)){
+				helper.closeMenu();
+			}
+		});
+		
+		return this;
+	}
 }
