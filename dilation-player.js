@@ -71,6 +71,10 @@ class DPConfig {
 	 * @return {object}
 	 */
 	mergeMenu(config){
+		if (config.menu === false) {
+			return false;
+		};
+		
 		let rs = this.or(config.menu, {});
 		
 		rs.loop = this.or(rs.loop, {
@@ -551,10 +555,6 @@ class DPMenu {
 	 * @return {DPMenu}
      */
 	events(){
-		if (!this.status) {
-			return this;
-		}
-		
 		let instance = this;
 		let container = this.config.get('elements.container', true);
 		let menuList = this.config.get('elements.menuList', true);
@@ -573,6 +573,10 @@ class DPMenu {
             else {
                 container.unbind('contextmenu');
             }
+			
+			if (!instance.status) {
+				return;
+			}
 			
 			// Gecko (Firefox), WebKit (Safari/Chrome) & Opera
 			if ("which" in event)  
