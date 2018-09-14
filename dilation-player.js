@@ -45,7 +45,7 @@ class DPConfig {
             // Config default
             volume: this.or(config.volume, 100),
             object: this.or(config.object, null),
-            view: this.or(config.view, false),
+            view: this.mergeView(config),
             sources: this.or(config.sources, []),
             logo: this.mergeLogo(config),
             size: this.mergeSize(config),
@@ -230,6 +230,22 @@ class DPConfig {
     }
 
     /**
+     * Merge view
+     * @return {object}
+     */
+    mergeView(config) {
+        if (config.view == false
+            || config.view == undefined ) {
+            config.view = {};
+        }
+
+        return {
+            content: this.or(config.view.content, null),
+            import: this.or(config.view.import, null)
+        };
+    }
+
+    /**
      * Check if value is undefined then return or
      * @param value
      * @param or
@@ -304,11 +320,6 @@ class DPView {
     async render() {
         let view = this.config.get('view');
         let sources = this.config.get('sources');
-
-        if (view === false) {
-            return true;
-        }
-
         let object = this.config.get('object', true);
 
         // Read content in template
@@ -694,7 +705,6 @@ class DPLogo {
         }
 
         let logo = this.config.get('elements.logo', true);
-        let height = logo.height();
         let logoConfig = this.config.get('logo');
 
         if (logoConfig.height !== undefined) {
