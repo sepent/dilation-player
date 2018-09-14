@@ -6,7 +6,8 @@ let DPTranslateData = {
 		},
 		
 		app: {
-			loading: 'Loading...'
+			loading: 'Loading...',
+			not_support_video: 'This browser not support video'
 		}
 	},
 	
@@ -17,7 +18,8 @@ let DPTranslateData = {
 		},
 		
 		app: {
-			loading: 'Đang tải...'
+			loading: 'Đang tải...',
+			not_support_video: 'Trình duyệt không hỗ trợ video'
 		}
 	}
 }
@@ -44,7 +46,7 @@ class DPConfig {
             volume: this.or(config.volume, 100),
             object: this.or(config.object, null),
             view: this.or(config.view, false),
-            resources: this.or(config.resources, {}),
+            sources: this.or(config.sources, []),
 			logo: this.mergeLogo(config),
 			size: this.mergeSize(config),
 			largeScreen: this.or(config.largeScreen, false),
@@ -296,6 +298,7 @@ class DPView {
      */
     async render() {
         let view = this.config.get('view');
+		let sources = this.config.get('sources');
 
         if (view === false) {
             return true;
@@ -331,10 +334,29 @@ class DPView {
 		// Setting
 		// Poster
 		let poster = this.config.get('poster');
+		let video = this.config.get('elements.video', true);
 		
 		if (poster) {
-			let video = this.config.get('elements.video', true);
 			video.get(0).poster = poster;
+		}
+		
+		if (sources !== undefined) {
+			video.html(this.translate.get('app.not_support_video'));
+			
+			// Generate video from resources
+			if (typeof sources === 'string') {
+				video.get(0).src = sources;
+			} else if(sources.length == 1) {
+				video.get(0).src = sources[0].src;
+			} else {
+				for (var i in sources) {
+					let source = document.createElement('source');
+					$(source).attr({src: sources[i].src, type: sources[i].type});
+					video.append(source);
+				}
+			}
+			
+			video.get(0).load();
 		}
 
         return true;
@@ -1239,8 +1261,18 @@ class DilationPlayer {
         let tooltipCanvas = progressTimerTooltipImage.find('canvas').get(0);
         tooltipCanvas.width = 90;
         tooltipCanvas.height = 70;
-		let videoClone = video.clone();
-		videoClone.get(0).load();
+		
+		// Create preview elements
+		let videoPreview = document.createElement('video');
+		
+		video.find('source').each(function(num, val){
+			var source = document.createElement('source');
+			$(source).prop('src', $(this).attr('src'));
+			videoPreview.append(source);
+		});
+		
+		videoPreview.load();
+		// videoPreview.pause();
 		
         /**
          * Helper object
@@ -1345,8 +1377,8 @@ class DilationPlayer {
                 progressTimerTooltipImage.css('left', left + 'px');
 
                 // Get picture
-				videoClone.get(0).currentTime = current;
-                tooltipCanvas.getContext('2d').drawImage(videoClone.get(0), 0, 0, tooltipCanvas.width, tooltipCanvas.height);
+				//videoPreview.currentTime = current;
+                //tooltipCanvas.getContext('2d').drawImage(videoPreview, 0, 0, tooltipCanvas.width, tooltipCanvas.height);
             } else {
                 progressTimerTooltipText.hide();
                 progressTimerTooltipImage.hide();
