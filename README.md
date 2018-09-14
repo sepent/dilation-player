@@ -88,4 +88,21 @@ Then it auto apply to your elements. If you want to custom, then change **config
 }
 ```
 
+
+Example, you would like to show video without **logo** then:
+
+```
+var player = new DilationPlayer('#your_container_id', {
+    logo: false
+});
+```
+
+Or you want to show the poster before start video then:
+
+```
+var player = new DilationPlayer('#your_container_id', {
+    poster: 'https://mywebsite.com/poster.png'
+});
+```
+
 OK, now it's working!
