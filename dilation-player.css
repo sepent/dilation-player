@@ -73,7 +73,7 @@ html, body {
 	background-color: rgba(51, 47, 47, 0.75);
 	color: #fff;
 	min-width: 100px;
-	position: absolute;
+	position: fixed;
 }
 
 .dp-menu .dp-menu-list .dp-menu-item{
@@ -82,7 +82,7 @@ html, body {
 }
 
 .dp-menu .dp-menu-list .dp-menu-item:hover{
-	background-color: rgba(95, 95, 95, 0.3);
+	background-color: rgba(0, 0, 0, 0.3);
 }
 
 .dp-menu .dp-menu-list .dp-menu-item:before{

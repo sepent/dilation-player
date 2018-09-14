@@ -1,7 +1,31 @@
+let DPTranslateData = {
+	en: {
+		menu: {
+			loop: 'Loop this video',
+			copy_url: 'Copy video\'s url'
+		},
+		
+		app: {
+			loading: 'Loading...'
+		}
+	},
+	
+	vi: {
+		menu: {
+			loop: 'Lặp video này',
+			copy_url: 'Copy đường dẫn video'
+		},
+		
+		app: {
+			loading: 'Đang tải...'
+		}
+	}
+}
+
 // ====================================================
-// Class {DilationPlayerConfig}
+// Class {DPConfig}
 // ====================================================
-class DilationPlayerConfig {
+class DPConfig {
     /**
      * Constructor
      * @param config
@@ -13,22 +37,19 @@ class DilationPlayerConfig {
 
         // Config for elements
         this.config = {
-            elements: this.convertElements(config),
+            elements: this.mergeElements(config),
             // Config for icon
-            icons: this.convertIcons(config),
+            icons: this.mergeIcons(config),
             // Config default
             volume: this.or(config.volume, 100),
             object: this.or(config.object, null),
             view: this.or(config.view, false),
             resources: this.or(config.resources, {}),
-			logo: this.or(config.logo === false ? false : undefined, {}),
-			size: {
-				width: this.or(config.size.width, '900px'),
-				height: this.or(config.size.height, '507px')
-			},
+			logo: this.mergeLogo(config),
+			size: this.mergeSize(config),
 			largeScreen: this.or(config.largeScreen, false),
-			language: this.or(config.language, 'en'),
-			menu: this.convertMenu(config)
+			locale: this.or(config.locale, 'en'),
+			menu: this.mergeMenu(config)
         }
 		
 		// Function
@@ -43,9 +64,10 @@ class DilationPlayerConfig {
     }
 	
 	/**
-	 * convertMenu
+	 * Merge menu
+	 * @return {object}
 	 */
-	convertMenu(config){
+	mergeMenu(config){
 		let rs = this.or(config.menu, {});
 		
 		rs.loop = this.or(rs.loop, {
@@ -68,9 +90,10 @@ class DilationPlayerConfig {
 	}
 
 	/**
-	 * convertElements
+	 * Merge Elements
+	 * @return {object}
 	 */
-	convertElements(config){
+	mergeElements(config){
 		config.elements = this.or(config.elements, {});
 		
 		return {
@@ -103,9 +126,10 @@ class DilationPlayerConfig {
 	}
 	
 	/**
-	 * convertIcons
+	 * Merge Icons
+	 * @return {object}
 	 */
-	convertIcons(config){
+	mergeIcons(config){
 		config.icons = this.or(config.icons, {});
 		
 		return {
@@ -124,6 +148,77 @@ class DilationPlayerConfig {
 		};
 	}
     
+	/**
+	 * Merge logo
+	 * @return {object}
+	 */
+	mergeLogo(config){
+		// Check if logo is false, its mean is not show
+		if (config.logo === false) {
+			return config.logo;
+		}
+		
+		// Check if logo is undefined then get default value
+		config.logo = this.or(config.logo, {});
+		
+		let rs = {};
+		
+		if (config.logo.height !== undefined) {
+			rs.height = config.logo.height;
+			
+			if (config.logo.width !== undefined) {
+				rs.width = config.logo.width;
+			} else {
+				rs.rate = this.or(config.logo.rate, 1);
+			}
+		} else if (config.logo.width !== undefined) {
+			rs.width = config.logo.width;
+			
+			if (config.logo.height !== undefined) {
+				rs.height = config.logo.height;
+			} else {
+				rs.rate = this.or(config.logo.rate, 1);
+			}
+		} else {
+			rs.height = '8%';
+			rs.rate = 1;
+		}
+		
+		return rs;
+	}
+	
+	/**
+	 * Merge size
+	 * @return {object}
+	 */
+	mergeSize(config){
+		config.size = this.or(config.size, {});
+		let rs = {};
+		
+		if (config.size.height !== undefined) {
+			rs.height = config.size.height;
+			
+			if (config.size.width !== undefined) {
+				rs.width = config.size.width;
+			} else {
+				rs.rate = this.or(config.size.rate, 3/2);
+			}
+		} else if (config.size.width !== undefined) {
+			rs.width = config.size.width;
+			
+			if (config.size.height !== undefined) {
+				rs.height = config.size.height;
+			} else {
+				rs.rate = this.or(config.size.rate, 2/3);
+			}
+		} else {
+			rs.width = '100%';
+			rs.rate = 2/3;
+		}
+		
+		return rs;
+	}
+	
 	/**
      * Check if value is undefined then return or
      * @param value
@@ -179,17 +274,23 @@ class DilationPlayerConfig {
 }
 
 // ====================================================
-// Class {DilationPlayerView}
+// Class {DPView}
 // ====================================================
-class DilationPlayerView {
+class DPView {
     /**
      * Constructor
      * @param config
      */
     constructor(app) {
         this.config = app.config;
+		this.translate = app.translate;
+		this.app = app;
     }
 
+	/**
+     * Render view
+     * @return {DPView}
+     */
     async render() {
         let view = this.config.get('view');
 
@@ -202,7 +303,8 @@ class DilationPlayerView {
         // Read content in template
         if (!view.content) {
             if (view.import) {
-                object.html('Loading ...');
+                object.html(this.translate.get('app.loading'));
+				
                 let response = await $.ajax({
                     url: view.import,
                     data: {},
@@ -226,24 +328,29 @@ class DilationPlayerView {
         return true;
     }
 
+	/**
+     * replace
+     * @return string
+     */
     replace(content) {
         return content;
     }
 }
 
 // ====================================================
-// Class {DilationPlayerTranslate}
+// Class {DPTranslator}
 // ====================================================
-class DilationPlayerTranslate {
+class DPTranslator {
 	/**
      * Constructor
      * @param config
      */
     constructor(app) {
 		this.config = app.config;
+		this.app = app;
 		
-		if (typeof DilationPlayerTranslateData !== 'undefined') {
-			this.languages = DilationPlayerTranslateData;
+		if (typeof DPTranslateData !== 'undefined') {
+			this.languages = DPTranslateData;
 		} else {
 			this.languages = {};
 		}
@@ -261,7 +368,7 @@ class DilationPlayerTranslate {
         }
 
         var keys = key.split('.');
-        var messages = this.or(this.languages[this.config.get('language')], {});
+        var messages = this.or(this.languages[this.config.get('locale')], {});
 		let message = messages;
 		
         // Get message format
@@ -304,9 +411,9 @@ class DilationPlayerTranslate {
 }
 
 // ====================================================
-// Class {DilationPlayerMenu}
+// Class {DPMenu}
 // ====================================================
-class DilationPlayerMenu {
+class DPMenu {
 	/**
      * Constructor
      * @param config
@@ -314,19 +421,29 @@ class DilationPlayerMenu {
     constructor(app) {
         this.config = app.config;
 		this.translate = app.translate;
+		this.app = app;
+		this.status = true;
     }
 	
 	/**
      * Render menu
      * @param config
-	 * @return {DilationPlayerMenu}
+	 * @return {DPMenu}
      */
 	render(){
-		let container = this.config.get('elements.container', true);
+		let enableMenuList = this.config.get('menu');
 		let menu = this.config.get('elements.menu', true);
+		
+		if (enableMenuList === false) {
+			menu.hide();
+			this.status = false;
+			return this;
+		}
+		
+		let container = this.config.get('elements.container', true);
+		
 		let menuList = this.config.get('elements.menuList', true);
 		let menuItemClass = this.config.get('elements.menuItem').replace('.', '');
-		let enableMenuList = this.config.get('menu');
 
 		for (var name in enableMenuList) {
 			let div = document.createElement('div');
@@ -343,9 +460,13 @@ class DilationPlayerMenu {
 	/**
      * Open menu
      * @param config
-	 * @return {DilationPlayerMenu}
+	 * @return {DPMenu}
      */
 	openMenu(event){
+		if (!this.status) {
+			return this;
+		}
+		
 		let container = this.config.get('elements.container', true);
 		let menu = this.config.get('elements.menu', true);
 		let menuList = this.config.get('elements.menuList', true);
@@ -355,12 +476,11 @@ class DilationPlayerMenu {
 		let height = menuList.height();
 		let width = menuList.width();
 		
-		let cheight = container.height();
-		let cwidth = container.width();
-		
-		let offset = container.offset();
-		let left = (event.pageX - offset.left);
-		let top = (event.pageY - offset.top);
+		let cheight = $(window).height();
+		let cwidth = $(window).width();
+
+		let left = event.pageX;
+		let top = event.pageY;
 		
 		if ((cheight - top) < height) {
 			top = cheight - height;
@@ -378,9 +498,13 @@ class DilationPlayerMenu {
 	/**
      * Close menu
      * @param config
-	 * @return {DilationPlayerMenu}
+	 * @return {DPMenu}
      */
 	closeMenu(){
+		if (!this.status) {
+			return this;
+		}
+		
 		let menu = this.config.get('elements.menu', true);
 		menu.removeClass('active');
 		
@@ -390,9 +514,13 @@ class DilationPlayerMenu {
 	/**
      * Event menu
      * @param config
-	 * @return {DilationPlayerMenu}
+	 * @return {DPMenu}
      */
 	events(){
+		if (!this.status) {
+			return this;
+		}
+		
 		let instance = this;
 		let container = this.config.get('elements.container', true);
 		let menuList = this.config.get('elements.menuList', true);
@@ -448,6 +576,10 @@ class DilationPlayerMenu {
 	 * @return {DilationPlayerMenu}
      */
 	execute(item, name){
+		if (!this.status) {
+			return this;
+		}
+		
 		let config = this.config.get('menu.'+name);
 		
 		if (config.execute !== undefined) {
@@ -462,6 +594,10 @@ class DilationPlayerMenu {
 	 * @return {DilationPlayerMenu}
      */
 	execLoop(item, config) {
+		if (!this.status) {
+			return this;
+		}
+		
 		let video = this.config.get('elements.video', true).get(0);
 
 		if (video.loop) {
@@ -482,11 +618,237 @@ class DilationPlayerMenu {
 	 * @return {DilationPlayerMenu}
      */
 	execCopyUrl(item, config) {
+		if (!this.status) {
+			return this;
+		}
+		
 		let video = this.config.get('elements.video', true).get(0);
 
 		this.closeMenu();
 		
 		return this;
+	}
+}
+
+// ====================================================
+// Class {DPLogo}
+// ====================================================
+class DPLogo {
+	/**
+     * Constructor
+     * @param config
+     */
+    constructor(app) {
+        this.config = app.config;
+		this.translate = app.translate;
+		this.app = app;
+		this.status = true;
+    }
+	
+	/**
+     * resizeLogo
+     * @return {DPLogo}
+     */
+	resize() {
+		if (!this.status) {
+			return this;
+		}
+		
+		let logo = this.config.get('elements.logo', true);
+		let height = logo.height();
+		let logoConfig = this.config.get('logo');
+
+		if (logoConfig.height !== undefined) {
+			logo.css({height: logoConfig.height});
+			
+			if (logoConfig.width !== undefined) {
+				logo.css({width: logoConfig.width});
+			} else {
+				logo.css({width: (logo.height() * logoConfig.rate) + 'px'});
+			}
+		} else {
+			logo.css({width: logoConfig.width});
+			
+			if (logoConfig.height !== undefined) {
+				logo.css({height: logoConfig.height});
+			} else {
+				logo.css({height: (logo.width() * logoConfig.rate) + 'px'});
+			}
+		}
+		
+		return this;
+	}
+	
+	/**
+     * render
+     * @return {DPLogo}
+     */
+	render() {
+		let logo = this.config.get('elements.logo', true);
+		let logoConfig = this.config.get('logo');
+		let instance = this;
+		
+		// Check if logo is hidden
+		if (logoConfig === false) {
+			this.status = false;
+			logo.hide();
+			return this;
+		}
+
+		// Event when resize window
+        $(window).resize(function () {
+            instance.resize();
+        });
+
+		// Default
+        instance.resize();
+
+        // Event when click on logo
+        // Event when hover on logo
+
+        return this;
+	}
+}
+
+// ====================================================
+// Class {DPModal}
+// ====================================================
+class DPModal {
+	/**
+     * Constructor
+     * @param config
+     */
+    constructor(app) {
+        this.config = app.config;
+		this.translate = app.translate;
+		this.app = app;
+    }
+	
+	/**
+     * Render
+     */
+	render(){
+		return this;
+	}
+	
+	/**
+     * Show
+     * @param config
+     */
+	toggle(config) {
+		let loader = this.config.get('elements.loaderModal', true);
+        let player = this.config.get('elements.playerModal', true);
+        let modal = this.config.get('elements.modal', true);
+        let videoDom = this.config.get('elements.video', true).get(0);
+        modal.removeClass('active');
+
+        if (config === undefined) {
+            if (!isNaN(videoDom.duration)) {
+                if (videoDom.paused) {
+                    player.addClass('active');
+                } else {
+                    player.removeClass('active');
+                }
+            } else {
+                loader.addClass('active');
+            }
+        } else {
+            if (config.loader === true) {
+                loader.addClass('active');
+            } else if (config.player === true || videoDom.paused) {
+                player.addClass('active');
+            }
+        }
+
+        return this;
+	}
+}
+
+// ====================================================
+// Class {DPModal}
+// ====================================================
+class DBControl {
+	constructor(app){
+		this.config = app.config;
+		this.app = app;
+		this.isMouseIn = false;
+		this.controlTime = null;
+	}
+	
+	/**
+	 * Render
+	 */
+	render(){
+		let instance = this;
+		let video = this.config.get('elements.video', true);
+		let videoDom = video.get(0);
+		let control = this.config.get('elements.control', true);
+		
+        // Event when hover on video/container/control
+        $(this.config.get('elements.container')
+            + ',' + this.config.get('elements.control')
+            + ',' + this.config.get('elements.video')).mousemove(function () {
+            instance.open();
+            instance.isMouseIn = true;
+        });
+		
+		$(window).scroll(function(){
+			instance.open();
+		});
+
+        // Event when out on video/container/control
+        $(this.config.get('elements.container')
+            + ',' + this.config.get('elements.control')
+            + ',' + this.config.get('elements.video')).mouseleave(function () {
+            instance.hidden();
+            instance.isMouseIn = false;
+        });
+
+        // Event when video pause or ended
+        video.on('pause ended', function () {
+            control.addClass('active');
+        });
+
+        // Default
+        videoDom.controls = false;
+
+        return this;
+	}
+	
+	/**
+	 * Hidden
+	 */
+	hidden() {
+		let control = this.config.get('elements.control', true);
+		let video = this.config.get('elements.video', true).get(0);
+		let container = this.config.get('elements.container', true);
+		
+		if (!video.paused) {
+			control.removeClass('active');
+
+			if (this.isMouseIn) {
+				container.addClass('hidden-cursor');
+			} else {
+				container.removeClass('hidden-cursor');
+			}
+		}
+	}
+	
+	/**
+	 * open
+	 */
+	open() {
+		let control = this.config.get('elements.control', true);
+		let container = this.config.get('elements.container', true);
+		let inst = this;
+		
+		window.clearTimeout(this.controlTime);
+		control.addClass('active');
+		container.removeClass('hidden-cursor');
+
+		this.controlTime = window.setTimeout(function () {
+			inst.hidden();
+		}, 2000);
 	}
 }
 
@@ -504,10 +866,13 @@ class DilationPlayer {
         }
 
         config.object = object;
-        this.config = new DilationPlayerConfig(config);
-		this.translate = new DilationPlayerTranslate(this);
-        this.view = new DilationPlayerView(this);
-		this.menu = new DilationPlayerMenu(this);
+        this.config = new DPConfig(config);
+		this.translate = new DPTranslator(this);
+        this.view = new DPView(this);
+		this.control = new DBControl(this);
+		this.menu = new DPMenu(this);
+		this.logo = new DPLogo(this);
+		this.modal = new DPModal(this);
         this.rendered = false;
         this.apply();
     }
@@ -532,12 +897,13 @@ class DilationPlayer {
         await this.render();
 
         // Regist events
-        this.control()
+        this.contextControl()
             .playPause()
             .fullScreen()
             .progress()
             .sound()
-            .logo()
+            .contextLogo()
+			.contextModal()
 			.contextMenu();
     }
 
@@ -601,7 +967,7 @@ class DilationPlayer {
                     btn.html(icons.pause);
                 }
 
-                instance.modal();
+                instance.modal.toggle();
             }
         };
 
@@ -646,9 +1012,10 @@ class DilationPlayer {
 		let btnLarge = this.config.get('elements.controlLargeScreen', true);
         let icons = this.config.get('icons');
 		let object = this.config.get('object', true);
-		let configSize = this.config.get('size');
+		let sizeConfig = this.config.get('size');
 		let defaultSize = null;
 		let largeScreen = this.config.get('largeScreen');
+		let instance = this;
 		
         /**
          * Helper
@@ -661,8 +1028,23 @@ class DilationPlayer {
              * Default screen
              */
 			defaultScreen: function(){
-				// Set to small
-				object.css({width: configSize.width, height: configSize.height});
+				if (sizeConfig.height !== undefined) {
+					object.css({height: sizeConfig.height});
+					
+					if (sizeConfig.width !== undefined) {
+						object.css({width: sizeConfig.width});
+					} else {
+						object.css({width: (object.height() * sizeConfig.rate) + 'px'});
+					}
+				} else {
+					object.css({width: sizeConfig.width});
+					
+					if (sizeConfig.height !== undefined) {
+						object.css({height: sizeConfig.height});
+					} else {
+						object.css({height: (object.width() * sizeConfig.rate) + 'px'});
+					}
+				}
 				
 				if (!defaultSize) {
 					defaultSize = {
@@ -673,6 +1055,8 @@ class DilationPlayer {
 				
 				object.css({maxWidth: '100%'});
 				this.rateScreenSize();
+				
+				return this;
 			},
 			
 			/**
@@ -702,6 +1086,8 @@ class DilationPlayer {
 				}
 				
 				object.css({height: h+'px'});
+				
+				return this;
 			},
 			
             /**
@@ -720,6 +1106,8 @@ class DilationPlayer {
                 } else {
                     btnFull.html(icons.fullScreen);
                 }
+				
+				return this;
             },
 
             /**
@@ -743,6 +1131,8 @@ class DilationPlayer {
                 };
 
                 isFullscreen ? document.cancelFullScreen() : element.requestFullScreen();
+				
+				return this;
             },
 			
 			/**
@@ -759,6 +1149,8 @@ class DilationPlayer {
                 } else {
                     btnLarge.html(icons.largeScreen);
                 }
+				
+				return this;
 			},
 			
 			/**
@@ -773,9 +1165,12 @@ class DilationPlayer {
 					this.isLarge = true;
 					this.rateScreenSize();
 				}
+				
+				instance.logo.resize();
+				
+				return this;
 			}
         };
-
 
         // Event when click on button fullscreen
         // Then call to check full or cancel
@@ -893,7 +1288,7 @@ class DilationPlayer {
         // Event when timeupdate
         video.on('timeupdate ', function (e) {
             helper.display();
-            instance.modal({loader: false});
+            instance.modal.toggle({loader: false});
         });
 
         // Event when click on progress bar
@@ -907,7 +1302,7 @@ class DilationPlayer {
                 let vidTime = videoDom.duration * percentage;
                 videoDom.currentTime = vidTime;
                 helper.setLoaded(left, totalWidth);
-                instance.modal({loader: true});
+                instance.modal.toggle({loader: true});
             }
         });
 
@@ -944,12 +1339,12 @@ class DilationPlayer {
         // Then call display information on screen
         video.on('loadeddata', function (e) {
             helper.display();
-            instance.modal({loader: false});
+            instance.modal.toggle({loader: false});
         });
 
         // Event when start load data
         video.on('loadstart', function (e) {
-            instance.modal({loader: true});
+            instance.modal.toggle({loader: true});
         });
 
         return this;
@@ -1040,32 +1435,8 @@ class DilationPlayer {
      * Logo
      * return {DilationPlayer}
      */
-    logo() {
-        let logo = this.config.get('elements.logo', true);
-		let logoConfig = this.config.get('logo');
-		let helper = {
-			resizeLogo: function(){
-				let height = logo.height();
-				logo.width(height);
-			}
-		};
-		
-		// Check if logo is hidden
-		if (logoConfig === false) {
-			logo.hide();
-		}
-
-		// Event when resize window
-        $(window).resize(function () {
-            helper.resizeLogo();
-        });
-
-		// Default
-        helper.resizeLogo();
-
-        // Event when click on logo
-        // Event when hover on logo
-
+    contextLogo() {
+		this.logo.render();
         return this;
     }
 
@@ -1073,78 +1444,9 @@ class DilationPlayer {
      * Toggle control
      * @return {DilationPlayer}
      */
-    control() {
-        // Defined elements
-        let controlTime = null;
-        let control = this.config.get('elements.control', true);
-        let isMouseIn = false;
-        let container = this.config.get('elements.container', true);
-        let video = this.config.get('elements.video', true);
-
-        /**
-         * Helper
-         * @type {{hidden: hidden, open: open}}
-         */
-        let helper = {
-            /**
-             * Hidden
-             */
-            hidden: function() {
-                if (!video.get(0).paused) {
-                    control.removeClass('active');
-
-                    if (isMouseIn) {
-                        container.addClass('hidden-cursor');
-                    } else {
-                        container.removeClass('hidden-cursor');
-                    }
-                }
-            },
-
-            /**
-             * Open
-             */
-            open: function() {
-                window.clearTimeout(controlTime);
-                control.addClass('active');
-                container.removeClass('hidden-cursor');
-                let inst = this;
-
-                controlTime = window.setTimeout(function () {
-                    inst.hidden();
-                }, 2000);
-            }
-        };
-
-        // Event when hover on video/container/control
-        $(this.config.get('elements.container')
-            + ',' + this.config.get('elements.control')
-            + ',' + this.config.get('elements.video')).mousemove(function () {
-            helper.open();
-            isMouseIn = true;
-        });
-		
-		$(window).scroll(function(){
-			helper.open();
-		});
-
-        // Event when out on video/container/control
-        $(this.config.get('elements.container')
-            + ',' + this.config.get('elements.control')
-            + ',' + this.config.get('elements.video')).mouseleave(function () {
-            helper.hidden();
-            isMouseIn = false;
-        });
-
-        // Event when video pause or ended
-        video.on('pause ended', function () {
-            control.addClass('active');
-        });
-
-        // Default
-        video.get(0).controls = false;
-
-        return this;
+    contextControl() {
+        this.control.render();
+		return this;
     }
 
     /**
@@ -1152,32 +1454,10 @@ class DilationPlayer {
      * @param disabled
      * @return {DilationPlayer}
      */
-    modal(config) {
-        let loader = this.config.get('elements.loaderModal', true);
-        let player = this.config.get('elements.playerModal', true);
-        let modal = this.config.get('elements.modal', true);
-        let videoDom = this.config.get('elements.video', true).get(0);
-        modal.removeClass('active');
-
-        if (config === undefined) {
-            if (!isNaN(videoDom.duration)) {
-                if (videoDom.paused) {
-                    player.addClass('active');
-                } else {
-                    player.removeClass('active');
-                }
-            } else {
-                loader.addClass('active');
-            }
-        } else {
-            if (config.loader === true) {
-                loader.addClass('active');
-            } else if (config.player === true || videoDom.paused) {
-                player.addClass('active');
-            }
-        }
-
-        return this;
+    contextModal(config) {
+        this.modal.render();
+		
+		return this;
     }
 
 	/**
