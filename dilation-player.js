@@ -1,27 +1,27 @@
 let DPTranslateData = {
-	en: {
-		menu: {
-			loop: 'Loop this video',
-			copy_url: 'Copy video\'s url'
-		},
-		
-		app: {
-			loading: 'Loading...',
-			not_support_video: 'This browser not support video'
-		}
-	},
-	
-	vi: {
-		menu: {
-			loop: 'Lặp video này',
-			copy_url: 'Copy đường dẫn video'
-		},
-		
-		app: {
-			loading: 'Đang tải...',
-			not_support_video: 'Trình duyệt không hỗ trợ video'
-		}
-	}
+    en: {
+        menu: {
+            loop: 'Loop this video',
+            copy_url: 'Copy video\'s url'
+        },
+
+        app: {
+            loading: 'Loading...',
+            not_support_video: 'This browser not support video'
+        }
+    },
+
+    vi: {
+        menu: {
+            loop: 'Lặp video này',
+            copy_url: 'Copy đường dẫn video'
+        },
+
+        app: {
+            loading: 'Đang tải...',
+            not_support_video: 'Trình duyệt không hỗ trợ video'
+        }
+    }
 }
 
 // ====================================================
@@ -34,8 +34,8 @@ class DPConfig {
      */
     constructor(config) {
         // Set default
-		config.logo = this.or(config.logo, {});
-		config.size = this.or(config.size, {});
+        config.logo = this.or(config.logo, {});
+        config.size = this.or(config.size, {});
 
         // Config for elements
         this.config = {
@@ -47,15 +47,15 @@ class DPConfig {
             object: this.or(config.object, null),
             view: this.or(config.view, false),
             sources: this.or(config.sources, []),
-			logo: this.mergeLogo(config),
-			size: this.mergeSize(config),
-			largeScreen: this.or(config.largeScreen, false),
-			locale: this.or(config.locale, 'en'),
-			menu: this.mergeMenu(config),
-			poster: this.or(config.poster, null)
+            logo: this.mergeLogo(config),
+            size: this.mergeSize(config),
+            largeScreen: this.or(config.largeScreen, false),
+            locale: this.or(config.locale, 'en'),
+            menu: this.mergeMenu(config),
+            poster: this.or(config.poster, null)
         }
-		
-		// Function
+
+        // Function
 
         // Init cache
         this.cache = {
@@ -65,170 +65,171 @@ class DPConfig {
             config: {}
         };
     }
-	
-	/**
-	 * Merge menu
-	 * @return {object}
-	 */
-	mergeMenu(config){
-		if (config.menu === false) {
-			return false;
-		};
-		
-		let rs = this.or(config.menu, {});
-		
-		rs.loop = this.or(rs.loop, {
-			text: 'menu.loop',
-			element: 'menuItemLoop',
-			execute: function(item, menu, config){
-				menu.execLoop(item, config);
-			}
-		});
-		
-		rs.copyUrl = this.or(rs.copyUrl, {
-			text: 'menu.copy_url',
-			element: 'menuItemCopyUrl',
-			execute: function(item, menu, config){
-				menu.execCopyUrl(item, config);
-			}
-		});
-		
-		return rs;
-	}
 
-	/**
-	 * Merge Elements
-	 * @return {object}
-	 */
-	mergeElements(config){
-		config.elements = this.or(config.elements, {});
-		
-		return {
-			container: this.or(config.elements.container, '.dp'),
-			video: this.or(config.elements.video, '.dp-video'),
-			logo: this.or(config.elements.logo, '.dp-logo'),
-			progress: this.or(config.elements.progress, '.dp-progress'),
-			progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
-			progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
-			control: this.or(config.elements.control, '.dp-control'),
-			button: this.or(config.elements.button, '.dp-button'),
-			controlPlayPause: this.or(config.elements.controlPlayPause, '.dp-btn-play'),
-			controlFullScreen: this.or(config.elements.controlFullScreen, '.dp-btn-fullscreen'),
-			controlLargeScreen: this.or(config.elements.controlLargeScreen, '.dp-btn-largescreen'),
-			controlVolume: this.or(config.elements.controlVolume, '.dp-btn-volume'),
-			controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dp-volume-tooltip'),
-			controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dp-volume-range'),
-			controlTimer: this.or(config.elements.controlTimer, '.dp-timer'),
-			modal: this.or(config.elements.modal, '.dp-modal'),
-			loaderModal: this.or(config.elements.loaderModal, '.dp-modal-loader'),
-			loaderModalIcon: this.or(config.elements.loaderModalIcon, '.dp-modal-loader-icon'),
-			playerModal: this.or(config.elements.playerModal, '.dp-modal-player'),
-			playerModalIcon: this.or(config.elements.playerModalIcon, '.dp-modal-player-icon'),
-			menu: this.or(config.elements.menu, '.dp-menu'),
-			menuList: this.or(config.elements.menuList, '.dp-menu-list'),
-			menuItem: this.or(config.elements.menuItem, '.dp-menu-item'),
-			menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
-			menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
-		};
-	}
-	
-	/**
-	 * Merge Icons
-	 * @return {object}
-	 */
-	mergeIcons(config){
-		config.icons = this.or(config.icons, {});
-		
-		return {
-			loaderModal: this.or(config.icons.loaderModal, '<i class="fa fa-spin fa-spinner"></i>'),
-			playerModal: this.or(config.icons.loaderModal, '<i class="icons icon-control-play"></i>'),
-			fullScreen: this.or(config.icons.fullScreen, '<i class="icons icon-size-fullscreen"></i>'),
-			actualScreen: this.or(config.icons.actualScreen, '<i class="icons icon-size-actual"></i>'),
-			largeScreen: this.or(config.icons.largeScreen, '<i class="icons icon-frame"></i>'),
-			smallScreen: this.or(config.icons.smallScreen, '<i class="icons icon-frame"></i>'),
-			pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
-			play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
-			volumeMute: this.or(config.icons.volumeMute, '<i class="icons icon-volume-off"></i>'),
-			volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
-			volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
-			volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>')
-		};
-	}
-    
-	/**
-	 * Merge logo
-	 * @return {object}
-	 */
-	mergeLogo(config){
-		// Check if logo is false, its mean is not show
-		if (config.logo === false) {
-			return config.logo;
-		}
-		
-		// Check if logo is undefined then get default value
-		config.logo = this.or(config.logo, {});
-		
-		let rs = {};
-		
-		if (config.logo.height !== undefined) {
-			rs.height = config.logo.height;
-			
-			if (config.logo.width !== undefined) {
-				rs.width = config.logo.width;
-			} else {
-				rs.rate = this.or(config.logo.rate, 1);
-			}
-		} else if (config.logo.width !== undefined) {
-			rs.width = config.logo.width;
-			
-			if (config.logo.height !== undefined) {
-				rs.height = config.logo.height;
-			} else {
-				rs.rate = this.or(config.logo.rate, 1);
-			}
-		} else {
-			rs.height = '10%';
-			rs.rate = 1;
-		}
-		
-		rs.url = this.or(config.logo.url, null);
-		
-		return rs;
-	}
-	
-	/**
-	 * Merge size
-	 * @return {object}
-	 */
-	mergeSize(config){
-		config.size = this.or(config.size, {});
-		let rs = {};
-		
-		if (config.size.height !== undefined) {
-			rs.height = config.size.height;
-			
-			if (config.size.width !== undefined) {
-				rs.width = config.size.width;
-			} else {
-				rs.rate = this.or(config.size.rate, 3/2);
-			}
-		} else if (config.size.width !== undefined) {
-			rs.width = config.size.width;
-			
-			if (config.size.height !== undefined) {
-				rs.height = config.size.height;
-			} else {
-				rs.rate = this.or(config.size.rate, 2/3);
-			}
-		} else {
-			rs.width = '100%';
-			rs.rate = 2/3;
-		}
-		
-		return rs;
-	}
-	
-	/**
+    /**
+     * Merge menu
+     * @return {object}
+     */
+    mergeMenu(config) {
+        if (config.menu === false) {
+            return false;
+        }
+        ;
+
+        let rs = this.or(config.menu, {});
+
+        rs.loop = this.or(rs.loop, {
+            text: 'menu.loop',
+            element: 'menuItemLoop',
+            execute: function (item, menu, config) {
+                menu.execLoop(item, config);
+            }
+        });
+
+        rs.copyUrl = this.or(rs.copyUrl, {
+            text: 'menu.copy_url',
+            element: 'menuItemCopyUrl',
+            execute: function (item, menu, config) {
+                menu.execCopyUrl(item, config);
+            }
+        });
+
+        return rs;
+    }
+
+    /**
+     * Merge Elements
+     * @return {object}
+     */
+    mergeElements(config) {
+        config.elements = this.or(config.elements, {});
+
+        return {
+            container: this.or(config.elements.container, '.dp'),
+            video: this.or(config.elements.video, '.dp-video'),
+            logo: this.or(config.elements.logo, '.dp-logo'),
+            progress: this.or(config.elements.progress, '.dp-progress'),
+            progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
+            progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
+            control: this.or(config.elements.control, '.dp-control'),
+            button: this.or(config.elements.button, '.dp-button'),
+            controlPlayPause: this.or(config.elements.controlPlayPause, '.dp-btn-play'),
+            controlFullScreen: this.or(config.elements.controlFullScreen, '.dp-btn-fullscreen'),
+            controlLargeScreen: this.or(config.elements.controlLargeScreen, '.dp-btn-largescreen'),
+            controlVolume: this.or(config.elements.controlVolume, '.dp-btn-volume'),
+            controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dp-volume-tooltip'),
+            controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dp-volume-range'),
+            controlTimer: this.or(config.elements.controlTimer, '.dp-timer'),
+            modal: this.or(config.elements.modal, '.dp-modal'),
+            loaderModal: this.or(config.elements.loaderModal, '.dp-modal-loader'),
+            loaderModalIcon: this.or(config.elements.loaderModalIcon, '.dp-modal-loader-icon'),
+            playerModal: this.or(config.elements.playerModal, '.dp-modal-player'),
+            playerModalIcon: this.or(config.elements.playerModalIcon, '.dp-modal-player-icon'),
+            menu: this.or(config.elements.menu, '.dp-menu'),
+            menuList: this.or(config.elements.menuList, '.dp-menu-list'),
+            menuItem: this.or(config.elements.menuItem, '.dp-menu-item'),
+            menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
+            menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
+        };
+    }
+
+    /**
+     * Merge Icons
+     * @return {object}
+     */
+    mergeIcons(config) {
+        config.icons = this.or(config.icons, {});
+
+        return {
+            loaderModal: this.or(config.icons.loaderModal, '<i class="fa fa-spin fa-spinner"></i>'),
+            playerModal: this.or(config.icons.loaderModal, '<i class="icons icon-control-play"></i>'),
+            fullScreen: this.or(config.icons.fullScreen, '<i class="icons icon-size-fullscreen"></i>'),
+            actualScreen: this.or(config.icons.actualScreen, '<i class="icons icon-size-actual"></i>'),
+            largeScreen: this.or(config.icons.largeScreen, '<i class="icons icon-frame"></i>'),
+            smallScreen: this.or(config.icons.smallScreen, '<i class="icons icon-frame"></i>'),
+            pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
+            play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
+            volumeMute: this.or(config.icons.volumeMute, '<i class="icons icon-volume-off"></i>'),
+            volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
+            volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
+            volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>')
+        };
+    }
+
+    /**
+     * Merge logo
+     * @return {object}
+     */
+    mergeLogo(config) {
+        // Check if logo is false, its mean is not show
+        if (config.logo === false) {
+            return config.logo;
+        }
+
+        // Check if logo is undefined then get default value
+        config.logo = this.or(config.logo, {});
+
+        let rs = {};
+
+        if (config.logo.height !== undefined) {
+            rs.height = config.logo.height;
+
+            if (config.logo.width !== undefined) {
+                rs.width = config.logo.width;
+            } else {
+                rs.rate = this.or(config.logo.rate, 1);
+            }
+        } else if (config.logo.width !== undefined) {
+            rs.width = config.logo.width;
+
+            if (config.logo.height !== undefined) {
+                rs.height = config.logo.height;
+            } else {
+                rs.rate = this.or(config.logo.rate, 1);
+            }
+        } else {
+            rs.height = '10%';
+            rs.rate = 1;
+        }
+
+        rs.url = this.or(config.logo.url, null);
+
+        return rs;
+    }
+
+    /**
+     * Merge size
+     * @return {object}
+     */
+    mergeSize(config) {
+        config.size = this.or(config.size, {});
+        let rs = {};
+
+        if (config.size.height !== undefined) {
+            rs.height = config.size.height;
+
+            if (config.size.width !== undefined) {
+                rs.width = config.size.width;
+            } else {
+                rs.rate = this.or(config.size.rate, 3 / 2);
+            }
+        } else if (config.size.width !== undefined) {
+            rs.width = config.size.width;
+
+            if (config.size.height !== undefined) {
+                rs.height = config.size.height;
+            } else {
+                rs.rate = this.or(config.size.rate, 2 / 3);
+            }
+        } else {
+            rs.width = '100%';
+            rs.rate = 2 / 3;
+        }
+
+        return rs;
+    }
+
+    /**
      * Check if value is undefined then return or
      * @param value
      * @param or
@@ -292,17 +293,17 @@ class DPView {
      */
     constructor(app) {
         this.config = app.config;
-		this.translate = app.translate;
-		this.app = app;
+        this.translate = app.translate;
+        this.app = app;
     }
 
-	/**
+    /**
      * Render view
      * @return {DPView}
      */
     async render() {
         let view = this.config.get('view');
-		let sources = this.config.get('sources');
+        let sources = this.config.get('sources');
 
         if (view === false) {
             return true;
@@ -314,7 +315,7 @@ class DPView {
         if (!view.content) {
             if (view.import) {
                 object.html(this.translate.get('app.loading'));
-				
+
                 let response = await $.ajax({
                     url: view.import,
                     data: {},
@@ -334,39 +335,39 @@ class DPView {
             let content = this.replace(view.content);
             object.html(content);
         }
-		
-		// Setting
-		// Poster
-		let poster = this.config.get('poster');
-		let video = this.config.get('elements.video', true);
-		
-		if (poster) {
-			video.get(0).poster = poster;
-		}
-		
-		if (sources !== undefined) {
-			video.html(this.translate.get('app.not_support_video'));
-			
-			// Generate video from resources
-			if (typeof sources === 'string') {
-				video.get(0).src = sources;
-			} else if(sources.length == 1) {
-				video.get(0).src = sources[0].src;
-			} else {
-				for (var i in sources) {
-					let source = document.createElement('source');
-					$(source).attr({src: sources[i].src, type: sources[i].type});
-					video.append(source);
-				}
-			}
-			
-			video.get(0).load();
-		}
+
+        // Setting
+        // Poster
+        let poster = this.config.get('poster');
+        let video = this.config.get('elements.video', true);
+
+        if (poster) {
+            video.get(0).poster = poster;
+        }
+
+        if (sources !== undefined) {
+            video.html(this.translate.get('app.not_support_video'));
+
+            // Generate video from resources
+            if (typeof sources === 'string') {
+                video.get(0).src = sources;
+            } else if (sources.length == 1) {
+                video.get(0).src = sources[0].src;
+            } else {
+                for (var i in sources) {
+                    let source = document.createElement('source');
+                    $(source).attr({src: sources[i].src, type: sources[i].type});
+                    video.append(source);
+                }
+            }
+
+            video.get(0).load();
+        }
 
         return true;
     }
 
-	/**
+    /**
      * replace
      * @return string
      */
@@ -379,36 +380,36 @@ class DPView {
 // Class {DPTranslator}
 // ====================================================
 class DPTranslator {
-	/**
+    /**
      * Constructor
      * @param config
      */
     constructor(app) {
-		this.config = app.config;
-		this.app = app;
-		
-		if (typeof DPTranslateData !== 'undefined') {
-			this.languages = DPTranslateData;
-		} else {
-			this.languages = {};
-		}
+        this.config = app.config;
+        this.app = app;
+
+        if (typeof DPTranslateData !== 'undefined') {
+            this.languages = DPTranslateData;
+        } else {
+            this.languages = {};
+        }
     }
-	
-	/**
+
+    /**
      * Get translate
      * @param key
      * @param attributes
      * @return mixed
      */
-	get(key, attributes){
+    get(key, attributes) {
         if (attributes == undefined) {
             attributes = {};
         }
 
         var keys = key.split('.');
         var messages = this.or(this.languages[this.config.get('locale')], {});
-		let message = messages;
-		
+        let message = messages;
+
         // Get message format
         for (var i in keys) {
             if (message[keys[i]] == undefined) {
@@ -430,14 +431,14 @@ class DPTranslator {
 
             var fields = messages[keys[0]].attributes[attrKey];
             var attr = (fields[attributes[attrKey]] != undefined ? fields[attributes[attrKey]] : attributes[attrKey]);
-            var regex = new RegExp(':'+attrKey, 'g');
+            var regex = new RegExp(':' + attrKey, 'g');
             message = message.replace(regex, attr);
         }
 
         return message;
     }
-	
-	/**
+
+    /**
      * Check if value is undefined then return or
      * @param value
      * @param or
@@ -452,119 +453,119 @@ class DPTranslator {
 // Class {DPMenu}
 // ====================================================
 class DPMenu {
-	/**
+    /**
      * Constructor
      * @param config
      */
     constructor(app) {
         this.config = app.config;
-		this.translate = app.translate;
-		this.app = app;
-		this.status = true;
+        this.translate = app.translate;
+        this.app = app;
+        this.status = true;
     }
-	
-	/**
+
+    /**
      * Render menu
      * @param config
-	 * @return {DPMenu}
+     * @return {DPMenu}
      */
-	render(){
-		let enableMenuList = this.config.get('menu');
-		let menu = this.config.get('elements.menu', true);
-		
-		if (enableMenuList === false) {
-			menu.hide();
-			this.status = false;
-			return this;
-		}
-		
-		let container = this.config.get('elements.container', true);
-		
-		let menuList = this.config.get('elements.menuList', true);
-		let menuItemClass = this.config.get('elements.menuItem').replace('.', '');
+    render() {
+        let enableMenuList = this.config.get('menu');
+        let menu = this.config.get('elements.menu', true);
 
-		for (var name in enableMenuList) {
-			let div = document.createElement('div');
-			$(div).addClass(menuItemClass)
-				.attr('dp-menu:name', name)
-				.html(this.translate.get(enableMenuList[name].text));
-				
-			menuList.append(div);
-		}
-		
-		return this;
-	}
-	
-	/**
+        if (enableMenuList === false) {
+            menu.hide();
+            this.status = false;
+            return this;
+        }
+
+        let container = this.config.get('elements.container', true);
+
+        let menuList = this.config.get('elements.menuList', true);
+        let menuItemClass = this.config.get('elements.menuItem').replace('.', '');
+
+        for (var name in enableMenuList) {
+            let div = document.createElement('div');
+            $(div).addClass(menuItemClass)
+                .attr('dp-menu:name', name)
+                .html(this.translate.get(enableMenuList[name].text));
+
+            menuList.append(div);
+        }
+
+        return this;
+    }
+
+    /**
      * Open menu
      * @param config
-	 * @return {DPMenu}
+     * @return {DPMenu}
      */
-	openMenu(event){
-		if (!this.status) {
-			return this;
-		}
-		
-		let container = this.config.get('elements.container', true);
-		let menu = this.config.get('elements.menu', true);
-		let menuList = this.config.get('elements.menuList', true);
-		
-		menu.addClass('active');
-		
-		let height = menuList.height();
-		let width = menuList.width();
-		
-		let cheight = $(window).height();
-		let cwidth = $(window).width();
+    openMenu(event) {
+        if (!this.status) {
+            return this;
+        }
 
-		let left = event.pageX;
-		let top = event.pageY;
-		
-		if ((cheight - top) < height) {
-			top = cheight - height;
-		}
+        let container = this.config.get('elements.container', true);
+        let menu = this.config.get('elements.menu', true);
+        let menuList = this.config.get('elements.menuList', true);
 
-		if ((cwidth - left) < width) {
-			left = cwidth - width;
-		}
-		
-		menuList.css({left: left + 'px', top: top + 'px'});
-		
-		return this;
-	}
-	
-	/**
+        menu.addClass('active');
+
+        let height = menuList.height();
+        let width = menuList.width();
+
+        let cheight = $(window).height();
+        let cwidth = $(window).width();
+
+        let left = event.pageX;
+        let top = event.pageY;
+
+        if ((cheight - top) < height) {
+            top = cheight - height;
+        }
+
+        if ((cwidth - left) < width) {
+            left = cwidth - width;
+        }
+
+        menuList.css({left: left + 'px', top: top + 'px'});
+
+        return this;
+    }
+
+    /**
      * Close menu
      * @param config
-	 * @return {DPMenu}
+     * @return {DPMenu}
      */
-	closeMenu(){
-		if (!this.status) {
-			return this;
-		}
-		
-		let menu = this.config.get('elements.menu', true);
-		menu.removeClass('active');
-		
-		return this;
-	}
-	
-	/**
+    closeMenu() {
+        if (!this.status) {
+            return this;
+        }
+
+        let menu = this.config.get('elements.menu', true);
+        menu.removeClass('active');
+
+        return this;
+    }
+
+    /**
      * Event menu
      * @param config
-	 * @return {DPMenu}
+     * @return {DPMenu}
      */
-	events(){
-		let instance = this;
-		let container = this.config.get('elements.container', true);
-		let menuList = this.config.get('elements.menuList', true);
-		let menuItem = this.config.get('elements.menuItem', true);
-		
-		// Event when right click or open menu
+    events() {
+        let instance = this;
+        let container = this.config.get('elements.container', true);
+        let menuList = this.config.get('elements.menuList', true);
+        let menuItem = this.config.get('elements.menuItem', true);
+
+        // Event when right click or open menu
         container.mousedown(function (event) {
-			var isRightMB;
-			event = event || window.event;
-		
+            var isRightMB;
+            event = event || window.event;
+
             if (event.which === 3) {
                 container.bind('contextmenu', function () {
                     return false;
@@ -573,211 +574,211 @@ class DPMenu {
             else {
                 container.unbind('contextmenu');
             }
-			
-			if (!instance.status) {
-				return;
-			}
-			
-			// Gecko (Firefox), WebKit (Safari/Chrome) & Opera
-			if ("which" in event)  
-				isRightMB = event.which == 3; 
-			// IE, Opera 
-			else if ("button" in event)
-				isRightMB = event.button == 2; 
-			
-			// Open menu
-			if (isRightMB) {
-				instance.openMenu(event);
-			}
-        });
-		
-		// Event when click out menu
-		$(window).click(function(event){
-			if (menuList.has(event.target).length == 0
-				&& !menuList.is(event.target)){
-				instance.closeMenu();
-			}
-		});
-		
-		// Event when click menu item
-		menuItem.click(function(){
-			let name = $(this).attr('dp-menu:name');
-			instance.execute(this, name);
-		});
-		
-		return this;
-	}
 
-	/**
+            if (!instance.status) {
+                return;
+            }
+
+            // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
+            if ("which" in event)
+                isRightMB = event.which == 3;
+            // IE, Opera
+            else if ("button" in event)
+                isRightMB = event.button == 2;
+
+            // Open menu
+            if (isRightMB) {
+                instance.openMenu(event);
+            }
+        });
+
+        // Event when click out menu
+        $(window).click(function (event) {
+            if (menuList.has(event.target).length == 0
+                && !menuList.is(event.target)) {
+                instance.closeMenu();
+            }
+        });
+
+        // Event when click menu item
+        menuItem.click(function () {
+            let name = $(this).attr('dp-menu:name');
+            instance.execute(this, name);
+        });
+
+        return this;
+    }
+
+    /**
      * execute
      * @param name
-	 * @return {DilationPlayerMenu}
+     * @return {DilationPlayerMenu}
      */
-	execute(item, name){
-		if (!this.status) {
-			return this;
-		}
-		
-		let config = this.config.get('menu.'+name);
-		
-		if (config.execute !== undefined) {
-			config.execute(item, this, config);
-		}
-		
-		return this;
-	}
-	
-	/**
+    execute(item, name) {
+        if (!this.status) {
+            return this;
+        }
+
+        let config = this.config.get('menu.' + name);
+
+        if (config.execute !== undefined) {
+            config.execute(item, this, config);
+        }
+
+        return this;
+    }
+
+    /**
      * Exec Loop
-	 * @return {DilationPlayerMenu}
+     * @return {DilationPlayerMenu}
      */
-	execLoop(item, config) {
-		if (!this.status) {
-			return this;
-		}
-		
-		let video = this.config.get('elements.video', true).get(0);
+    execLoop(item, config) {
+        if (!this.status) {
+            return this;
+        }
 
-		if (video.loop) {
-			video.loop = false;
-			$(item).removeClass('active');
-		} else {
-			video.loop = true;
-			$(item).addClass('active');
-		}
-		
-		this.closeMenu();
-		
-		return this;
-	}
-	
-	/**
+        let video = this.config.get('elements.video', true).get(0);
+
+        if (video.loop) {
+            video.loop = false;
+            $(item).removeClass('active');
+        } else {
+            video.loop = true;
+            $(item).addClass('active');
+        }
+
+        this.closeMenu();
+
+        return this;
+    }
+
+    /**
      * Exec Copy Video Url
-	 * @return {DilationPlayerMenu}
+     * @return {DilationPlayerMenu}
      */
-	execCopyUrl(item, config) {
-		if (!this.status) {
-			return this;
-		}
-		
-		let video = this.config.get('elements.video', true).get(0);
+    execCopyUrl(item, config) {
+        if (!this.status) {
+            return this;
+        }
 
-		this.closeMenu();
-		
-		return this;
-	}
+        let video = this.config.get('elements.video', true).get(0);
+
+        this.closeMenu();
+
+        return this;
+    }
 }
 
 // ====================================================
 // Class {DPLogo}
 // ====================================================
 class DPLogo {
-	/**
+    /**
      * Constructor
      * @param config
      */
     constructor(app) {
         this.config = app.config;
-		this.translate = app.translate;
-		this.app = app;
-		this.status = true;
+        this.translate = app.translate;
+        this.app = app;
+        this.status = true;
     }
-	
-	/**
+
+    /**
      * resizeLogo
      * @return {DPLogo}
      */
-	resize() {
-		if (!this.status) {
-			return this;
-		}
-		
-		let logo = this.config.get('elements.logo', true);
-		let height = logo.height();
-		let logoConfig = this.config.get('logo');
+    resize() {
+        if (!this.status) {
+            return this;
+        }
 
-		if (logoConfig.height !== undefined) {
-			logo.css({height: logoConfig.height});
-			
-			if (logoConfig.width !== undefined) {
-				logo.css({width: logoConfig.width});
-			} else {
-				logo.css({width: (logo.height() * logoConfig.rate) + 'px'});
-			}
-		} else {
-			logo.css({width: logoConfig.width});
-			
-			if (logoConfig.height !== undefined) {
-				logo.css({height: logoConfig.height});
-			} else {
-				logo.css({height: (logo.width() * logoConfig.rate) + 'px'});
-			}
-		}
-		
-		return this;
-	}
-	
-	/**
+        let logo = this.config.get('elements.logo', true);
+        let height = logo.height();
+        let logoConfig = this.config.get('logo');
+
+        if (logoConfig.height !== undefined) {
+            logo.css({height: logoConfig.height});
+
+            if (logoConfig.width !== undefined) {
+                logo.css({width: logoConfig.width});
+            } else {
+                logo.css({width: (logo.height() * logoConfig.rate) + 'px'});
+            }
+        } else {
+            logo.css({width: logoConfig.width});
+
+            if (logoConfig.height !== undefined) {
+                logo.css({height: logoConfig.height});
+            } else {
+                logo.css({height: (logo.width() * logoConfig.rate) + 'px'});
+            }
+        }
+
+        return this;
+    }
+
+    /**
      * render
      * @return {DPLogo}
      */
-	render() {
-		let logo = this.config.get('elements.logo', true);
-		let logoConfig = this.config.get('logo');
-		let instance = this;
-		
-		// Check if logo is hidden
-		if (logoConfig === false) {
-			this.status = false;
-			logo.hide();
-			return this;
-		}
-		
-		// Make logo
-		logo.css({backgroundImage: 'url(\''+logoConfig.url+'\')'});
+    render() {
+        let logo = this.config.get('elements.logo', true);
+        let logoConfig = this.config.get('logo');
+        let instance = this;
 
-		// Event when resize window
+        // Check if logo is hidden
+        if (logoConfig === false) {
+            this.status = false;
+            logo.hide();
+            return this;
+        }
+
+        // Make logo
+        logo.css({backgroundImage: 'url(\'' + logoConfig.url + '\')'});
+
+        // Event when resize window
         $(window).resize(function () {
             instance.resize();
         });
 
-		// Default
+        // Default
         instance.resize();
 
         // Event when click on logo
         // Event when hover on logo
 
         return this;
-	}
+    }
 }
 
 // ====================================================
 // Class {DPModal}
 // ====================================================
 class DPModal {
-	/**
+    /**
      * Constructor
      * @param config
      */
     constructor(app) {
         this.config = app.config;
-		this.translate = app.translate;
-		this.app = app;
+        this.translate = app.translate;
+        this.app = app;
     }
-	
-	/**
+
+    /**
      * Render
      */
-	render(){
-		return this;
-	}
-	
-	/**
+    render() {
+        return this;
+    }
+
+    /**
      * Show
      * @param config
      */
-	toggle(config) {
-		let loader = this.config.get('elements.loaderModal', true);
+    toggle(config) {
+        let loader = this.config.get('elements.loaderModal', true);
         let player = this.config.get('elements.playerModal', true);
         let modal = this.config.get('elements.modal', true);
         let videoDom = this.config.get('elements.video', true).get(0);
@@ -802,29 +803,29 @@ class DPModal {
         }
 
         return this;
-	}
+    }
 }
 
 // ====================================================
 // Class {DPModal}
 // ====================================================
 class DBControl {
-	constructor(app){
-		this.config = app.config;
-		this.app = app;
-		this.isMouseIn = false;
-		this.controlTime = null;
-	}
-	
-	/**
-	 * Render
-	 */
-	render(){
-		let instance = this;
-		let video = this.config.get('elements.video', true);
-		let videoDom = video.get(0);
-		let control = this.config.get('elements.control', true);
-		
+    constructor(app) {
+        this.config = app.config;
+        this.app = app;
+        this.isMouseIn = false;
+        this.controlTime = null;
+    }
+
+    /**
+     * Render
+     */
+    render() {
+        let instance = this;
+        let video = this.config.get('elements.video', true);
+        let videoDom = video.get(0);
+        let control = this.config.get('elements.control', true);
+
         // Event when hover on video/container/control
         $(this.config.get('elements.container')
             + ',' + this.config.get('elements.control')
@@ -832,10 +833,10 @@ class DBControl {
             instance.open();
             instance.isMouseIn = true;
         });
-		
-		$(window).scroll(function(){
-			instance.open();
-		});
+
+        $(window).scroll(function () {
+            instance.open();
+        });
 
         // Event when out on video/container/control
         $(this.config.get('elements.container')
@@ -854,43 +855,43 @@ class DBControl {
         videoDom.controls = false;
 
         return this;
-	}
-	
-	/**
-	 * Hidden
-	 */
-	hidden() {
-		let control = this.config.get('elements.control', true);
-		let video = this.config.get('elements.video', true).get(0);
-		let container = this.config.get('elements.container', true);
-		
-		if (!video.paused) {
-			control.removeClass('active');
+    }
 
-			if (this.isMouseIn) {
-				container.addClass('hidden-cursor');
-			} else {
-				container.removeClass('hidden-cursor');
-			}
-		}
-	}
-	
-	/**
-	 * open
-	 */
-	open() {
-		let control = this.config.get('elements.control', true);
-		let container = this.config.get('elements.container', true);
-		let inst = this;
-		
-		window.clearTimeout(this.controlTime);
-		control.addClass('active');
-		container.removeClass('hidden-cursor');
+    /**
+     * Hidden
+     */
+    hidden() {
+        let control = this.config.get('elements.control', true);
+        let video = this.config.get('elements.video', true).get(0);
+        let container = this.config.get('elements.container', true);
 
-		this.controlTime = window.setTimeout(function () {
-			inst.hidden();
-		}, 2000);
-	}
+        if (!video.paused) {
+            control.removeClass('active');
+
+            if (this.isMouseIn) {
+                container.addClass('hidden-cursor');
+            } else {
+                container.removeClass('hidden-cursor');
+            }
+        }
+    }
+
+    /**
+     * open
+     */
+    open() {
+        let control = this.config.get('elements.control', true);
+        let container = this.config.get('elements.container', true);
+        let inst = this;
+
+        window.clearTimeout(this.controlTime);
+        control.addClass('active');
+        container.removeClass('hidden-cursor');
+
+        this.controlTime = window.setTimeout(function () {
+            inst.hidden();
+        }, 2000);
+    }
 }
 
 // ====================================================
@@ -908,12 +909,12 @@ class DilationPlayer {
 
         config.object = object;
         this.config = new DPConfig(config);
-		this.translate = new DPTranslator(this);
+        this.translate = new DPTranslator(this);
         this.view = new DPView(this);
-		this.control = new DBControl(this);
-		this.menu = new DPMenu(this);
-		this.logo = new DPLogo(this);
-		this.modal = new DPModal(this);
+        this.control = new DBControl(this);
+        this.menu = new DPMenu(this);
+        this.logo = new DPLogo(this);
+        this.modal = new DPModal(this);
         this.rendered = false;
         this.apply();
     }
@@ -923,12 +924,12 @@ class DilationPlayer {
      * @param resources
      */
     load(resources) {
-		if (this.rendered) {
-			let video = this.config.get('video', true);
-			var source = document.createElement('source');
-			source.setAttribute('src', resources);
-			video.appendChild(source);
-		}
+        if (this.rendered) {
+            let video = this.config.get('video', true);
+            var source = document.createElement('source');
+            source.setAttribute('src', resources);
+            video.appendChild(source);
+        }
     }
 
     /**
@@ -944,8 +945,8 @@ class DilationPlayer {
             .progress()
             .sound()
             .contextLogo()
-			.contextModal()
-			.contextMenu();
+            .contextModal()
+            .contextMenu();
     }
 
     /**
@@ -955,15 +956,15 @@ class DilationPlayer {
     async render() {
         let rendered = await this.view.render();
         this.rendered = true;
-		
-		let icons = this.config.get('icons');
+
+        let icons = this.config.get('icons');
         let loaderIcon = this.config.get('elements.loaderModalIcon', true);
-		let playerIcon = this.config.get('elements.playerModalIcon', true);
-		
-		// default
+        let playerIcon = this.config.get('elements.playerModalIcon', true);
+
+        // default
         playerIcon.html(icons.playerModal);
         loaderIcon.html(icons.loaderModal);
-		
+
         return rendered;
     }
 
@@ -1050,105 +1051,105 @@ class DilationPlayer {
         // Defined elements
         let element = this.config.get('elements.container', true).get(0);
         let btnFull = this.config.get('elements.controlFullScreen', true);
-		let btnLarge = this.config.get('elements.controlLargeScreen', true);
+        let btnLarge = this.config.get('elements.controlLargeScreen', true);
         let icons = this.config.get('icons');
-		let object = this.config.get('object', true);
-		let sizeConfig = this.config.get('size');
-		let defaultSize = null;
-		let largeScreen = this.config.get('largeScreen');
-		let instance = this;
-		
+        let object = this.config.get('object', true);
+        let sizeConfig = this.config.get('size');
+        let defaultSize = null;
+        let largeScreen = this.config.get('largeScreen');
+        let instance = this;
+
         /**
          * Helper
          * @type {{makeIcon: makeIcon, request: request, cancel: cancel}}
          */
         let helper = {
-			isLarge: false,
-			
-			/**
+            isLarge: false,
+
+            /**
              * Default screen
              */
-			defaultScreen: function(){
-				if (sizeConfig.height !== undefined) {
-					object.css({height: sizeConfig.height});
-					
-					if (sizeConfig.width !== undefined) {
-						object.css({width: sizeConfig.width});
-					} else {
-						object.css({width: (object.height() * sizeConfig.rate) + 'px'});
-					}
-				} else {
-					object.css({width: sizeConfig.width});
-					
-					if (sizeConfig.height !== undefined) {
-						object.css({height: sizeConfig.height});
-					} else {
-						object.css({height: (object.width() * sizeConfig.rate) + 'px'});
-					}
-				}
-				
-				if (!defaultSize) {
-					defaultSize = {
-						width: object.width(),
-						height: object.height()
-					};
-				}
-				
-				object.css({maxWidth: '100%'});
-				this.rateScreenSize();
-				
-				return this;
-			},
-			
-			/**
+            defaultScreen: function () {
+                if (sizeConfig.height !== undefined) {
+                    object.css({height: sizeConfig.height});
+
+                    if (sizeConfig.width !== undefined) {
+                        object.css({width: sizeConfig.width});
+                    } else {
+                        object.css({width: (object.height() * sizeConfig.rate) + 'px'});
+                    }
+                } else {
+                    object.css({width: sizeConfig.width});
+
+                    if (sizeConfig.height !== undefined) {
+                        object.css({height: sizeConfig.height});
+                    } else {
+                        object.css({height: (object.width() * sizeConfig.rate) + 'px'});
+                    }
+                }
+
+                if (!defaultSize) {
+                    defaultSize = {
+                        width: object.width(),
+                        height: object.height()
+                    };
+                }
+
+                object.css({maxWidth: '100%'});
+                this.rateScreenSize();
+
+                return this;
+            },
+
+            /**
              * Rate screen size
              */
-			rateScreenSize: function(isLg){
-				if (isLg == undefined) {
-					isLg = this.isLarge;
-				}
-				
-				let videoSize = 0;
-				let h = 0;
-				
-				if (this.isLarge) {
-					videoSize = $(window).width();
-					
-					object.width(videoSize);
-					h = (videoSize*defaultSize.height/defaultSize.width);
-					let windowH = $(window).height()*85/100;
-					
-					if (h > windowH) {
-						h = windowH;
-					}
-				} else {
-					videoSize = object.width();
-					h = (videoSize*defaultSize.height/defaultSize.width);
-				}
-				
-				object.css({height: h+'px'});
-				
-				return this;
-			},
-			
+            rateScreenSize: function (isLg) {
+                if (isLg == undefined) {
+                    isLg = this.isLarge;
+                }
+
+                let videoSize = 0;
+                let h = 0;
+
+                if (this.isLarge) {
+                    videoSize = $(window).width();
+
+                    object.width(videoSize);
+                    h = (videoSize * defaultSize.height / defaultSize.width);
+                    let windowH = $(window).height() * 85 / 100;
+
+                    if (h > windowH) {
+                        h = windowH;
+                    }
+                } else {
+                    videoSize = object.width();
+                    h = (videoSize * defaultSize.height / defaultSize.width);
+                }
+
+                object.css({height: h + 'px'});
+
+                return this;
+            },
+
             /**
              * Make icon
              * @param isFull
              */
             makeIconForFullScreen: function (isFull) {
-				if (isFull === undefined) {
-					isFull = document.fullscreenElement
-					|| document.mozFullScreenElement
-					|| document.webkitFullscreenElement;
-				}
-				
+                if (isFull === undefined) {
+                    isFull = document.fullscreenElement
+                        || document.mozFullScreenElement
+                        || document.webkitFullscreenElement;
+                }
+
                 if (isFull) {
                     btnFull.html(icons.actualScreen);
                 } else {
                     btnFull.html(icons.fullScreen);
                 }
-				
-				return this;
+
+                return this;
             },
 
             /**
@@ -1172,45 +1173,45 @@ class DilationPlayer {
                 };
 
                 isFullscreen ? document.cancelFullScreen() : element.requestFullScreen();
-				
-				return this;
+
+                return this;
             },
-			
-			/**
+
+            /**
              * Make icon
              * @param isFull
              */
-			makeIconForLargeScreen: function(isLg){
-				if (isLg === undefined) {
-					isLg = this.isLarge;
-				}
-				
-				if (isLg) {
+            makeIconForLargeScreen: function (isLg) {
+                if (isLg === undefined) {
+                    isLg = this.isLarge;
+                }
+
+                if (isLg) {
                     btnLarge.html(icons.smallScreen);
                 } else {
                     btnLarge.html(icons.largeScreen);
                 }
-				
-				return this;
-			},
-			
-			/**
+
+                return this;
+            },
+
+            /**
              * Toggle
              * @param event
              */
-			toggleLargeScreen: function(){
-				if (this.isLarge) {
-					this.isLarge = false;
-					this.defaultScreen();
-				} else {
-					this.isLarge = true;
-					this.rateScreenSize();
-				}
-				
-				instance.logo.resize();
-				
-				return this;
-			}
+            toggleLargeScreen: function () {
+                if (this.isLarge) {
+                    this.isLarge = false;
+                    this.defaultScreen();
+                } else {
+                    this.isLarge = true;
+                    this.rateScreenSize();
+                }
+
+                instance.logo.resize();
+
+                return this;
+            }
         };
 
         // Event when click on button fullscreen
@@ -1218,12 +1219,12 @@ class DilationPlayer {
         btnFull.on('click', function (event) {
             helper.toggleFullScreen();
         });
-		
-		// Event when click on button large
+
+        // Event when click on button large
         // Then call to check large or cancel
         btnLarge.on('click', function (event) {
             helper.toggleLargeScreen();
-			helper.makeIconForLargeScreen();
+            helper.makeIconForLargeScreen();
         });
 
         // Event when change screen
@@ -1231,21 +1232,21 @@ class DilationPlayer {
         $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
             helper.makeIconForFullScreen();
         });
-		
-		// Event when window resize
-		$(window).resize(function(){
-			helper.rateScreenSize();
-		});
 
-		helper.defaultScreen();
+        // Event when window resize
+        $(window).resize(function () {
+            helper.rateScreenSize();
+        });
+
+        helper.defaultScreen();
         helper.makeIconForFullScreen(false);
-		
-		if (largeScreen) {
-			helper.toggleLargeScreen();
-		}
-		
-		helper.makeIconForLargeScreen();
-		
+
+        if (largeScreen) {
+            helper.toggleLargeScreen();
+        }
+
+        helper.makeIconForLargeScreen();
+
         return this;
     }
 
@@ -1265,19 +1266,19 @@ class DilationPlayer {
         let tooltipCanvas = progressTimerTooltipImage.find('canvas').get(0);
         tooltipCanvas.width = 90;
         tooltipCanvas.height = 70;
-		
-		// Create preview elements
-		let videoPreview = document.createElement('video');
-		
-		video.find('source').each(function(num, val){
-			var source = document.createElement('source');
-			$(source).prop('src', $(this).attr('src'));
-			videoPreview.append(source);
-		});
-		
-		videoPreview.load();
-		// videoPreview.pause();
-		
+
+        // Create preview elements
+        let videoPreview = document.createElement('video');
+
+        video.find('source').each(function (num, val) {
+            var source = document.createElement('source');
+            $(source).prop('src', $(this).attr('src'));
+            videoPreview.append(source);
+        });
+
+        videoPreview.load();
+        // videoPreview.pause();
+
         /**
          * Helper object
          * @type {{pad: (function(*, *, *=): *), setLoaded: setLoaded, setTimer: setTimer, display: display}}
@@ -1381,7 +1382,7 @@ class DilationPlayer {
                 progressTimerTooltipImage.css('left', left + 'px');
 
                 // Get picture
-				//videoPreview.currentTime = current;
+                //videoPreview.currentTime = current;
                 //tooltipCanvas.getContext('2d').drawImage(videoPreview, 0, 0, tooltipCanvas.width, tooltipCanvas.height);
             } else {
                 progressTimerTooltipText.hide();
@@ -1450,7 +1451,7 @@ class DilationPlayer {
             /**
              * Toggle mute video
              */
-            toggleMute: function(){
+            toggleMute: function () {
                 if (videoDom.muted == true) {
                     videoDom.muted = false;
                 } else if (videoDom.volume > 0) {
@@ -1479,8 +1480,8 @@ class DilationPlayer {
 
         // Set volume default
         helper.setVolume(range);
-		volumeRange.val(range);
-		helper.makeIcon();
+        volumeRange.val(range);
+        helper.makeIcon();
 
         return this;
     }
@@ -1490,7 +1491,7 @@ class DilationPlayer {
      * return {DilationPlayer}
      */
     contextLogo() {
-		this.logo.render();
+        this.logo.render();
         return this;
     }
 
@@ -1500,7 +1501,7 @@ class DilationPlayer {
      */
     contextControl() {
         this.control.render();
-		return this;
+        return this;
     }
 
     /**
@@ -1510,16 +1511,16 @@ class DilationPlayer {
      */
     contextModal(config) {
         this.modal.render();
-		
-		return this;
+
+        return this;
     }
 
-	/**
+    /**
      * Menu
      * @return {DilationPlayer}
      */
-	contextMenu() {
-		this.menu.render().events();
-		return this;
-	}
+    contextMenu() {
+        this.menu.render().events();
+        return this;
+    }
 }
