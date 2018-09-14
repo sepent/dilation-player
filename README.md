@@ -9,7 +9,7 @@ DilationPlayer is object, It provide methods to play video/audio.
 
 Import file DilationPlayer.js to your html page.
 
-Sample: **[Video demo](http://dilationplayer.cobonla.org/)**
+Html page: 
 
 ```
 <!DOCTYPE html>
@@ -143,5 +143,7 @@ Sample: **[Video demo](http://dilationplayer.cobonla.org/)**
     </script>
 </body>
 ```
+
+**[Video demo](http://dilationplayer.cobonla.org/)**
 
 OK, now it's working!
