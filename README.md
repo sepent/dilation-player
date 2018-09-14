@@ -108,7 +108,7 @@ Then it auto apply to your elements. If you want to custom, then change **json_c
 Example, you would like to show video without **logo** then:
 
 ```
-var player = new DilationPlayer('#your_container_id', {
+var player = new DilationPlayer('#video-container', {
     logo: false
 });
 ```
@@ -116,9 +116,32 @@ var player = new DilationPlayer('#your_container_id', {
 Or you want to show the poster before start video then:
 
 ```
-var player = new DilationPlayer('#your_container_id', {
+var player = new DilationPlayer('#video-container', {
     poster: 'https://mywebsite.com/poster.png'
 });
+```
+
+Full source code after config:
+
+Sample: **[Video demo](http://dilationplayer.cobonla.org/)**
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/dilation-player.css">
+</head>
+<body>
+    <div id="video-container"></div>
+    <script src="http://cdn.lib.cobonla.org/jquery/v3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
+    <script>
+    var player = new DilationPlayer('#video-container', {
+        poster: 'https://mywebsite.com/poster.png',
+        logo: false
+    });
+    </script>
+</body>
 ```
 
 OK, now it's working!
