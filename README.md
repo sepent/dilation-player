@@ -7,13 +7,30 @@ DilationPlayer is object, It provide methods to play video/audio.
 
 **Using**
 
-Import file DilationPlayer.js to your html page. Then create new object.
+Import file DilationPlayer.js to your html page.
+
+Sample:
 
 ```
-var player = new DilationPlayer('#your_container_id', config);
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/dilation-player.css">
+</head>
+<body>
+    <div id="video-container"></div>
+    <script src="http://cdn.lib.cobonla.org/jquery/v3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
+</body>
 ```
 
-Then it auto apply to your elements. If you want to custom, then change **config** value bellow.
+Then create new object.
+
+```
+var player = new DilationPlayer('#video-container', json_config);
+```
+
+Then it auto apply to your elements. If you want to custom, then change **json_config** value bellow.
 
 ```
 {
@@ -87,7 +104,6 @@ Then it auto apply to your elements. If you want to custom, then change **config
     poster: null
 }
 ```
-
 
 Example, you would like to show video without **logo** then:
 
