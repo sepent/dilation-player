@@ -235,7 +235,7 @@ class DPConfig {
      */
     mergeView(config) {
         if (config.view == false
-            || config.view == undefined ) {
+            || config.view == undefined) {
             config.view = {};
         }
 
@@ -1169,7 +1169,7 @@ class DilationPlayer {
             toggleFullScreen: function () {
                 // Check if event is html element
                 // if (event instanceof HTMLElement) {
-                //     element = event;
+                //   element = event;
                 // }
 
                 var isFullscreen = document.webkitIsFullScreen || document.mozFullScreen || false;
