@@ -49,7 +49,8 @@ class DPConfig {
 			size: this.mergeSize(config),
 			largeScreen: this.or(config.largeScreen, false),
 			locale: this.or(config.locale, 'en'),
-			menu: this.mergeMenu(config)
+			menu: this.mergeMenu(config),
+			poster: this.or(config.poster, null)
         }
 		
 		// Function
@@ -324,6 +325,15 @@ class DPView {
             let content = this.replace(view.content);
             object.html(content);
         }
+		
+		// Setting
+		// Poster
+		let poster = this.config.get('poster');
+		
+		if (poster) {
+			let video = this.config.get('elements.video', true);
+			video.get(0).poster = poster;
+		}
 
         return true;
     }
@@ -1224,7 +1234,9 @@ class DilationPlayer {
         let tooltipCanvas = progressTimerTooltipImage.find('canvas').get(0);
         tooltipCanvas.width = 90;
         tooltipCanvas.height = 70;
-
+		let videoClone = video.clone();
+		videoClone.get(0).load();
+		
         /**
          * Helper object
          * @type {{pad: (function(*, *, *=): *), setLoaded: setLoaded, setTimer: setTimer, display: display}}
@@ -1328,7 +1340,8 @@ class DilationPlayer {
                 progressTimerTooltipImage.css('left', left + 'px');
 
                 // Get picture
-                tooltipCanvas.getContext('2d').drawImage(videoDom, 0, 0, tooltipCanvas.width, tooltipCanvas.height);
+				videoClone.get(0).currentTime = current;
+                tooltipCanvas.getContext('2d').drawImage(videoClone.get(0), 0, 0, tooltipCanvas.width, tooltipCanvas.height);
             } else {
                 progressTimerTooltipText.hide();
                 progressTimerTooltipImage.hide();
