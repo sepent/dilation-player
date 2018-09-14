@@ -1,6 +1,6 @@
 # DilationPlayer
 
-DilationPlayer is object, It provide methods to play video/audio.
+DilationPlayer is object, It provide methods to play video/audio. **[Video demo](http://dilationplayer.cobonla.org/)**
 
 **Platform**
 - Jquery
@@ -123,8 +123,6 @@ var player = new DilationPlayer('#video-container', {
 
 Full source code after config:
 
-Sample: **[Video demo](http://dilationplayer.cobonla.org/)**
-
 ```
 <!DOCTYPE html>
 <html>
@@ -143,7 +141,5 @@ Sample: **[Video demo](http://dilationplayer.cobonla.org/)**
     </script>
 </body>
 ```
-
-**[Video demo](http://dilationplayer.cobonla.org/)**
 
 OK, now it's working!
