@@ -181,9 +181,11 @@ class DPConfig {
 				rs.rate = this.or(config.logo.rate, 1);
 			}
 		} else {
-			rs.height = '8%';
+			rs.height = '10%';
 			rs.rate = 1;
 		}
+		
+		rs.url = this.or(config.logo.url, null);
 		
 		return rs;
 	}
@@ -704,6 +706,9 @@ class DPLogo {
 			logo.hide();
 			return this;
 		}
+		
+		// Make logo
+		logo.css({backgroundImage: 'url(\''+logoConfig.url+'\')'});
 
 		// Event when resize window
         $(window).resize(function () {
