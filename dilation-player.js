@@ -321,6 +321,28 @@ class DPView {
         let view = this.config.get('view');
         let sources = this.config.get('sources');
         let object = this.config.get('object', true);
+		let sizeConfig = this.config.get('size');
+		
+		// Render size
+		object.css({maxWidth: '100%'});
+		
+		if (sizeConfig.height !== undefined) {
+			object.css({height: sizeConfig.height});
+
+			if (sizeConfig.width !== undefined) {
+				object.css({width: sizeConfig.width});
+			} else {
+				object.css({width: (object.height() * sizeConfig.rate) + 'px'});
+			}
+		} else {
+			object.css({width: sizeConfig.width});
+
+			if (sizeConfig.height !== undefined) {
+				object.css({height: sizeConfig.height});
+			} else {
+				object.css({height: (object.width() * sizeConfig.rate) + 'px'});
+			}
+		}
 
         // Read content in template
         if (!view.content) {
@@ -480,7 +502,7 @@ class DPMenu {
      * @param config
      * @return {DPMenu}
      */
-    render() {
+    run() {
         let enableMenuList = this.config.get('menu');
         let menu = this.config.get('elements.menu', true);
 
@@ -503,6 +525,8 @@ class DPMenu {
 
             menuList.append(div);
         }
+		
+		this.events();
 
         return this;
     }
@@ -732,7 +756,7 @@ class DPLogo {
      * render
      * @return {DPLogo}
      */
-    render() {
+    run() {
         let logo = this.config.get('elements.logo', true);
         let logoConfig = this.config.get('logo');
         let instance = this;
@@ -779,7 +803,7 @@ class DPModal {
     /**
      * Render
      */
-    render() {
+    run() {
         return this;
     }
 
@@ -830,7 +854,7 @@ class DBControl {
     /**
      * Render
      */
-    render() {
+    run() {
         let instance = this;
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
@@ -1501,7 +1525,7 @@ class DilationPlayer {
      * return {DilationPlayer}
      */
     contextLogo() {
-        this.logo.render();
+        this.logo.run();
         return this;
     }
 
@@ -1510,7 +1534,7 @@ class DilationPlayer {
      * @return {DilationPlayer}
      */
     contextControl() {
-        this.control.render();
+        this.control.run();
         return this;
     }
 
@@ -1520,7 +1544,7 @@ class DilationPlayer {
      * @return {DilationPlayer}
      */
     contextModal(config) {
-        this.modal.render();
+        this.modal.run();
 
         return this;
     }
@@ -1530,7 +1554,7 @@ class DilationPlayer {
      * @return {DilationPlayer}
      */
     contextMenu() {
-        this.menu.render().events();
+        this.menu.run();
         return this;
     }
 }
