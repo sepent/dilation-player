@@ -126,6 +126,7 @@ class DPConfig extends Base {
             video: this.or(config.elements.video, '.dp-video'),
             logo: this.or(config.elements.logo, '.dp-logo'),
             progress: this.or(config.elements.progress, '.dp-progress'),
+            progressLoading: this.or(config.elements.progressLoading, '.dp-progress .dp-loading'),
             progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
             progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
             control: this.or(config.elements.control, '.dp-control'),
@@ -1384,7 +1385,7 @@ class DilationPlayer extends Base{
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
         let progressBar = this.config.get('elements.progress', true);
-        let progress = progressBar.find('.playing');
+        let progress = this.config.get('elements.progressLoading', true);
         let timer = this.config.get('elements.controlTimer', true);
         let progressTimerTooltipText = this.config.get('elements.progressHoverTooltipText', true);
         let progressTimerTooltipImage = this.config.get('elements.progressToverTooltipImage', true);
