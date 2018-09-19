@@ -270,11 +270,11 @@ class DPConfig extends Base {
      * @return {object}
      */
     mergeSchedules(config) {
-        if (config.alarm === false) {
-            return false;
+        if (!config.schedules) {
+            return [];
         }
 
-        let rs = this.or(config.alarm, []);
+        let rs = this.or(config.schedules, []);
 
         return rs;
     }
@@ -982,8 +982,8 @@ class DPSchedule extends Base{
         this.config = app.config;
         this.app = app;
         this.helper = app.helper;
-        this.schedules = [];
-        this.aliasSchedules = {};
+        this.schedules = {};
+        this.alias = {};
     }
 
     /**
@@ -1001,8 +1001,7 @@ class DPSchedule extends Base{
                 this.schedules[schedules[i].at] = [];
             }
 
-            // this.aliasSchedules[]
-            this.aliasSchedules[schedules[i].name] = schedules[i];
+            this.alias[schedules[i].name] = schedules[i];
             this.schedules[schedules[i].at].push(schedules[i]);
         }
 
@@ -1014,12 +1013,13 @@ class DPSchedule extends Base{
 
             for (let i in list) {
                 dp.execute(list[i].name);
+                delete dp.schedules[time][i];
             }
         });
     }
 
     execute(name){
-        let schedule = this.aliasSchedules[name];
+        let schedule = this.alias[name];
         schedule.execute(this);
     }
 }
