@@ -274,7 +274,7 @@ class DPConfig extends Base {
             return false;
         }
 
-        let rs = this.or(config.alarm, {});
+        let rs = this.or(config.alarm, []);
 
         return rs;
     }
@@ -983,14 +983,15 @@ class DPSchedule extends Base{
         this.app = app;
         this.helper = app.helper;
         this.schedules = [];
+        this.aliasSchedules = {};
     }
 
     /**
      * Run
      */
     run() {
-        let dp = this;
         let schedules = this.config.get('schedules');
+        let dp = this;
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
 
@@ -1000,6 +1001,8 @@ class DPSchedule extends Base{
                 this.schedules[schedules[i].at] = [];
             }
 
+            // this.aliasSchedules[]
+            this.aliasSchedules[schedules[i].name] = schedules[i];
             this.schedules[schedules[i].at].push(schedules[i]);
         }
 
@@ -1010,9 +1013,14 @@ class DPSchedule extends Base{
             let list = dp.or(dp.schedules[time], []);
 
             for (let i in list) {
-                list[i].execute(dp);
+                dp.execute(list[i].name);
             }
         });
+    }
+
+    execute(name){
+        let schedule = this.aliasSchedules[name];
+        schedule.execute(this);
     }
 }
 
