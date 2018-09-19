@@ -13,16 +13,24 @@
     <div class="dp-modal-player dp-modal">
         <div class="dp-modal-icon dp-modal-player-icon"></div>
     </div>
-	<div class="dp-menu">
-		<div class="dp-menu-list"></div>
-	</div>
+    <div class="dp-menu">
+        <div class="dp-menu-list"></div>
+    </div>
+    <div class="dp-schedule">
+        <div class="dp-schedule-ads dp-schedule-item">
+            <button class="dp-schedule-close">Close</button>
+            <div class="dp-schedule-content"></div>
+        </div>
+    </div>
     <div class="dp-control active">
         <div class="dp-progress">
-            <div class="dp-progress-tooltip-image"><canvas></canvas></div>
+            <div class="dp-progress-tooltip-image">
+                <canvas></canvas>
+            </div>
             <span class="dp-progress-tooltip-text"></span>
-            <div class="line">
-                <div class="playing"></div>
-                <div class="loading"></div>
+            <div class="dp-line">
+                <div class="dp-playing"></div>
+                <div class="dp-loading"></div>
             </div>
         </div>
         <div class="dp-button">
@@ -31,13 +39,13 @@
                 <div class="dp-group">
                     <button class="dp-btn-volume"></button>
                     <div class="dp-volume-tooltip">
-						<input class="dp-volume-range" type="range">
-					</div>
+                        <input class="dp-volume-range" type="range">
+                    </div>
                 </div>
                 <!--<input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1">-->
                 <button class="dp-timer"></button>
-				<button class="dp-btn-fullscreen"></button>
-				<button class="dp-btn-largescreen"></button>
+                <button class="dp-btn-fullscreen"></button>
+                <button class="dp-btn-largescreen"></button>
             </div>
         </div>
     </div>

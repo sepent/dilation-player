@@ -25,14 +25,31 @@ let DPTranslateData = {
 }
 
 // ====================================================
+// Class {Base}
+// ====================================================
+class Base {
+    /**
+     * Check if value is undefined then return or
+     * @param value
+     * @param or
+     * @return mixed
+     */
+    or(value, or) {
+        return value === undefined ? or : value;
+    }
+}
+
+// ====================================================
 // Class {DPConfig}
 // ====================================================
-class DPConfig {
+class DPConfig extends Base {
     /**
      * Constructor
      * @param config
      */
     constructor(config) {
+        super();
+
         // Set default
         config.logo = this.or(config.logo, {});
         config.size = this.or(config.size, {});
@@ -52,8 +69,9 @@ class DPConfig {
             largeScreen: this.or(config.largeScreen, false),
             locale: this.or(config.locale, 'en'),
             menu: this.mergeMenu(config),
-            poster: this.or(config.poster, null)
-        }
+            poster: this.or(config.poster, null),
+            schedules: this.mergeSchedules(config)
+        };
 
         // Function
 
@@ -74,7 +92,6 @@ class DPConfig {
         if (config.menu === false) {
             return false;
         }
-        ;
 
         let rs = this.or(config.menu, {});
 
@@ -109,6 +126,8 @@ class DPConfig {
             video: this.or(config.elements.video, '.dp-video'),
             logo: this.or(config.elements.logo, '.dp-logo'),
             progress: this.or(config.elements.progress, '.dp-progress'),
+            progressLoading: this.or(config.elements.progressLoading, '.dp-progress .dp-loading'),
+            progressPlaying: this.or(config.elements.progressPlaying, '.dp-progress .dp-playing'),
             progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
             progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
             control: this.or(config.elements.control, '.dp-control'),
@@ -130,6 +149,11 @@ class DPConfig {
             menuItem: this.or(config.elements.menuItem, '.dp-menu-item'),
             menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
             menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
+            schedule: this.or(config.elements.schedule, '.dp-schedule'),
+            scheduleClose: this.or(config.elements.schedule, '.dp-schedule .dp-schedule-close'),
+            scheduleItem: this.or(config.elements.scheduleItem, '.dp-schedule .dp-schedule-item'),
+            scheduleAds: this.or(config.elements.scheduleAds, '.dp-schedule .dp-schedule-ads'),
+            scheduleAdsContent: this.or(config.elements.scheduleAdsContent, '.dp-schedule .dp-schedule-ads .dp-schedule-content'),
         };
     }
 
@@ -246,13 +270,18 @@ class DPConfig {
     }
 
     /**
-     * Check if value is undefined then return or
-     * @param value
-     * @param or
-     * @return mixed
+     * Merge schedules
+     * @param config
+     * @return {object}
      */
-    or(value, or) {
-        return value === undefined ? or : value;
+    mergeSchedules(config) {
+        if (!config.schedules) {
+            return [];
+        }
+
+        let rs = this.or(config.schedules, []);
+
+        return rs;
     }
 
     /**
@@ -300,14 +329,40 @@ class DPConfig {
 }
 
 // ====================================================
+// Class {DPHelper}
+// ====================================================
+class DPHelper extends Base {
+    constructor(app) {
+        super();
+        this.app = app;
+    }
+
+    pad(n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+
+    parseTime(times) {
+        let hours = Math.floor(times / 3600);
+        let minutes = Math.floor((times - hours * 3600) / 60);
+        let seconds = Math.floor(times - (minutes * 60 + hours * 3600));
+        let format = (hours > 0 ? (this.pad(hours, 2) + ':') : '') + this.pad(minutes, 2) + ':' + this.pad(seconds, 2);
+
+        return format;
+    }
+}
+
+// ====================================================
 // Class {DPView}
 // ====================================================
-class DPView {
+class DPView extends Base {
     /**
      * Constructor
      * @param config
      */
     constructor(app) {
+        super();
         this.config = app.config;
         this.translate = app.translate;
         this.app = app;
@@ -321,28 +376,28 @@ class DPView {
         let view = this.config.get('view');
         let sources = this.config.get('sources');
         let object = this.config.get('object', true);
-		let sizeConfig = this.config.get('size');
-		
-		// Render size
-		object.css({maxWidth: '100%'});
-		
-		if (sizeConfig.height !== undefined) {
-			object.css({height: sizeConfig.height});
+        let sizeConfig = this.config.get('size');
 
-			if (sizeConfig.width !== undefined) {
-				object.css({width: sizeConfig.width});
-			} else {
-				object.css({width: (object.height() * sizeConfig.rate) + 'px'});
-			}
-		} else {
-			object.css({width: sizeConfig.width});
+        // Render size
+        object.css({maxWidth: '100%'});
 
-			if (sizeConfig.height !== undefined) {
-				object.css({height: sizeConfig.height});
-			} else {
-				object.css({height: (object.width() * sizeConfig.rate) + 'px'});
-			}
-		}
+        if (sizeConfig.height !== undefined) {
+            object.css({height: sizeConfig.height});
+
+            if (sizeConfig.width !== undefined) {
+                object.css({width: sizeConfig.width});
+            } else {
+                object.css({width: (object.height() * sizeConfig.rate) + 'px'});
+            }
+        } else {
+            object.css({width: sizeConfig.width});
+
+            if (sizeConfig.height !== undefined) {
+                object.css({height: sizeConfig.height});
+            } else {
+                object.css({height: (object.width() * sizeConfig.rate) + 'px'});
+            }
+        }
 
         // Read content in template
         if (!view.content) {
@@ -412,12 +467,13 @@ class DPView {
 // ====================================================
 // Class {DPTranslator}
 // ====================================================
-class DPTranslator {
+class DPTranslator extends Base{
     /**
      * Constructor
      * @param config
      */
     constructor(app) {
+        super();
         this.config = app.config;
         this.app = app;
 
@@ -470,27 +526,18 @@ class DPTranslator {
 
         return message;
     }
-
-    /**
-     * Check if value is undefined then return or
-     * @param value
-     * @param or
-     * @return mixed
-     */
-    or(value, or) {
-        return value === undefined ? or : value;
-    }
 }
 
 // ====================================================
 // Class {DPMenu}
 // ====================================================
-class DPMenu {
+class DPMenu extends Base{
     /**
      * Constructor
      * @param config
      */
     constructor(app) {
+        super();
         this.config = app.config;
         this.translate = app.translate;
         this.app = app;
@@ -525,8 +572,8 @@ class DPMenu {
 
             menuList.append(div);
         }
-		
-		this.events();
+
+        this.events();
 
         return this;
     }
@@ -591,7 +638,7 @@ class DPMenu {
      * @return {DPMenu}
      */
     events() {
-        let instance = this;
+        let dp = this;
         let container = this.config.get('elements.container', true);
         let menuList = this.config.get('elements.menuList', true);
         let menuItem = this.config.get('elements.menuItem', true);
@@ -610,7 +657,7 @@ class DPMenu {
                 container.unbind('contextmenu');
             }
 
-            if (!instance.status) {
+            if (!dp.status) {
                 return;
             }
 
@@ -623,7 +670,7 @@ class DPMenu {
 
             // Open menu
             if (isRightMB) {
-                instance.openMenu(event);
+                dp.openMenu(event);
             }
         });
 
@@ -631,14 +678,14 @@ class DPMenu {
         $(window).click(function (event) {
             if (menuList.has(event.target).length == 0
                 && !menuList.is(event.target)) {
-                instance.closeMenu();
+                dp.closeMenu();
             }
         });
 
         // Event when click menu item
         menuItem.click(function () {
             let name = $(this).attr('dp-menu:name');
-            instance.execute(this, name);
+            dp.execute(this, name);
         });
 
         return this;
@@ -707,12 +754,13 @@ class DPMenu {
 // ====================================================
 // Class {DPLogo}
 // ====================================================
-class DPLogo {
+class DPLogo extends Base{
     /**
      * Constructor
      * @param config
      */
     constructor(app) {
+        super();
         this.config = app.config;
         this.translate = app.translate;
         this.app = app;
@@ -759,7 +807,7 @@ class DPLogo {
     run() {
         let logo = this.config.get('elements.logo', true);
         let logoConfig = this.config.get('logo');
-        let instance = this;
+        let dp = this;
 
         // Check if logo is hidden
         if (logoConfig === false) {
@@ -773,11 +821,11 @@ class DPLogo {
 
         // Event when resize window
         $(window).resize(function () {
-            instance.resize();
+            dp.resize();
         });
 
         // Default
-        instance.resize();
+        dp.resize();
 
         // Event when click on logo
         // Event when hover on logo
@@ -789,12 +837,13 @@ class DPLogo {
 // ====================================================
 // Class {DPModal}
 // ====================================================
-class DPModal {
+class DPModal extends Base{
     /**
      * Constructor
      * @param config
      */
     constructor(app) {
+        super();
         this.config = app.config;
         this.translate = app.translate;
         this.app = app;
@@ -843,8 +892,9 @@ class DPModal {
 // ====================================================
 // Class {DPModal}
 // ====================================================
-class DBControl {
+class DPControl extends Base{
     constructor(app) {
+        super();
         this.config = app.config;
         this.app = app;
         this.isMouseIn = false;
@@ -855,7 +905,7 @@ class DBControl {
      * Render
      */
     run() {
-        let instance = this;
+        let dp = this;
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
         let control = this.config.get('elements.control', true);
@@ -864,20 +914,20 @@ class DBControl {
         $(this.config.get('elements.container')
             + ',' + this.config.get('elements.control')
             + ',' + this.config.get('elements.video')).mousemove(function () {
-            instance.open();
-            instance.isMouseIn = true;
+            dp.open();
+            dp.isMouseIn = true;
         });
 
         $(window).scroll(function () {
-            instance.open();
+            dp.open();
         });
 
         // Event when out on video/container/control
         $(this.config.get('elements.container')
             + ',' + this.config.get('elements.control')
             + ',' + this.config.get('elements.video')).mouseleave(function () {
-            instance.hidden();
-            instance.isMouseIn = false;
+            dp.hidden();
+            dp.isMouseIn = false;
         });
 
         // Event when video pause or ended
@@ -929,27 +979,109 @@ class DBControl {
 }
 
 // ====================================================
+// Class {DPSchedule}
+// ====================================================
+class DPSchedule extends Base{
+    constructor(app) {
+        super();
+        this.config = app.config;
+        this.app = app;
+        this.helper = app.helper;
+        this.schedules = {};
+        this.alias = {};
+    }
+
+    /**
+     * Run
+     */
+    run() {
+        let schedules = this.config.get('schedules');
+        let dp = this;
+        let video = this.config.get('elements.video', true);
+        let videoDom = video.get(0);
+        let close = this.config.get('elements.scheduleClose', true);
+        let scheduleContainer = this.config.get('elements.schedule', true);
+
+        for (var i in schedules) {
+            // Add schedule to progress bar
+            if (this.schedules[schedules[i].at] === undefined) {
+                this.schedules[schedules[i].at] = [];
+            }
+
+            this.alias[schedules[i].name] = schedules[i];
+            this.schedules[schedules[i].at].push(schedules[i]);
+        }
+
+        // Event when timeupdate
+        video.on('timeupdate ', function (e) {
+            let current = videoDom.currentTime;
+            let time = dp.helper.parseTime(current);
+            let list = dp.or(dp.schedules[time], []);
+
+            for (let i in list) {
+                dp.execute(list[i].name);
+
+                if (list[i].loop !== true) {
+                    delete dp.schedules[time][i];
+                }
+            }
+        });
+
+        // Event when click on button close
+        close.on('click', function(){
+            scheduleContainer.removeClass('active');
+        });
+    }
+
+    ads(content){
+        let schedule = this.config.get('elements.schedule', true);
+        let item = this.config.get('elements.scheduleItem', true);
+        let ads = this.config.get('elements.scheduleAds', true);
+        let adsContent = this.config.get('elements.scheduleAdsContent', true);
+
+        schedule.addClass('active');
+        item.removeClass('active');
+        ads.addClass('active');
+
+        if (content !== undefined) {
+            adsContent.html(content);
+        }
+    }
+
+    execute(name){
+        let schedule = this.alias[name];
+        schedule.execute(this);
+    }
+}
+
+// ====================================================
 // Class {DilationPlayer}
 // ====================================================
-class DilationPlayer {
+class DilationPlayer extends Base{
     /**
      * Constructor
      * @param config
      */
     constructor(object, config) {
+        super();
+
         if (config == undefined) {
             config = {};
         }
 
         config.object = object;
+
         this.config = new DPConfig(config);
         this.translate = new DPTranslator(this);
+        this.helper = new DPHelper(this);
         this.view = new DPView(this);
-        this.control = new DBControl(this);
+        this.control = new DPControl(this);
         this.menu = new DPMenu(this);
         this.logo = new DPLogo(this);
         this.modal = new DPModal(this);
+        this.schedule = new DPSchedule(this);
         this.rendered = false;
+
         this.apply();
     }
 
@@ -980,7 +1112,8 @@ class DilationPlayer {
             .sound()
             .contextLogo()
             .contextModal()
-            .contextMenu();
+            .contextMenu()
+            .contextSchedule();
     }
 
     /**
@@ -1013,7 +1146,7 @@ class DilationPlayer {
         let btn = this.config.get('elements.controlPlayPause', true);
         let icons = this.config.get('icons');
         let videoDom = video.get(0);
-        let instance = this;
+        let dp = this;
 
         /**
          * Helper
@@ -1043,7 +1176,7 @@ class DilationPlayer {
                     btn.html(icons.pause);
                 }
 
-                instance.modal.toggle();
+                dp.modal.toggle();
             }
         };
 
@@ -1091,7 +1224,7 @@ class DilationPlayer {
         let sizeConfig = this.config.get('size');
         let defaultSize = null;
         let largeScreen = this.config.get('largeScreen');
-        let instance = this;
+        let dp = this;
 
         /**
          * Helper
@@ -1242,7 +1375,7 @@ class DilationPlayer {
                     this.rateScreenSize();
                 }
 
-                instance.logo.resize();
+                dp.logo.resize();
 
                 return this;
             }
@@ -1289,11 +1422,11 @@ class DilationPlayer {
      * @return {DilationPlayer}
      */
     progress() {
-        let instance = this;
+        let dp = this;
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
         let progressBar = this.config.get('elements.progress', true);
-        let progress = progressBar.find('.playing');
+        let playing = this.config.get('elements.progressPlaying', true);
         let timer = this.config.get('elements.controlTimer', true);
         let progressTimerTooltipText = this.config.get('elements.progressHoverTooltipText', true);
         let progressTimerTooltipImage = this.config.get('elements.progressToverTooltipImage', true);
@@ -1319,25 +1452,12 @@ class DilationPlayer {
          */
         let helper = {
             /**
-             * Pad
-             * @param n
-             * @param width
-             * @param z
-             * @return {*}
-             */
-            pad: function (n, width, z) {
-                z = z || '0';
-                n = n + '';
-                return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-            },
-
-            /**
              * Set loaded data
              * @param current
              * @param duration
              */
             setLoaded: function (current, duration) {
-                progress.width((current / duration * 100) + '%');
+                playing.width((current / duration * 100) + '%');
             },
 
             /**
@@ -1346,17 +1466,9 @@ class DilationPlayer {
              * @param duration
              */
             setTimer: function (current, duration) {
-                let hours = Math.floor(current / 3600);
-                let minutes = Math.floor((current - hours * 3600) / 60);
-                let seconds = Math.floor(current - (minutes * 60 + hours * 3600));
-                let currentTime = (hours > 0 ? (this.pad(hours, 2) + ':') : '') + this.pad(minutes, 2) + ':' + this.pad(seconds, 2);
-
-                hours = Math.floor(duration / 3600);
-                minutes = Math.floor((duration - hours * 3600) / 60);
-                seconds = Math.floor(duration - (minutes * 60 + hours * 3600));
-                let totalTime = (hours > 0 ? (this.pad(hours, 2) + ':') : '') + this.pad(minutes, 2) + ':' + this.pad(seconds, 2);
-
-                timer.html(currentTime + ' / ' + totalTime);
+                current = dp.helper.parseTime(current);
+                duration = dp.helper.parseTime(duration);
+                timer.html(current + ' / ' + duration);
             },
 
             /**
@@ -1371,12 +1483,12 @@ class DilationPlayer {
                     helper.setTimer(current, duration);
                 }
             }
-        }
+        };
 
         // Event when timeupdate
         video.on('timeupdate ', function (e) {
             helper.display();
-            instance.modal.toggle({loader: false});
+            dp.modal.toggle({loader: false});
         });
 
         // Event when click on progress bar
@@ -1390,7 +1502,7 @@ class DilationPlayer {
                 let vidTime = videoDom.duration * percentage;
                 videoDom.currentTime = vidTime;
                 helper.setLoaded(left, totalWidth);
-                instance.modal.toggle({loader: true});
+                dp.modal.toggle({loader: true});
             }
         });
 
@@ -1407,12 +1519,8 @@ class DilationPlayer {
                 let percentage = (left / totalWidth);
                 let current = videoDom.duration * percentage;
 
-                let hours = Math.floor(current / 3600);
-                let minutes = Math.floor((current - hours * 3600) / 60);
-                let seconds = Math.floor(current - (minutes * 60 + hours * 3600));
-                let currentTime = (hours > 0 ? (helper.pad(hours, 2) + ':') : '') + helper.pad(minutes, 2) + ':' + helper.pad(seconds, 2);
-
-                progressTimerTooltipText.css('left', left + 'px').text(currentTime);
+                let parseTime = dp.helper.parseTime(current);
+                progressTimerTooltipText.css('left', left + 'px').text(parseTime);
                 progressTimerTooltipImage.css('left', left + 'px');
 
                 // Get picture
@@ -1428,12 +1536,12 @@ class DilationPlayer {
         // Then call display information on screen
         video.on('loadeddata', function (e) {
             helper.display();
-            instance.modal.toggle({loader: false});
+            dp.modal.toggle({loader: false});
         });
 
         // Event when start load data
         video.on('loadstart', function (e) {
-            instance.modal.toggle({loader: true});
+            dp.modal.toggle({loader: true});
         });
 
         return this;
@@ -1539,11 +1647,10 @@ class DilationPlayer {
     }
 
     /**
-     * Toggle show/hidel loader
-     * @param disabled
+     * Context modal
      * @return {DilationPlayer}
      */
-    contextModal(config) {
+    contextModal() {
         this.modal.run();
 
         return this;
@@ -1555,6 +1662,15 @@ class DilationPlayer {
      */
     contextMenu() {
         this.menu.run();
+        return this;
+    }
+
+    /**
+     * Alarm
+     * @return {DilationPlayer}
+     */
+    contextSchedule() {
+        this.schedule.run();
         return this;
     }
 }
