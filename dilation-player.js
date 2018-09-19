@@ -150,8 +150,10 @@ class DPConfig extends Base {
             menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
             menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
             schedule: this.or(config.elements.schedule, '.dp-schedule'),
+            scheduleClose: this.or(config.elements.schedule, '.dp-schedule .dp-schedule-close'),
             scheduleItem: this.or(config.elements.scheduleItem, '.dp-schedule .dp-schedule-item'),
             scheduleAds: this.or(config.elements.scheduleAds, '.dp-schedule .dp-schedule-ads'),
+            scheduleAdsContent: this.or(config.elements.scheduleAdsContent, '.dp-schedule .dp-schedule-ads .dp-schedule-content'),
         };
     }
 
@@ -997,6 +999,8 @@ class DPSchedule extends Base{
         let dp = this;
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
+        let close = this.config.get('elements.scheduleClose', true);
+        let scheduleContainer = this.config.get('elements.schedule', true);
 
         for (var i in schedules) {
             // Add schedule to progress bar
@@ -1016,22 +1020,31 @@ class DPSchedule extends Base{
 
             for (let i in list) {
                 dp.execute(list[i].name);
-                delete dp.schedules[time][i];
+
+                if (list[i].loop !== true) {
+                    delete dp.schedules[time][i];
+                }
             }
+        });
+
+        // Event when click on button close
+        close.on('click', function(){
+            scheduleContainer.removeClass('active');
         });
     }
 
     ads(content){
         let schedule = this.config.get('elements.schedule', true);
-        let item = this.config.get('elements.scheduleAds', true);
+        let item = this.config.get('elements.scheduleItem', true);
         let ads = this.config.get('elements.scheduleAds', true);
+        let adsContent = this.config.get('elements.scheduleAdsContent', true);
 
         schedule.addClass('active');
         item.removeClass('active');
         ads.addClass('active');
 
         if (content !== undefined) {
-            ads.html(content);
+            adsContent.html(content);
         }
     }
 
