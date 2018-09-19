@@ -150,10 +150,11 @@ class DPConfig extends Base {
             menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
             menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
             schedule: this.or(config.elements.schedule, '.dp-schedule'),
-            scheduleClose: this.or(config.elements.schedule, '.dp-schedule .dp-schedule-close'),
-            scheduleItem: this.or(config.elements.scheduleItem, '.dp-schedule .dp-schedule-item'),
+            scheduleItem: this.or(config.elements.schedule, '.dp-schedule .dp-schedule-item'),
+            scheduleClose: this.or(config.elements.schedule, '.dp-schedule .dp-schedule-item .dp-schedule-close'),
             scheduleAds: this.or(config.elements.scheduleAds, '.dp-schedule .dp-schedule-ads'),
             scheduleAdsContent: this.or(config.elements.scheduleAdsContent, '.dp-schedule .dp-schedule-ads .dp-schedule-content'),
+            scheduleAdsClose: this.or(config.elements.scheduleAdsClose, '.dp-schedule .dp-schedule-ads .dp-schedule-close'),
         };
     }
 
@@ -176,7 +177,8 @@ class DPConfig extends Base {
             volumeMute: this.or(config.icons.volumeMute, '<i class="icons icon-volume-off"></i>'),
             volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
             volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
-            volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>')
+            volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>'),
+            closeSchedule: this.or(config.icons.closeSchedule, '[X]')
         };
     }
 
@@ -999,8 +1001,9 @@ class DPSchedule extends Base{
         let dp = this;
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
+        let icon = this.config.get('icons.closeSchedule');
         let close = this.config.get('elements.scheduleClose', true);
-        let scheduleContainer = this.config.get('elements.schedule', true);
+        let scheduleItem = this.config.get('elements.scheduleItem');
 
         for (var i in schedules) {
             // Add schedule to progress bar
@@ -1029,19 +1032,21 @@ class DPSchedule extends Base{
 
         // Event when click on button close
         close.on('click', function(){
-            scheduleContainer.removeClass('active');
+            $(this).closest(scheduleItem).removeClass('active');
         });
+
+        close.html(icon);
     }
 
     ads(content){
-        let schedule = this.config.get('elements.schedule', true);
-        let item = this.config.get('elements.scheduleItem', true);
+        let schedule = this.config.get('elements.scheduleItem', true);
         let ads = this.config.get('elements.scheduleAds', true);
+        let adsClose = this.config.get('elements.scheduleAdsClose', true);
         let adsContent = this.config.get('elements.scheduleAdsContent', true);
 
-        schedule.addClass('active');
-        item.removeClass('active');
+        schedule.removeClass('active');
         ads.addClass('active');
+        adsClose.addClass('active');
 
         if (content !== undefined) {
             adsContent.html(content);
