@@ -1022,9 +1022,9 @@ class DPSchedule extends Base{
     }
 
     ads(content){
-        let schedule = this.config.get('elements.schedule');
-        let item = this.config.get('elements.scheduleAds');
-        let ads = this.config.get('elements.scheduleAds');
+        let schedule = this.config.get('elements.schedule', true);
+        let item = this.config.get('elements.scheduleAds', true);
+        let ads = this.config.get('elements.scheduleAds', true);
 
         schedule.addClass('active');
         item.removeClass('active');
