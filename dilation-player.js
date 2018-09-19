@@ -127,6 +127,7 @@ class DPConfig extends Base {
             logo: this.or(config.elements.logo, '.dp-logo'),
             progress: this.or(config.elements.progress, '.dp-progress'),
             progressLoading: this.or(config.elements.progressLoading, '.dp-progress .dp-loading'),
+            progressPlaying: this.or(config.elements.progressPlaying, '.dp-progress .dp-playing'),
             progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
             progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
             control: this.or(config.elements.control, '.dp-control'),
@@ -1031,8 +1032,10 @@ class DilationPlayer extends Base{
         }
 
         config.object = object;
+
         this.config = new DPConfig(config);
         this.translate = new DPTranslator(this);
+        this.helper = new DPHelper(this);
         this.view = new DPView(this);
         this.control = new DPControl(this);
         this.menu = new DPMenu(this);
@@ -1040,7 +1043,7 @@ class DilationPlayer extends Base{
         this.modal = new DPModal(this);
         this.schedule = new DPSchedule(this);
         this.rendered = false;
-        this.helper = new DPHelper(this);
+
         this.apply();
     }
 
@@ -1385,7 +1388,7 @@ class DilationPlayer extends Base{
         let video = this.config.get('elements.video', true);
         let videoDom = video.get(0);
         let progressBar = this.config.get('elements.progress', true);
-        let progress = this.config.get('elements.progressLoading', true);
+        let playing = this.config.get('elements.progressPlaying', true);
         let timer = this.config.get('elements.controlTimer', true);
         let progressTimerTooltipText = this.config.get('elements.progressHoverTooltipText', true);
         let progressTimerTooltipImage = this.config.get('elements.progressToverTooltipImage', true);
@@ -1416,7 +1419,7 @@ class DilationPlayer extends Base{
              * @param duration
              */
             setLoaded: function (current, duration) {
-                progress.width((current / duration * 100) + '%');
+                playing.width((current / duration * 100) + '%');
             },
 
             /**
@@ -1442,7 +1445,7 @@ class DilationPlayer extends Base{
                     helper.setTimer(current, duration);
                 }
             }
-        }
+        };
 
         // Event when timeupdate
         video.on('timeupdate ', function (e) {
