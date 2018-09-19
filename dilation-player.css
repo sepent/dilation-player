@@ -369,3 +369,14 @@ html, body {
 .dp .dp-schedule.active {
     display: block;
 }
+
+.dp .dp-schedule .dp-schedule-item {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.dp .dp-schedule .dp-schedule-item.active {
+    display: block;
+}

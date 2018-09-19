@@ -149,6 +149,9 @@ class DPConfig extends Base {
             menuItem: this.or(config.elements.menuItem, '.dp-menu-item'),
             menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
             menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
+            schedule: this.or(config.elements.schedule, '.dp-schedule'),
+            scheduleItem: this.or(config.elements.scheduleItem, '.dp-schedule .dp-schedule-item'),
+            scheduleAds: this.or(config.elements.scheduleAds, '.dp-schedule .dp-schedule-ads'),
         };
     }
 
@@ -1016,6 +1019,20 @@ class DPSchedule extends Base{
                 delete dp.schedules[time][i];
             }
         });
+    }
+
+    ads(content){
+        let schedule = this.config.get('elements.schedule');
+        let item = this.config.get('elements.scheduleAds');
+        let ads = this.config.get('elements.scheduleAds');
+
+        schedule.addClass('active');
+        item.removeClass('active');
+        ads.addClass('active');
+
+        if (content !== undefined) {
+            ads.html(content);
+        }
     }
 
     execute(name){
