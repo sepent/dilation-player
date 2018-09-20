@@ -1,0 +1,28 @@
+{
+  "name": "dilation-player",
+  "version": "1.0.0",
+  "description": "The player for video html5",
+  "main": "dilation-player.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cobonla/DilationPlayer.git"
+  },
+  "keywords": [
+    "video player",
+    "free player",
+    "html5 player",
+    "free video player",
+    "custom video player",
+	"stream video player",
+	"stream video"
+  ],
+  "author": "Cobonla",
+  "license": "MIT license",
+  "bugs": {
+    "url": "https://github.com/cobonla/DilationPlayer/issues"
+  },
+  "homepage": "https://github.com/cobonla/DilationPlayer#readme"
+}
