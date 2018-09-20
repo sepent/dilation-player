@@ -64,6 +64,6 @@ class DPAdsPlugin extends DPBase {
             adsContent.html(content);
         }
 
-        window.setTimeout(function(){pl.resize()}, 300);
+        window.setTimeout(function(){pl.resize()}, 50);
     }
 }
