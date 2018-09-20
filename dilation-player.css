@@ -126,7 +126,7 @@ html, body {
     z-index: 9;
 }
 
-.dp .dp-control .dp-progress .line {
+.dp .dp-control .dp-progress .dp-line {
     width: 100%;
     height: 60%;
     transition: all 0.2s linear;
