@@ -12,6 +12,7 @@ class DPAdsPlugin extends DPBase {
         this.app = app;
         this.helper = app.helper;
         this.plugins = {};
+        this.currentSetting = {};
     }
 
     /**
@@ -42,21 +43,27 @@ class DPAdsPlugin extends DPBase {
      * Resize
      */
     resize(){
-        let ads = this.config.get('elements.ads', true);
-        let height = ads.css('height');
-        ads.css('marginTop', '-'+height);
+        if (this.currentSetting.type === 'line') {
+            let ads = this.config.get('elements.ads', true);
+            let height = ads.css('height');
+            ads.css('marginTop', '-'+height);
+        }
     }
 
     /**
      * Run
      * @return {DilationPlayerPluginsAds}
      */
-    show(content) {
+    show(content, conf) {
         let ads = this.config.get('elements.ads', true);
         let adsClose = this.config.get('elements.adsClose', true);
         let adsContent = this.config.get('elements.adsContent', true);
         let pl = this;
 
+        this.currentSetting = this.or(conf, {});
+        this.currentSetting.type = this.or(this.currentSetting.type, 'line');
+
+        ads.addClass(this.currentSetting.type);
         ads.addClass('active');
         adsClose.addClass('active');
 
