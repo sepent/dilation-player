@@ -367,7 +367,7 @@ html, body {
 
 .dp .dp-ads.line {
     height: 10%;
-    min-height: 80px;
+    min-height: 40px;
     max-height: 100px;
     position: absolute;
     bottom: 0;
