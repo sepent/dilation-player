@@ -11,8 +11,8 @@ class DPAdsPlugin extends DPBase {
         this.config = app.config;
         this.app = app;
         this.helper = app.helper;
-        this.plugins = {};
         this.currentSetting = {};
+        this.usedType = [];
     }
 
     /**
@@ -62,8 +62,9 @@ class DPAdsPlugin extends DPBase {
 
         this.currentSetting = this.or(conf, {});
         this.currentSetting.type = this.or(this.currentSetting.type, 'line');
+        this.usedType.push(this.currentSetting.type);
 
-        ads.addClass(this.currentSetting.type);
+        ads.removeClass(this.usedType.join(' ')).addClass(this.currentSetting.type);
         ads.addClass('active');
         adsClose.addClass('active');
 
