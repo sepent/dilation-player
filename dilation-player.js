@@ -1029,6 +1029,7 @@ class DPSchedule extends DPBase {
                 this.schedules[schedules[i].at] = [];
             }
 
+            schedules[i].name = schedules[i].name || Math.random().toString(36).substring(10);
             this.alias[schedules[i].name] = schedules[i];
             this.schedules[schedules[i].at].push(schedules[i]);
         }
