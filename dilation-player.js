@@ -1081,8 +1081,8 @@ class DPPlugin extends DPBase {
         let list = this.config.get('plugins');
 
         for (let name in list) {
-            this[name] = await eval('new ' + list[name].className + '(this.app)');
-            this[name].init();
+            this.app[name] = await eval('new ' + list[name].className + '(this.app)');
+            this.app[name].init();
         }
 
         return this;
