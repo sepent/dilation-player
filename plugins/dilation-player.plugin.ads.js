@@ -44,7 +44,6 @@ class DPAdsPlugin extends DPBase {
     resize(){
         let ads = this.config.get('elements.ads', true);
         let height = ads.css('height');
-
         ads.css('marginTop', '-'+height);
     }
 
@@ -56,6 +55,7 @@ class DPAdsPlugin extends DPBase {
         let ads = this.config.get('elements.ads', true);
         let adsClose = this.config.get('elements.adsClose', true);
         let adsContent = this.config.get('elements.adsContent', true);
+        let pl = this;
 
         ads.addClass('active');
         adsClose.addClass('active');
@@ -64,6 +64,6 @@ class DPAdsPlugin extends DPBase {
             adsContent.html(content);
         }
 
-        this.resize();
+        window.setTimeout(function(){pl.resize()}, 300);
     }
 }
