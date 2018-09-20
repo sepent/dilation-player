@@ -7,7 +7,7 @@ let DPTranslateData = {
 
         app: {
             loading: 'Loading...',
-            not_support_video: 'This browser not support video'
+            not_support: 'This browser not support player'
         }
     },
 
@@ -19,7 +19,7 @@ let DPTranslateData = {
 
         app: {
             loading: 'Đang tải...',
-            not_support_video: 'Trình duyệt không hỗ trợ video'
+            not_support: 'Trình duyệt không hỗ trợ player'
         }
     }
 }
@@ -70,7 +70,8 @@ class DPConfig extends Base {
             locale: this.or(config.locale, 'en'),
             menu: this.mergeMenu(config),
             poster: this.or(config.poster, null),
-            schedules: this.mergeSchedules(config)
+            schedules: this.mergeSchedules(config),
+            type: this.or(config.type, 'video'), // audio or video
         };
 
         // Function
@@ -124,6 +125,7 @@ class DPConfig extends Base {
         return {
             container: this.or(config.elements.container, '.dp'),
             video: this.or(config.elements.video, '.dp-video'),
+            audio: this.or(config.elements.audio, '.dp-audio'),
             logo: this.or(config.elements.logo, '.dp-logo'),
             progress: this.or(config.elements.progress, '.dp-progress'),
             progressLoading: this.or(config.elements.progressLoading, '.dp-progress .dp-loading'),
@@ -328,6 +330,16 @@ class DPConfig extends Base {
 
         return config;
     }
+
+    /**
+     * Get runner
+     * @param isDom
+     * @return {mixed}
+     */
+    runner(isDom){
+        let type = this.get('type');
+        return this.get('elements.' + type, isDom);
+    }
 }
 
 // ====================================================
@@ -429,29 +441,29 @@ class DPView extends Base {
         // Setting
         // Poster
         let poster = this.config.get('poster');
-        let video = this.config.get('elements.video', true);
+        let runner = this.config.runner(true);
 
         if (poster) {
-            video.get(0).poster = poster;
+            runner.get(0).poster = poster;
         }
 
         if (sources !== undefined) {
-            video.html(this.translate.get('app.not_support_video'));
+            runner.html(this.translate.get('app.not_support'));
 
             // Generate video from resources
             if (typeof sources === 'string') {
-                video.get(0).src = sources;
+                runner.get(0).src = sources;
             } else if (sources.length == 1) {
-                video.get(0).src = sources[0].src;
+                runner.get(0).src = sources[0].src;
             } else {
                 for (var i in sources) {
                     let source = document.createElement('source');
                     $(source).attr({src: sources[i].src, type: sources[i].type});
-                    video.append(source);
+                    runner.append(source);
                 }
             }
 
-            video.get(0).load();
+            runner.get(0).load();
         }
 
         return true;
@@ -721,13 +733,13 @@ class DPMenu extends Base{
             return this;
         }
 
-        let video = this.config.get('elements.video', true).get(0);
+        let runner = this.config.runner(true).get(0);
 
-        if (video.loop) {
-            video.loop = false;
+        if (runner.loop) {
+            runner.loop = false;
             $(item).removeClass('active');
         } else {
-            video.loop = true;
+            runner.loop = true;
             $(item).addClass('active');
         }
 
@@ -745,7 +757,7 @@ class DPMenu extends Base{
             return this;
         }
 
-        let video = this.config.get('elements.video', true).get(0);
+        let runner = this.config.runner(true).get(0);
 
         this.closeMenu();
 
@@ -866,12 +878,12 @@ class DPModal extends Base{
         let loader = this.config.get('elements.loaderModal', true);
         let player = this.config.get('elements.playerModal', true);
         let modal = this.config.get('elements.modal', true);
-        let videoDom = this.config.get('elements.video', true).get(0);
+        let runnerDom = this.config.runner(true).get(0);
         modal.removeClass('active');
 
         if (config === undefined) {
-            if (!isNaN(videoDom.duration)) {
-                if (videoDom.paused) {
+            if (!isNaN(runnerDom.duration)) {
+                if (runnerDom.paused) {
                     player.addClass('active');
                 } else {
                     player.removeClass('active');
@@ -882,7 +894,7 @@ class DPModal extends Base{
         } else {
             if (config.loader === true) {
                 loader.addClass('active');
-            } else if (config.player === true || videoDom.paused) {
+            } else if (config.player === true || runnerDom.paused) {
                 player.addClass('active');
             }
         }
@@ -908,14 +920,14 @@ class DPControl extends Base{
      */
     run() {
         let dp = this;
-        let video = this.config.get('elements.video', true);
-        let videoDom = video.get(0);
+        let runner = this.config.runner(true);
+        let runnerDom = runner.get(0);
         let control = this.config.get('elements.control', true);
 
-        // Event when hover on video/container/control
+        // Event when hover on runner/container/control
         $(this.config.get('elements.container')
             + ',' + this.config.get('elements.control')
-            + ',' + this.config.get('elements.video')).mousemove(function () {
+            + ',' + this.config.runner()).mousemove(function () {
             dp.open();
             dp.isMouseIn = true;
         });
@@ -924,21 +936,21 @@ class DPControl extends Base{
             dp.open();
         });
 
-        // Event when out on video/container/control
+        // Event when out on runner/container/control
         $(this.config.get('elements.container')
             + ',' + this.config.get('elements.control')
-            + ',' + this.config.get('elements.video')).mouseleave(function () {
+            + ',' + this.config.runner()).mouseleave(function () {
             dp.hidden();
             dp.isMouseIn = false;
         });
 
-        // Event when video pause or ended
-        video.on('pause ended', function () {
+        // Event when runner pause or ended
+        runner.on('pause ended', function () {
             control.addClass('active');
         });
 
         // Default
-        videoDom.controls = false;
+        runnerDom.controls = false;
 
         return this;
     }
@@ -948,10 +960,10 @@ class DPControl extends Base{
      */
     hidden() {
         let control = this.config.get('elements.control', true);
-        let video = this.config.get('elements.video', true).get(0);
+        let runner = this.config.runner(true).get(0);
         let container = this.config.get('elements.container', true);
 
-        if (!video.paused) {
+        if (!runner.paused) {
             control.removeClass('active');
 
             if (this.isMouseIn) {
@@ -999,8 +1011,8 @@ class DPSchedule extends Base{
     run() {
         let schedules = this.config.get('schedules');
         let dp = this;
-        let video = this.config.get('elements.video', true);
-        let videoDom = video.get(0);
+        let runner = this.config.runner(true);
+        let runnerDom = runner.get(0);
         let icon = this.config.get('icons.closeSchedule');
         let close = this.config.get('elements.scheduleClose', true);
         let scheduleItem = this.config.get('elements.scheduleItem');
@@ -1016,8 +1028,8 @@ class DPSchedule extends Base{
         }
 
         // Event when timeupdate
-        video.on('timeupdate ', function (e) {
-            let current = videoDom.currentTime;
+        runner.on('timeupdate ', function (e) {
+            let current = runnerDom.currentTime;
             let time = dp.helper.parseTime(current);
             let list = dp.or(dp.schedules[time], []);
 
@@ -1096,10 +1108,10 @@ class DilationPlayer extends Base{
      */
     load(resources) {
         if (this.rendered) {
-            let video = this.config.get('video', true);
+            let runner = this.config.runner(true);
             var source = document.createElement('source');
             source.setAttribute('src', resources);
-            video.appendChild(source);
+            runner.appendChild(source);
         }
     }
 
@@ -1146,11 +1158,11 @@ class DilationPlayer extends Base{
      */
     playPause() {
         // Defined elements
-        let video = this.config.get('elements.video', true);
+        let runner = this.config.runner(true);
         let player = this.config.get('elements.playerModal', true);
         let btn = this.config.get('elements.controlPlayPause', true);
         let icons = this.config.get('icons');
-        let videoDom = video.get(0);
+        let runnerDom = runner.get(0);
         let dp = this;
 
         /**
@@ -1162,11 +1174,11 @@ class DilationPlayer extends Base{
              * Toggle play or pause
              */
             toggle: function () {
-                if (!isNaN(videoDom.duration)) {
-                    if (videoDom.paused) {
-                        videoDom.play();
+                if (!isNaN(runnerDom.duration)) {
+                    if (runnerDom.paused) {
+                        runnerDom.play();
                     } else {
-                        videoDom.pause();
+                        runnerDom.pause();
                     }
                 }
             },
@@ -1175,7 +1187,7 @@ class DilationPlayer extends Base{
              * Make icon
              */
             makeIcon: function () {
-                if (videoDom.paused) {
+                if (runnerDom.paused) {
                     btn.html(icons.play);
                 } else {
                     btn.html(icons.pause);
@@ -1194,18 +1206,18 @@ class DilationPlayer extends Base{
             helper.toggle();
         });
 
-        // Event when click on video
-        video.click(function () {
+        // Event when click on runner
+        runner.click(function () {
             helper.toggle();
         });
 
-        // Event when video play
-        video.on('play', function () {
+        // Event when runner play
+        runner.on('play', function () {
             helper.makeIcon();
         });
 
-        // Event when video pause or ended
-        video.on('pause ended', function () {
+        // Event when runner pause or ended
+        runner.on('pause ended', function () {
             helper.makeIcon();
         });
 
@@ -1281,22 +1293,22 @@ class DilationPlayer extends Base{
                     isLg = this.isLarge;
                 }
 
-                let videoSize = 0;
+                let runnerSize = 0;
                 let h = 0;
 
                 if (this.isLarge) {
-                    videoSize = $(window).width();
+                    runnerSize = $(window).width();
 
-                    object.width(videoSize);
-                    h = (videoSize * defaultSize.height / defaultSize.width);
+                    object.width(runnerSize);
+                    h = (runnerSize * defaultSize.height / defaultSize.width);
                     let windowH = $(window).height() * 85 / 100;
 
                     if (h > windowH) {
                         h = windowH;
                     }
                 } else {
-                    videoSize = object.width();
-                    h = (videoSize * defaultSize.height / defaultSize.width);
+                    runnerSize = object.width();
+                    h = (runnerSize * defaultSize.height / defaultSize.width);
                 }
 
                 object.css({height: h + 'px'});
@@ -1428,8 +1440,8 @@ class DilationPlayer extends Base{
      */
     progress() {
         let dp = this;
-        let video = this.config.get('elements.video', true);
-        let videoDom = video.get(0);
+        let runner = this.config.runner(true);
+        let runnerDom = runner.get(0);
         let progressBar = this.config.get('elements.progress', true);
         let playing = this.config.get('elements.progressPlaying', true);
         let timer = this.config.get('elements.controlTimer', true);
@@ -1440,16 +1452,16 @@ class DilationPlayer extends Base{
         tooltipCanvas.height = 70;
 
         // Create preview elements
-        let videoPreview = document.createElement('video');
+        let runnerPreview = document.createElement('video');
 
-        video.find('source').each(function (num, val) {
+        runner.find('source').each(function (num, val) {
             var source = document.createElement('source');
             $(source).prop('src', $(this).attr('src'));
-            videoPreview.append(source);
+            runnerPreview.append(source);
         });
 
-        videoPreview.load();
-        // videoPreview.pause();
+        runnerPreview.load();
+        // runnerPreview.pause();
 
         /**
          * Helper object
@@ -1480,9 +1492,9 @@ class DilationPlayer extends Base{
              * Display
              */
             display: function () {
-                if (!isNaN(videoDom.duration)) {
-                    let current = videoDom.currentTime;
-                    let duration = videoDom.duration;
+                if (!isNaN(runnerDom.duration)) {
+                    let current = runnerDom.currentTime;
+                    let duration = runnerDom.duration;
 
                     helper.setLoaded(current, duration);
                     helper.setTimer(current, duration);
@@ -1491,7 +1503,7 @@ class DilationPlayer extends Base{
         };
 
         // Event when timeupdate
-        video.on('timeupdate ', function (e) {
+        runner.on('timeupdate ', function (e) {
             helper.display();
             dp.modal.toggle({loader: false});
         });
@@ -1499,13 +1511,13 @@ class DilationPlayer extends Base{
         // Event when click on progress bar
         // Then get position of mouse and count the time go to
         progressBar.on("click", function (e) {
-            if (!isNaN(videoDom.duration)) {
+            if (!isNaN(runnerDom.duration)) {
                 let offset = $(this).offset();
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
-                let vidTime = videoDom.duration * percentage;
-                videoDom.currentTime = vidTime;
+                let vidTime = runnerDom.duration * percentage;
+                runnerDom.currentTime = vidTime;
                 helper.setLoaded(left, totalWidth);
                 dp.modal.toggle({loader: true});
             }
@@ -1514,7 +1526,7 @@ class DilationPlayer extends Base{
         // Event when hover on progress
         // Then get position of mouse, count the time go to and get information
         progressBar.on("mousemove", function (e) {
-            if (!isNaN(videoDom.duration)) {
+            if (!isNaN(runnerDom.duration)) {
                 progressTimerTooltipText.show();
                 progressTimerTooltipImage.show();
 
@@ -1522,15 +1534,15 @@ class DilationPlayer extends Base{
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
-                let current = videoDom.duration * percentage;
+                let current = runnerDom.duration * percentage;
 
                 let parseTime = dp.helper.parseTime(current);
                 progressTimerTooltipText.css('left', left + 'px').text(parseTime);
                 progressTimerTooltipImage.css('left', left + 'px');
 
                 // Get picture
-                //videoPreview.currentTime = current;
-                //tooltipCanvas.getContext('2d').drawImage(videoPreview, 0, 0, tooltipCanvas.width, tooltipCanvas.height);
+                //runnerPreview.currentTime = current;
+                //tooltipCanvas.getContext('2d').drawImage(runnerPreview, 0, 0, tooltipCanvas.width, tooltipCanvas.height);
             } else {
                 progressTimerTooltipText.hide();
                 progressTimerTooltipImage.hide();
@@ -1539,13 +1551,13 @@ class DilationPlayer extends Base{
 
         // Event when loaded data
         // Then call display information on screen
-        video.on('loadeddata', function (e) {
+        runner.on('loadeddata', function (e) {
             helper.display();
             dp.modal.toggle({loader: false});
         });
 
         // Event when start load data
-        video.on('loadstart', function (e) {
+        runner.on('loadstart', function (e) {
             dp.modal.toggle({loader: true});
         });
 
@@ -1558,8 +1570,8 @@ class DilationPlayer extends Base{
      */
     sound() {
         // Defined elements
-        let video = this.config.get('elements.video', true);
-        let videoDom = video.get(0);
+        let runner = this.config.runner(true);
+        let runnerDom = runner.get(0);
         let volume = this.config.get('elements.controlVolume', true);
         let volumeRange = this.config.get('elements.controlVolumeRange', true);
         let range = this.config.get('volume');
@@ -1574,9 +1586,9 @@ class DilationPlayer extends Base{
              * Make icon for button
              */
             makeIcon: function () {
-                if (videoDom.muted == true || videoDom.volume == 0) {
+                if (runnerDom.muted == true || runnerDom.volume == 0) {
                     volume.html(icons.volumeMute);
-                } else if (videoDom.volume <= 0.5) {
+                } else if (runnerDom.volume <= 0.5) {
                     volume.html(icons.volume1);
                 } else {
                     volume.html(icons.volume2);
@@ -1584,25 +1596,25 @@ class DilationPlayer extends Base{
             },
 
             /**
-             * Set volume for video
+             * Set volume for runner
              * @param number
              */
             setVolume: function (number) {
-                videoDom.volume = number / 100;
+                runnerDom.volume = number / 100;
 
-                if (videoDom.volume > 0) {
-                    videoDom.muted = false;
+                if (runnerDom.volume > 0) {
+                    runnerDom.muted = false;
                 }
             },
 
             /**
-             * Toggle mute video
+             * Toggle mute runner
              */
             toggleMute: function () {
-                if (videoDom.muted == true) {
-                    videoDom.muted = false;
-                } else if (videoDom.volume > 0) {
-                    videoDom.muted = true;
+                if (runnerDom.muted == true) {
+                    runnerDom.muted = false;
+                } else if (runnerDom.volume > 0) {
+                    runnerDom.muted = true;
                 }
             }
         };
@@ -1621,7 +1633,7 @@ class DilationPlayer extends Base{
         });
 
         // Event when volume change
-        video.on('volumechange', function () {
+        runner.on('volumechange', function () {
             helper.makeIcon();
         });
 
