@@ -27,7 +27,7 @@ let DPTranslateData = {
 // ====================================================
 // Class {Base}
 // ====================================================
-class Base {
+class DPBase {
     /**
      * Check if value is undefined then return or
      * @param value
@@ -42,7 +42,7 @@ class Base {
 // ====================================================
 // Class {DPConfig}
 // ====================================================
-class DPConfig extends Base {
+class DPConfig extends DPBase {
     /**
      * Constructor
      * @param config
@@ -72,6 +72,7 @@ class DPConfig extends Base {
             poster: this.or(config.poster, null),
             schedules: this.mergeSchedules(config),
             type: this.or(config.type, 'video'), // audio or video
+            plugins: this.mergePlugins(config)
         };
 
         // Function
@@ -151,12 +152,10 @@ class DPConfig extends Base {
             menuItem: this.or(config.elements.menuItem, '.dp-menu-item'),
             menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
             menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
-            schedule: this.or(config.elements.schedule, '.dp-schedule'),
-            scheduleClose: this.or(config.elements.scheduleClose, '.dp-schedule .dp-schedule-close'),
-            scheduleAds: this.or(config.elements.scheduleAds, '.dp-schedule.dp-schedule-ads'),
-            scheduleAdsItem: this.or(config.elements.schedule, '.dp-schedule.dp-schedule-ads .dp-schedule-item'),
-            scheduleAdsContent: this.or(config.elements.scheduleAdsContent, '.dp-schedule.dp-schedule-ads .dp-schedule-content'),
-            scheduleAdsClose: this.or(config.elements.scheduleAdsClose, '.dp-schedule.dp-schedule-ads .dp-schedule-close'),
+            ads: this.or(config.elements.ads, '.dp-ads'),
+            adsItem: this.or(config.elements.adsItem, '.dp-ads .dp-ads-item'),
+            adsContent: this.or(config.elements.adsContent, '.dp-ads .dp-ads-content'),
+            adsClose: this.or(config.elements.adsClose, '.dp-ads .dp-ads-close'),
         };
     }
 
@@ -180,7 +179,7 @@ class DPConfig extends Base {
             volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
             volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
             volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>'),
-            scheduleClose: this.or(config.icons.scheduleClose, '[X]')
+            close: this.or(config.icons.close, '[X]')
         };
     }
 
@@ -289,6 +288,15 @@ class DPConfig extends Base {
     }
 
     /**
+     * Merge plugins
+     * @param config
+     * @return {object}
+     */
+    mergePlugins(config) {
+        return this.or(config.plugins, {});
+    }
+
+    /**
      * Get config
      * @param key
      * @return mixed
@@ -336,7 +344,7 @@ class DPConfig extends Base {
      * @param isDom
      * @return {mixed}
      */
-    runner(isDom){
+    runner(isDom) {
         let type = this.get('type');
         return this.get('elements.' + type, isDom);
     }
@@ -345,7 +353,7 @@ class DPConfig extends Base {
 // ====================================================
 // Class {DPHelper}
 // ====================================================
-class DPHelper extends Base {
+class DPHelper extends DPBase {
     constructor(app) {
         super();
         this.app = app;
@@ -370,7 +378,7 @@ class DPHelper extends Base {
 // ====================================================
 // Class {DPView}
 // ====================================================
-class DPView extends Base {
+class DPView extends DPBase {
     /**
      * Constructor
      * @param config
@@ -481,7 +489,7 @@ class DPView extends Base {
 // ====================================================
 // Class {DPTranslator}
 // ====================================================
-class DPTranslator extends Base{
+class DPTranslator extends DPBase {
     /**
      * Constructor
      * @param config
@@ -545,7 +553,7 @@ class DPTranslator extends Base{
 // ====================================================
 // Class {DPMenu}
 // ====================================================
-class DPMenu extends Base{
+class DPMenu extends DPBase {
     /**
      * Constructor
      * @param config
@@ -563,7 +571,7 @@ class DPMenu extends Base{
      * @param config
      * @return {DPMenu}
      */
-    run() {
+    init() {
         let enableMenuList = this.config.get('menu');
         let menu = this.config.get('elements.menu', true);
 
@@ -768,7 +776,7 @@ class DPMenu extends Base{
 // ====================================================
 // Class {DPLogo}
 // ====================================================
-class DPLogo extends Base{
+class DPLogo extends DPBase {
     /**
      * Constructor
      * @param config
@@ -818,7 +826,7 @@ class DPLogo extends Base{
      * render
      * @return {DPLogo}
      */
-    run() {
+    init() {
         let logo = this.config.get('elements.logo', true);
         let logoConfig = this.config.get('logo');
         let dp = this;
@@ -851,7 +859,7 @@ class DPLogo extends Base{
 // ====================================================
 // Class {DPModal}
 // ====================================================
-class DPModal extends Base{
+class DPModal extends DPBase {
     /**
      * Constructor
      * @param config
@@ -866,7 +874,7 @@ class DPModal extends Base{
     /**
      * Render
      */
-    run() {
+    init() {
         return this;
     }
 
@@ -906,7 +914,7 @@ class DPModal extends Base{
 // ====================================================
 // Class {DPModal}
 // ====================================================
-class DPControl extends Base{
+class DPControl extends DPBase {
     constructor(app) {
         super();
         this.config = app.config;
@@ -918,7 +926,7 @@ class DPControl extends Base{
     /**
      * Render
      */
-    run() {
+    init() {
         let dp = this;
         let runner = this.config.runner(true);
         let runnerDom = runner.get(0);
@@ -995,7 +1003,7 @@ class DPControl extends Base{
 // ====================================================
 // Class {DPSchedule}
 // ====================================================
-class DPSchedule extends Base{
+class DPSchedule extends DPBase {
     constructor(app) {
         super();
         this.config = app.config;
@@ -1003,19 +1011,17 @@ class DPSchedule extends Base{
         this.helper = app.helper;
         this.schedules = {};
         this.alias = {};
+        this.lastTime = null;
     }
 
     /**
      * Run
      */
-    run() {
+    init() {
         let schedules = this.config.get('schedules');
         let dp = this;
         let runner = this.config.runner(true);
         let runnerDom = runner.get(0);
-        let icon = this.config.get('icons.scheduleClose');
-        let close = this.config.get('elements.scheduleClose', true);
-        let schedule = this.config.get('elements.schedule');
 
         for (var i in schedules) {
             // Add schedule to progress bar
@@ -1031,6 +1037,13 @@ class DPSchedule extends Base{
         runner.on('timeupdate ', function (e) {
             let current = runnerDom.currentTime;
             let time = dp.helper.parseTime(current);
+
+            if (this.lastTime === time) {
+                return;
+            }
+
+            this.lastTime = time;
+
             let list = dp.or(dp.schedules[time], []);
 
             for (let i in list) {
@@ -1041,38 +1054,45 @@ class DPSchedule extends Base{
                 }
             }
         });
-
-        // Event when click on button close
-        close.on('click', function(){
-            $(this).closest(schedule).removeClass('active');
-        });
-
-        close.html(icon);
     }
 
-    ads(content){
-        let ads = this.config.get('elements.scheduleAds', true);
-        let adsClose = this.config.get('elements.scheduleAdsClose', true);
-        let adsContent = this.config.get('elements.scheduleAdsContent', true);
-
-        ads.addClass('active');
-        adsClose.addClass('active');
-
-        if (content !== undefined) {
-            adsContent.html(content);
-        }
-    }
-
-    execute(name){
+    /**
+     * Execute schedule
+     * @param name
+     */
+    execute(name) {
         let schedule = this.alias[name];
-        schedule.execute(this);
+        schedule.execute(this.app);
+    }
+}
+
+// ====================================================
+// Plugin {DPAds}
+// ====================================================
+class DPPlugin extends DPBase {
+    constructor(app) {
+        super();
+        this.config = app.config;
+        this.app = app;
+        this.helper = app.helper;
+    }
+
+    async init() {
+        let list = this.config.get('plugins');
+
+        for (let name in list) {
+            this[name] = await eval('new ' + list[name].className + '(this.app)');
+            this[name].init();
+        }
+
+        return this;
     }
 }
 
 // ====================================================
 // Class {DilationPlayer}
 // ====================================================
-class DilationPlayer extends Base{
+class DilationPlayer extends DPBase {
     /**
      * Constructor
      * @param config
@@ -1085,6 +1105,7 @@ class DilationPlayer extends Base{
         }
 
         config.object = object;
+        this.rendered = false;
 
         this.config = new DPConfig(config);
         this.translate = new DPTranslator(this);
@@ -1094,8 +1115,8 @@ class DilationPlayer extends Base{
         this.menu = new DPMenu(this);
         this.logo = new DPLogo(this);
         this.modal = new DPModal(this);
+        this.plugin = new DPPlugin(this);
         this.schedule = new DPSchedule(this);
-        this.rendered = false;
 
         this.apply();
     }
@@ -1128,6 +1149,7 @@ class DilationPlayer extends Base{
             .contextLogo()
             .contextModal()
             .contextMenu()
+            .contextPlugin()
             .contextSchedule();
     }
 
@@ -1648,7 +1670,7 @@ class DilationPlayer extends Base{
      * return {DilationPlayer}
      */
     contextLogo() {
-        this.logo.run();
+        this.logo.init();
         return this;
     }
 
@@ -1657,7 +1679,7 @@ class DilationPlayer extends Base{
      * @return {DilationPlayer}
      */
     contextControl() {
-        this.control.run();
+        this.control.init();
         return this;
     }
 
@@ -1666,7 +1688,7 @@ class DilationPlayer extends Base{
      * @return {DilationPlayer}
      */
     contextModal() {
-        this.modal.run();
+        this.modal.init();
 
         return this;
     }
@@ -1676,7 +1698,7 @@ class DilationPlayer extends Base{
      * @return {DilationPlayer}
      */
     contextMenu() {
-        this.menu.run();
+        this.menu.init();
         return this;
     }
 
@@ -1685,7 +1707,16 @@ class DilationPlayer extends Base{
      * @return {DilationPlayer}
      */
     contextSchedule() {
-        this.schedule.run();
+        this.schedule.init();
+        return this;
+    }
+
+    /**
+     * Plugin
+     * @return {DilationPlayer}
+     */
+    contextPlugin() {
+        this.plugin.init();
         return this;
     }
 }

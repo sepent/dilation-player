@@ -355,32 +355,25 @@ html, body {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-/* ======================== CSS for schedule ============== */
-.dp .dp-schedule {
+/* ======================== CSS for ADS ============== */
+.dp .dp-ads {
     z-index: 9;
     display: none;
+    width: 100%;
 }
 
-.dp .dp-schedule.active {
+.dp .dp-ads.active {
     display: block;
 }
 
-/*For ADS */
-.dp .dp-schedule.dp-schedule-ads {
-    width: 100%;
-    height: 80px;
-    margin-top: -80px;
-}
-
-.dp .dp-schedule.dp-schedule-ads .dp-schedule-item{
+.dp .dp-ads .dp-ads-item{
     margin: auto;
     position: relative;
     display: block;
     width: fit-content;
-    height: 80px;
 }
 
-.dp .dp-schedule.dp-schedule-ads .dp-schedule-close {
+.dp .dp-ads .dp-ads-close {
     position: absolute;
     top: 0;
     right: 0;
@@ -393,6 +386,6 @@ html, body {
     display: none;
 }
 
-.dp .dp-schedule.dp-schedule-ads .dp-schedule-close.active {
+.dp .dp-ads .dp-ads-close.active {
     display: inline-block;
 }

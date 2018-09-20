@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Demo</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+
+    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/dilation-player.css">
+</head>
+<body>
+<div style="width: 600px; height: 400px; background-color: #000; color: #fff; margin: auto" id="dilation-player"></div>
+<script src="http://cdn.lib.cobonla.org/jquery/v3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
+<script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/plugins/dilation-player.plugin.ads.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var dilationPlayer = new DilationPlayer('#dilation-player', {
+            view: {
+                import: 'dilation-player.template.html'
+            },
+            locale: 'vi',
+            logo: {height: '10%', rate: 1, url: 'http://cobonla.org/logo-base.png'},
+            size: {width: '60%'},
+            poster: 'http://cobonla.org/logo-base.png',
+            sources: [{
+                src: 'https://www.sample-videos.com/video/mp4/240/big_buck_bunny_240p_30mb.mp4',
+                type: 'video/mp4'
+            }],
+            plugins: {
+                ads: {
+                    className: "DPAdsPlugin"
+                }
+            },
+            schedules: [
+                {
+                    name: 'toi',
+                    at: '00:05',
+                    loop: true,
+                    execute: function (app) {
+                        app.plugin.ads.show('<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL9vphuP475tkW9tWoxOFMxtTafe8OZEXxnjRJUGpGyzSl8JXj" style="max-width: 100%; max-height: 80px">');
+                    }
+                }
+            ]
+        });
+    });
+</script>
+</body>
+</html>
