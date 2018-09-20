@@ -152,11 +152,11 @@ class DPConfig extends Base {
             menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
             menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
             schedule: this.or(config.elements.schedule, '.dp-schedule'),
-            scheduleItem: this.or(config.elements.schedule, '.dp-schedule .dp-schedule-item'),
-            scheduleClose: this.or(config.elements.schedule, '.dp-schedule .dp-schedule-item .dp-schedule-close'),
-            scheduleAds: this.or(config.elements.scheduleAds, '.dp-schedule .dp-schedule-ads'),
-            scheduleAdsContent: this.or(config.elements.scheduleAdsContent, '.dp-schedule .dp-schedule-ads .dp-schedule-content'),
-            scheduleAdsClose: this.or(config.elements.scheduleAdsClose, '.dp-schedule .dp-schedule-ads .dp-schedule-close'),
+            scheduleClose: this.or(config.elements.scheduleClose, '.dp-schedule .dp-schedule-close'),
+            scheduleAds: this.or(config.elements.scheduleAds, '.dp-schedule.dp-schedule-ads'),
+            scheduleAdsItem: this.or(config.elements.schedule, '.dp-schedule.dp-schedule-ads .dp-schedule-item'),
+            scheduleAdsContent: this.or(config.elements.scheduleAdsContent, '.dp-schedule.dp-schedule-ads .dp-schedule-content'),
+            scheduleAdsClose: this.or(config.elements.scheduleAdsClose, '.dp-schedule.dp-schedule-ads .dp-schedule-close'),
         };
     }
 
@@ -180,7 +180,7 @@ class DPConfig extends Base {
             volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
             volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
             volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>'),
-            closeSchedule: this.or(config.icons.closeSchedule, '[X]')
+            scheduleClose: this.or(config.icons.scheduleClose, '[X]')
         };
     }
 
@@ -1013,9 +1013,9 @@ class DPSchedule extends Base{
         let dp = this;
         let runner = this.config.runner(true);
         let runnerDom = runner.get(0);
-        let icon = this.config.get('icons.closeSchedule');
+        let icon = this.config.get('icons.scheduleClose');
         let close = this.config.get('elements.scheduleClose', true);
-        let scheduleItem = this.config.get('elements.scheduleItem');
+        let schedule = this.config.get('elements.schedule');
 
         for (var i in schedules) {
             // Add schedule to progress bar
@@ -1044,19 +1044,17 @@ class DPSchedule extends Base{
 
         // Event when click on button close
         close.on('click', function(){
-            $(this).closest(scheduleItem).removeClass('active');
+            $(this).closest(schedule).removeClass('active');
         });
 
         close.html(icon);
     }
 
     ads(content){
-        let schedule = this.config.get('elements.scheduleItem', true);
         let ads = this.config.get('elements.scheduleAds', true);
         let adsClose = this.config.get('elements.scheduleAdsClose', true);
         let adsContent = this.config.get('elements.scheduleAdsContent', true);
 
-        schedule.removeClass('active');
         ads.addClass('active');
         adsClose.addClass('active');
 
