@@ -387,8 +387,15 @@ html, body {
 /*For ADS */
 .dp .dp-schedule-item.dp-schedule-ads {
     bottom: 70px;
-    width: 80%;
-    left: 10%;
+    width: 100%;
+    left: 0;
     height: 10%;
     min-height: 80px;
+}
+
+.dp .dp-schedule-item.dp-schedule-ads > *{
+    margin: auto;
+    position: relative;
+    display: block;
+    width: fit-content;
 }
