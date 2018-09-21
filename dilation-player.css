@@ -45,6 +45,11 @@ html, body {
     background-position: left;
     background-size: contain;
     background-repeat: no-repeat;
+    display: none;
+}
+
+.dp .dp-logo.active{
+    display: block;
 }
 
 .dp .dp-logo:hover {
