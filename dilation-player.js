@@ -526,7 +526,7 @@ class DPEvent extends DPBase {
             ];
         };
 
-        this.events['dp.screen.large.inactive'] = function(parameters) {
+        this.events['dp.screen.full.inactive'] = function(parameters) {
             return [
                 instance.createEvent('dp.screen.full.change', parameters),
                 instance.createEvent('dp.screen.full.inactive', parameters)
