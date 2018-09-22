@@ -1,70 +1,222 @@
-var config = {
-    elements: {
-        container: '.dp',
-        video: '.dp-video',
-        logo: '.dp-logo',
-        progress: '.dp-progress',
-        progressHoverTooltipText: '.dp-progress-tooltip-text',
-        progressToverTooltipImage: '.dp-progress-tooltip-image',
-        control: '.dp-control',
-        button: '.dp-button',
-        controlPlayPause: '.dp-btn-play',
-        controlFullScreen: '.dp-btn-fullscreen',
-        controlLargeScreen: '.dp-btn-largescreen',
-        controlVolume: '.dp-btn-volume',
-        controlVolumeTooltip: '.dp-volume-tooltip',
-        controlVolumeRange: '.dp-volume-range',
-        controlTimer: '.dp-timer',
-        modal: '.dp-modal',
-        loaderModal: '.dp-modal-loader',
-        loaderModalIcon: '.dp-modal-loader-icon',
-        playerModal: '.dp-modal-player',
-        playerModalIcon: '.dp-modal-player-icon',
-        menu: '.dp-menu',
-        menuList: '.dp-menu-list',
-        menuItem: '.dp-menu-item',
-        menuItemLoop: '.dp-menu-item-loop',
-        menuItemCopyUrl: '.dp-menu-item-copy-url',
-    },
-    icons: {
-        loaderModal: '<i class="fa fa-spin fa-spinner"></i>',
-        playerModal: '<i class="icons icon-control-play"></i>',
-        fullScreen: '<i class="icons icon-size-fullscreen"></i>',
-        actualScreen: '<i class="icons icon-size-actual"></i>',
-        largeScreen: '<i class="icons icon-frame"></i>',
-        smallScreen: '<i class="icons icon-frame"></i>',
-        pause: '<i class="icons icon-control-pause"></i>',
-        play: '<i class="icons icon-control-play"></i>',
-        volumeMute: '<i class="icons icon-volume-off"></i>',
-        volume1: '<i class="icons icon-volume-1"></i>',
-        volume2: '<i class="icons icon-volume-2"></i>',
-        volume3: '<i class="icons icon-volume-3"></i>'
-    },
-    volume: 100,
-    view: {
-        content: null,
-        import: null
-    },
-    sources: [],
-    logo: {
-        height: '10%',
-        width: undefined,
-        rate: 1
-    },
-    size: {
-        height: undefined,
-        width: '100%',
-        rate: 2 / 3
-    },
-    largeScreen: false,
-    locale: 'en',
-    menu: {
-        name: {
-            text: 'translate.key',
-            element: 'class_name',
-            execute: function (item, menu, config) {
+// ====================================================
+// Class {DPScreen}
+// ====================================================
+class DPScreen extends DPBase {
+    /**
+     * Constructor
+     * @param app
+     */
+    constructor(app) {
+        super();
+        this.app = app;
+    }
+
+    /**
+     * Default screen
+     */
+    defaultScreen() {
+        let sizeConfig = this.app.config.get('size', false);
+        let elObject = this.app.config.get('elements.object', true);
+
+        if (sizeConfig.height !== undefined) {
+            elObject.css({height: sizeConfig.height});
+
+            if (sizeConfig.width !== undefined) {
+                elObject.css({width: sizeConfig.width});
+            } else {
+                elObject.css({width: (elObject.height() * sizeConfig.rate) + 'px'});
+            }
+        } else {
+            elObject.css({width: sizeConfig.width});
+
+            if (sizeConfig.height !== undefined) {
+                elObject.css({height: sizeConfig.height});
+            } else {
+                elObject.css({height: (elObject.width() * sizeConfig.rate) + 'px'});
             }
         }
-    },
-    poster: null
+
+        if (!this.defaultSize) {
+            this.defaultSize = {
+                width: elObject.width(),
+                height: elObject.height()
+            };
+        }
+
+        elObject.css({maxWidth: '100%'});
+        this.rateScreenSize();
+
+        return this;
+    }
+
+    /**
+     * Rate screen size
+     */
+    rateScreenSize() {
+        let elObject = this.app.config.get('elements.object', true);
+        let runnerSize = 0;
+        let h = 0;
+
+        if (this.isLarge) {
+            runnerSize = $(window).width();
+
+            elObject.width(runnerSize);
+            h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
+            let windowH = $(window).height() * 85 / 100;
+
+            if (h > windowH) {
+                h = windowH;
+            }
+        } else {
+            runnerSize = elObject.width();
+            h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
+        }
+
+        elObject.css({height: h + 'px'});
+        this.app.event.trigger('dp.screen.change');
+
+        return this;
+    }
+
+    /**
+     * Make icon
+     * @param isFull
+     */
+    makeIconForFullScreen(isFull) {
+        let icons = this.app.config.get('icons', false);
+        let elBtnFullScreen = this.app.config.get('elements.controlFullScreen', true);
+
+        if (isFull === undefined) {
+            isFull = document.fullscreenElement
+                || document.mozFullScreenElement
+                || document.webkitFullscreenElement;
+        }
+
+        if (isFull) {
+            elBtnFullScreen.html(icons.actualScreen);
+        } else {
+            elBtnFullScreen.html(icons.fullScreen);
+        }
+
+        return this;
+    }
+
+    /**
+     * Toggle
+     * @param event
+     */
+    toggleFullScreen() {
+        let elContainer = this.app.config.get('elements.container', true);
+        let isFullScreen = document.webkitIsFullScreen || document.mozFullScreen || false;
+        let container = elContainer.get(0);
+        let instance = this;
+
+        container.requestFullScreen = container.requestFullScreen || container.webkitRequestFullScreen || container.mozRequestFullScreen || function () {
+            return false;
+        };
+
+        document.cancelFullScreen = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || function () {
+            return false;
+        };
+
+        isFullScreen ? (function () {
+            instance.app.event.trigger('dp.screen.full.inactive');
+            document.cancelFullScreen();
+        })() : (function () {
+            instance.app.event.trigger('dp.screen.full.active');
+            container.requestFullScreen();
+        })();
+
+        return this;
+    }
+
+    /**
+     * Make icon
+     * @param isFull
+     */
+    makeIconForLargeScreen(isLg) {
+        let elBtnLargeScreen = this.app.config.get('elements.controlLargeScreen', true);
+
+        if (isLg === undefined) {
+            isLg = this.isLarge;
+        }
+
+        if (isLg) {
+            elBtnLargeScreen.html(this.icons.smallScreen);
+        } else {
+            elBtnLargeScreen.html(this.icons.largeScreen);
+        }
+
+        return this;
+    }
+
+    /**
+     * Toggle
+     * @param event
+     */
+    toggleLargeScreen() {
+        if (this.isLarge) {
+            this.isLarge = false;
+            this.app.event.trigger('dp.screen.large.inactive');
+            this.defaultScreen();
+        } else {
+            this.isLarge = true;
+            this.app.event.trigger('dp.screen.large.active');
+            this.rateScreenSize();
+        }
+
+        return this;
+    }
+
+    /**
+     * Init
+     * @return {DPScreen}
+     */
+    init() {
+        // Defined the common variable for object
+        this.isLarge = false;
+        this.defaultSize = null;
+
+        let elBtnFullScreen = this.app.config.get('elements.controlFullScreen', true);
+        let elBtnLargeScreen = this.app.config.get('elements.controlLargeScreen', true);
+        let largeScreen = this.app.config.get('largeScreen');
+        let instance = this;
+
+        // Event when click on button fullscreen
+        // Then call to check full or cancel
+        elBtnFullScreen.on('click', function (event) {
+            instance.toggleFullScreen();
+        });
+
+        // Event when click on button large
+        // Then call to check large or cancel
+        elBtnLargeScreen.on('click', function (event) {
+            instance.toggleLargeScreen();
+            instance.makeIconForLargeScreen();
+        });
+
+        // Event when change screen
+        // Then get status and change icon
+        $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
+            instance.makeIconForFullScreen();
+        });
+
+        // Event when window resize
+        $(window).resize(function () {
+            instance.rateScreenSize();
+        });
+
+        // Call when init screen
+        this.defaultScreen();
+        this.makeIconForFullScreen(false);
+
+        // Check if config is setting true large as default
+        if (largeScreen) {
+            instance.toggleLargeScreen();
+        }
+
+        this.makeIconForLargeScreen();
+
+        return this;
+    }
 }

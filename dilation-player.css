@@ -45,6 +45,11 @@ html, body {
     background-position: left;
     background-size: contain;
     background-repeat: no-repeat;
+    display: none;
+}
+
+.dp .dp-logo.active{
+    display: block;
 }
 
 .dp .dp-logo:hover {
@@ -367,8 +372,7 @@ html, body {
 
 .dp .dp-ads.line {
     height: 17%;
-    min-height: 70px;
-    max-height: 100px;
+    min-height: 40px;
     position: absolute;
     bottom: 0;
     left: 0;

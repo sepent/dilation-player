@@ -61,7 +61,6 @@ class DPConfig extends DPBase {
             icons: this.mergeIcons(config),
             // Config default
             volume: this.or(config.volume, 100),
-            object: this.or(config.object, null),
             view: this.mergeView(config),
             sources: this.or(config.sources, []),
             logo: this.mergeLogo(config),
@@ -79,9 +78,7 @@ class DPConfig extends DPBase {
 
         // Init cache
         this.cache = {
-            dom: {
-                object: $(this.config.object)
-            },
+            dom: {},
             config: {}
         };
     }
@@ -124,6 +121,7 @@ class DPConfig extends DPBase {
         config.elements = this.or(config.elements, {});
 
         return {
+            object: this.or(config.elements.object, null),
             container: this.or(config.elements.container, '.dp'),
             video: this.or(config.elements.video, '.dp-video'),
             audio: this.or(config.elements.audio, '.dp-audio'),
@@ -301,13 +299,15 @@ class DPConfig extends DPBase {
      * @param key
      * @return mixed
      */
-    get(key, dom) {
+    get(key, dom, cache) {
         let config = null;
+        cache = cache !== undefined ? cache : true;
 
         // Get config cache
-        if (this.cache.config[key] !== undefined) {
+        if (this.cache.config[key] !== undefined && cache) {
             config = this.cache.config[key];
         }
+
         // Config not in cache then read
         // Split key string to array
         else {
@@ -326,14 +326,22 @@ class DPConfig extends DPBase {
             this.cache.config[key] = config;
         }
 
-        // Check get dom is true and dom is created
-        // Then return dom in cache
-        if (dom === true && (typeof config === 'string')) {
-            if (this.cache.dom[key] === undefined) {
-                this.cache.dom[key] = this.cache.dom['object'].find(config);
-            }
+        if (dom === true) {
+            // Check if is object elements
+            if (key === 'elements.object' && (this.cache.dom[key] === undefined || !cache)) {
+                this.cache.dom[key] = $(config);
 
-            return this.cache.dom[key];
+                return this.cache.dom[key];
+            }
+            // Check get dom is true and dom is created
+            // Then return dom in cache
+            else if (typeof config === 'string') {
+                if (this.cache.dom[key] === undefined || !cache) {
+                    this.cache.dom[key] = this.cache.dom['elements.object'].find(config);
+                }
+
+                return this.cache.dom[key];
+            }
         }
 
         return config;
@@ -344,9 +352,9 @@ class DPConfig extends DPBase {
      * @param isDom
      * @return {mixed}
      */
-    runner(isDom) {
+    runner(isDom, cache) {
         let type = this.get('type');
-        return this.get('elements.' + type, isDom);
+        return this.get('elements.' + type, isDom, cache);
     }
 }
 
@@ -376,6 +384,202 @@ class DPHelper extends DPBase {
 }
 
 // ====================================================
+// Class {DPEvent}
+// ====================================================
+class DPEvent extends DPBase {
+    /**
+     * constructor
+     */
+    constructor(app) {
+        super();
+        this.app = app;
+    }
+
+    /**
+     * Init
+     */
+    init() {
+        this.events = {};
+        this.viewEvents()
+            .logoEvents()
+            .menuEvents()
+            .controlEvents()
+            .screenEvents()
+            .modalEvents();
+    }
+
+    /**
+     * View events
+     * @return {DPEvent}
+     */
+    viewEvents() {
+        let instance = this;
+
+        this.events['dp.view.rendering'] = function (parameters) {
+            return instance.createEvent('dp.view.rendering', parameters);
+        };
+
+        this.events['dp.view.rendered'] = function (parameters) {
+            return instance.createEvent('dp.view.rendered', parameters);
+        };
+
+        return this;
+    }
+
+    /**
+     * Logo events
+     * @return {DPEvent}
+     */
+    logoEvents() {
+        let instance = this;
+
+        this.events['dp.logo.resize'] = function (parameters) {
+            return instance.createEvent('dp.logo.resize', parameters);
+        };
+
+        return this;
+    }
+
+    /**
+     * Menu events
+     * @return {DPEvent}
+     */
+    menuEvents() {
+        let instance = this;
+
+        this.events['dp.menu.open'] = function (parameters) {
+            return instance.createEvent('dp.menu.open', parameters);
+        };
+
+        this.events['dp.menu.close'] = function (parameters) {
+            return instance.createEvent('dp.menu.close', parameters);
+        };
+
+        return this;
+    }
+
+    /**
+     * Control events
+     * @return {DPEvent}
+     */
+    controlEvents() {
+        let instance = this;
+
+        this.events['dp.control.show'] = function (parameters) {
+            return instance.createEvent('dp.control.show', parameters);
+        };
+
+        this.events['dp.control.hide'] = function (parameters) {
+            return instance.createEvent('dp.control.hide', parameters);
+        };
+
+        return this;
+    }
+
+    /**
+     * Logo events
+     * @return {DPEvent}
+     */
+    modalEvents() {
+        let instance = this;
+
+        // Event for loader
+        this.events['dp.modal.loader.show'] = function (parameters) {
+            return instance.createEvent('dp.modal.loader.show', parameters);
+        };
+
+        this.events['dp.modal.loader.hide'] = function (parameters) {
+            return instance.createEvent('dp.modal.loader.hide', parameters);
+        };
+
+        // Event for player
+        this.events['dp.modal.player.show'] = function (parameters) {
+            return instance.createEvent('dp.modal.player.show', parameters);
+        };
+
+        this.events['dp.modal.player.hide'] = function (parameters) {
+            return instance.createEvent('dp.modal.player.hide', parameters);
+        };
+
+        return this;
+    }
+
+    /**
+     * Screen events
+     * @return {DPEvent}
+     */
+    screenEvents() {
+        let instance = this;
+
+        // Event for large screen
+        this.events['dp.screen.large.active'] = function (parameters) {
+            return [
+                instance.createEvent('dp.screen.large.change', parameters),
+                instance.createEvent('dp.screen.large.active', parameters)
+            ];
+        };
+
+        this.events['dp.screen.large.inactive'] = function (parameters) {
+            return [
+                instance.createEvent('dp.screen.large.change', parameters),
+                instance.createEvent('dp.screen.large.inactive', parameters)
+            ];
+        };
+
+        // Event for full screen
+        this.events['dp.screen.full.active'] = function (parameters) {
+            return [
+                instance.createEvent('dp.screen.full.change', parameters),
+                instance.createEvent('dp.screen.full.active', parameters)
+            ];
+        };
+
+        this.events['dp.screen.full.inactive'] = function (parameters) {
+            return [
+                instance.createEvent('dp.screen.full.change', parameters),
+                instance.createEvent('dp.screen.full.inactive', parameters)
+            ];
+        };
+
+        this.events['dp.screen.change'] = function (parameters) {
+            return instance.createEvent('dp.screen.change', parameters);
+        };
+
+        return this;
+    }
+
+    /**
+     * Create event
+     * @param name
+     * @param parameters
+     */
+    createEvent(name, parameters) {
+        return new CustomEvent(name, parameters);
+    }
+
+    /**
+     * Trigger event
+     * @param name
+     * @param parameters
+     */
+    trigger(name, parameters) {
+        let events = this.events[name](this.or(parameters, {}));
+        let ob = this.app.config.get('elements.object', true);
+        let dom = ob.get(0);
+
+        if (events instanceof Array) {
+            events.forEach(function (item, index) {
+                dom.dispatchEvent(item);
+                ob.trigger(item.type);
+            });
+        } else {
+            dom.dispatchEvent(events);
+            ob.trigger(events.type);
+        }
+    }
+}
+
+// ====================================================
 // Class {DPView}
 // ====================================================
 class DPView extends DPBase {
@@ -385,9 +589,15 @@ class DPView extends DPBase {
      */
     constructor(app) {
         super();
-        this.config = app.config;
-        this.translate = app.translate;
         this.app = app;
+    }
+
+    /**
+     * Init
+     * @return {DPView}
+     */
+    init() {
+        return this;
     }
 
     /**
@@ -395,39 +605,41 @@ class DPView extends DPBase {
      * @return {DPView}
      */
     async render() {
-        let view = this.config.get('view');
-        let sources = this.config.get('sources');
-        let object = this.config.get('object', true);
-        let sizeConfig = this.config.get('size');
+        let viewConfig = this.app.config.get('view', false);
+        let posterUrl = this.app.config.get('poster', false);
+        let elObject = this.app.config.get('elements.object', true);
+        let sizeConfig = this.app.config.get('size', false);
+
+        this.app.event.trigger('dp.view.rendering');
 
         // Render size
-        object.css({maxWidth: '100%'});
+        elObject.css({maxWidth: '100%'});
 
         if (sizeConfig.height !== undefined) {
-            object.css({height: sizeConfig.height});
+            elObject.css({height: sizeConfig.height});
 
             if (sizeConfig.width !== undefined) {
-                object.css({width: sizeConfig.width});
+                elObject.css({width: sizeConfig.width});
             } else {
-                object.css({width: (object.height() * sizeConfig.rate) + 'px'});
+                elObject.css({width: (elObject.height() * sizeConfig.rate) + 'px'});
             }
         } else {
-            object.css({width: sizeConfig.width});
+            elObject.css({width: sizeConfig.width});
 
             if (sizeConfig.height !== undefined) {
-                object.css({height: sizeConfig.height});
+                elObject.css({height: sizeConfig.height});
             } else {
-                object.css({height: (object.width() * sizeConfig.rate) + 'px'});
+                elObject.css({height: (elObject.width() * sizeConfig.rate) + 'px'});
             }
         }
 
         // Read content in template
-        if (!view.content) {
-            if (view.import) {
-                object.html(this.translate.get('app.loading'));
+        if (!viewConfig.content) {
+            if (viewConfig.import) {
+                elObject.html(this.app.translate.get('app.loading'));
 
                 let response = await $.ajax({
-                    url: view.import,
+                    url: viewConfig.import,
                     data: {},
                     method: 'GET',
                     success: function (response) {
@@ -439,40 +651,20 @@ class DPView extends DPBase {
                 });
 
                 let content = this.replace(response);
-                object.html(content);
+                elObject.html(content);
             }
         } else {
-            let content = this.replace(view.content);
-            object.html(content);
+            let content = this.replace(viewConfig.content);
+            elObject.html(content);
         }
 
-        // Setting
-        // Poster
-        let poster = this.config.get('poster');
-        let runner = this.config.runner(true);
-
-        if (poster) {
-            runner.get(0).poster = poster;
+        // Render the poster for video
+        if (this.poster) {
+            let runner = this.app.config.runner(true);
+            runner.get(0).poster = posterUrl;
         }
 
-        if (sources !== undefined) {
-            runner.html(this.translate.get('app.not_support'));
-
-            // Generate video from resources
-            if (typeof sources === 'string') {
-                runner.get(0).src = sources;
-            } else if (sources.length == 1) {
-                runner.get(0).src = sources[0].src;
-            } else {
-                for (var i in sources) {
-                    let source = document.createElement('source');
-                    $(source).attr({src: sources[i].src, type: sources[i].type});
-                    runner.append(source);
-                }
-            }
-
-            runner.get(0).load();
-        }
+        this.app.event.trigger('dp.view.rendered');
 
         return true;
     }
@@ -560,10 +752,7 @@ class DPMenu extends DPBase {
      */
     constructor(app) {
         super();
-        this.config = app.config;
-        this.translate = app.translate;
         this.app = app;
-        this.status = true;
     }
 
     /**
@@ -572,27 +761,25 @@ class DPMenu extends DPBase {
      * @return {DPMenu}
      */
     init() {
-        let enableMenuList = this.config.get('menu');
-        let menu = this.config.get('elements.menu', true);
+        this.status = true;
 
-        if (enableMenuList === false) {
-            menu.hide();
+        let menuList = this.app.config.get('menu', false);
+        let elMenuList = this.app.config.get('elements.menuList', true);
+
+        if (menuList === false) {
             this.status = false;
             return this;
         }
 
-        let container = this.config.get('elements.container', true);
+        let menuItemClass = this.app.config.get('elements.menuItem', false).replace('.', '');
 
-        let menuList = this.config.get('elements.menuList', true);
-        let menuItemClass = this.config.get('elements.menuItem').replace('.', '');
-
-        for (var name in enableMenuList) {
+        for (var name in menuList) {
             let div = document.createElement('div');
             $(div).addClass(menuItemClass)
                 .attr('dp-menu:name', name)
-                .html(this.translate.get(enableMenuList[name].text));
+                .html(this.app.translate.get(menuList[name].text));
 
-            menuList.append(div);
+            elMenuList.append(div);
         }
 
         this.events();
@@ -610,14 +797,13 @@ class DPMenu extends DPBase {
             return this;
         }
 
-        let container = this.config.get('elements.container', true);
-        let menu = this.config.get('elements.menu', true);
-        let menuList = this.config.get('elements.menuList', true);
+        let elMenu = this.app.config.get('elements.menu', true);
+        let elMenuList = this.app.config.get('elements.menuList', true);
 
-        menu.addClass('active');
+        elMenu.addClass('active');
 
-        let height = menuList.height();
-        let width = menuList.width();
+        let height = elMenuList.height();
+        let width = elMenuList.width();
 
         let cheight = $(window).height();
         let cwidth = $(window).width();
@@ -633,7 +819,9 @@ class DPMenu extends DPBase {
             left = cwidth - width;
         }
 
-        menuList.css({left: left + 'px', top: top + 'px'});
+        elMenuList.css({left: left + 'px', top: top + 'px'});
+
+        this.app.event.trigger('dp.menu.open');
 
         return this;
     }
@@ -644,12 +832,15 @@ class DPMenu extends DPBase {
      * @return {DPMenu}
      */
     closeMenu() {
+        let elMenu = this.app.config.get('elements.menu', true);
+
         if (!this.status) {
             return this;
         }
 
-        let menu = this.config.get('elements.menu', true);
-        menu.removeClass('active');
+        elMenu.removeClass('active');
+
+        this.app.event.trigger('dp.menu.close');
 
         return this;
     }
@@ -660,26 +851,26 @@ class DPMenu extends DPBase {
      * @return {DPMenu}
      */
     events() {
-        let dp = this;
-        let container = this.config.get('elements.container', true);
-        let menuList = this.config.get('elements.menuList', true);
-        let menuItem = this.config.get('elements.menuItem', true);
+        let instance = this;
+        let elMenuList = this.app.config.get('elements.menuList', true);
+        let elMenuItem = this.app.config.get('elements.menuItem', true);
+        let elContainer = this.app.config.get('elements.container', true);
 
         // Event when right click or open menu
-        container.mousedown(function (event) {
+        elContainer.mousedown(function (event) {
             var isRightMB;
             event = event || window.event;
 
             if (event.which === 3) {
-                container.bind('contextmenu', function () {
+                elContainer.bind('contextmenu', function () {
                     return false;
                 });
             }
             else {
-                container.unbind('contextmenu');
+                elContainer.unbind('contextmenu');
             }
 
-            if (!dp.status) {
+            if (!instance.status) {
                 return;
             }
 
@@ -692,22 +883,22 @@ class DPMenu extends DPBase {
 
             // Open menu
             if (isRightMB) {
-                dp.openMenu(event);
+                instance.openMenu(event);
             }
         });
 
         // Event when click out menu
         $(window).click(function (event) {
-            if (menuList.has(event.target).length == 0
-                && !menuList.is(event.target)) {
-                dp.closeMenu();
+            if (elMenuList.has(event.target).length == 0
+                && !elMenuList.is(event.target)) {
+                instance.closeMenu();
             }
         });
 
         // Event when click menu item
-        menuItem.click(function () {
+        elMenuItem.click(function () {
             let name = $(this).attr('dp-menu:name');
-            dp.execute(this, name);
+            instance.execute(this, name);
         });
 
         return this;
@@ -716,14 +907,14 @@ class DPMenu extends DPBase {
     /**
      * execute
      * @param name
-     * @return {DilationPlayerMenu}
+     * @return {DPMenu}
      */
     execute(item, name) {
         if (!this.status) {
             return this;
         }
 
-        let config = this.config.get('menu.' + name);
+        let config = this.app.config.get('menu.' + name);
 
         if (config.execute !== undefined) {
             config.execute(item, this, config);
@@ -734,14 +925,15 @@ class DPMenu extends DPBase {
 
     /**
      * Exec Loop
-     * @return {DilationPlayerMenu}
+     * @return {DPMenu}
      */
     execLoop(item, config) {
         if (!this.status) {
             return this;
         }
 
-        let runner = this.config.runner(true).get(0);
+        let elRunner = this.app.config.runner(true);
+        let runner = elRunner.get(0);
 
         if (runner.loop) {
             runner.loop = false;
@@ -758,14 +950,15 @@ class DPMenu extends DPBase {
 
     /**
      * Exec Copy Video Url
-     * @return {DilationPlayerMenu}
+     * @return {DPMenu}
      */
     execCopyUrl(item, config) {
         if (!this.status) {
             return this;
         }
 
-        let runner = this.config.runner(true).get(0);
+        let elRunner = this.app.config.runner(true);
+        let runner = elRunner.get(0);
 
         this.closeMenu();
 
@@ -783,10 +976,7 @@ class DPLogo extends DPBase {
      */
     constructor(app) {
         super();
-        this.config = app.config;
-        this.translate = app.translate;
         this.app = app;
-        this.status = true;
     }
 
     /**
@@ -798,26 +988,28 @@ class DPLogo extends DPBase {
             return this;
         }
 
-        let logo = this.config.get('elements.logo', true);
-        let logoConfig = this.config.get('logo');
+        let elLogo = this.app.config.get('elements.logo', true);
+        let logoConfig = this.app.config.get('logo', false);
 
         if (logoConfig.height !== undefined) {
-            logo.css({height: logoConfig.height});
+            elLogo.css({height: logoConfig.height});
 
             if (logoConfig.width !== undefined) {
-                logo.css({width: logoConfig.width});
+                elLogo.css({width: logoConfig.width});
             } else {
-                logo.css({width: (logo.height() * logoConfig.rate) + 'px'});
+                elLogo.css({width: (elLogo.height() * logoConfig.rate) + 'px'});
             }
         } else {
-            logo.css({width: logoConfig.width});
+            elLogo.css({width: logoConfig.width});
 
             if (logoConfig.height !== undefined) {
-                logo.css({height: logoConfig.height});
+                elLogo.css({height: logoConfig.height});
             } else {
-                logo.css({height: (logo.width() * logoConfig.rate) + 'px'});
+                elLogo.css({height: (elLogo.width() * logoConfig.rate) + 'px'});
             }
         }
+
+        this.app.event.trigger('dp.logo.resize');
 
         return this;
     }
@@ -827,30 +1019,30 @@ class DPLogo extends DPBase {
      * @return {DPLogo}
      */
     init() {
-        let logo = this.config.get('elements.logo', true);
-        let logoConfig = this.config.get('logo');
-        let dp = this;
+        this.status = true;
+
+        let elLogo = this.app.config.get('elements.logo', true);
+        let logoConfig = this.app.config.get('logo', false);
+        let elObject = this.app.config.get('elements.object', true);
+        let instance = this;
 
         // Check if logo is hidden
         if (logoConfig === false) {
             this.status = false;
-            logo.hide();
+            elLogo.removeClass('active');
             return this;
         }
 
-        // Make logo
-        logo.css({backgroundImage: 'url(\'' + logoConfig.url + '\')'});
+        elLogo.addClass('active');
+        elLogo.css({backgroundImage: 'url(\'' + logoConfig.url + '\')'});
 
-        // Event when resize window
-        $(window).resize(function () {
-            dp.resize();
+        // Event when screen change
+        elObject.on('dp.screen.change', function () {
+            instance.resize();
         });
 
         // Default
-        dp.resize();
-
-        // Event when click on logo
-        // Event when hover on logo
+        instance.resize();
 
         return this;
     }
@@ -866,8 +1058,6 @@ class DPModal extends DPBase {
      */
     constructor(app) {
         super();
-        this.config = app.config;
-        this.translate = app.translate;
         this.app = app;
     }
 
@@ -875,6 +1065,14 @@ class DPModal extends DPBase {
      * Render
      */
     init() {
+        let icons = this.app.config.get('icons', false);
+        let elLoaderIcon = this.app.config.get('elements.loaderModalIcon', true);
+        let elPlayerIcon = this.app.config.get('elements.playerModalIcon', true);
+
+        // default
+        elPlayerIcon.html(icons.playerModal);
+        elLoaderIcon.html(icons.loaderModal);
+
         return this;
     }
 
@@ -883,28 +1081,42 @@ class DPModal extends DPBase {
      * @param config
      */
     toggle(config) {
-        let loader = this.config.get('elements.loaderModal', true);
-        let player = this.config.get('elements.playerModal', true);
-        let modal = this.config.get('elements.modal', true);
-        let runnerDom = this.config.runner(true).get(0);
-        modal.removeClass('active');
+        let elLoaderModal = this.app.config.get('elements.loaderModal', true);
+        let elPlayerModal = this.app.config.get('elements.playerModal', true);
+        let elModal = this.app.config.get('elements.modal', true);
+        let elRunner = this.app.config.runner(true);
+
+        let runnerDom = elRunner.get(0);
+        let isLoaderActive = elLoaderModal.hasClass('active');
+        let isPlayerActive = elPlayerModal.hasClass('active');
+
+        elModal.removeClass('active');
 
         if (config === undefined) {
             if (!isNaN(runnerDom.duration)) {
                 if (runnerDom.paused) {
-                    player.addClass('active');
+                    elPlayerModal.addClass('active');
                 } else {
-                    player.removeClass('active');
+                    elPlayerModal.removeClass('active');
                 }
             } else {
-                loader.addClass('active');
+                elLoaderModal.addClass('active');
             }
         } else {
             if (config.loader === true) {
-                loader.addClass('active');
+                elLoaderModal.addClass('active');
             } else if (config.player === true || runnerDom.paused) {
-                player.addClass('active');
+                elPlayerModal.addClass('active');
             }
+        }
+
+        // Check event
+        if (elLoaderModal.hasClass('active') !== isLoaderActive) {
+            !isLoaderActive ? this.app.event.trigger('dp.modal.loader.show') : this.app.event.trigger('dp.modal.loader.hide');
+        }
+
+        if (elPlayerModal.hasClass('active') !== isPlayerActive) {
+            !isPlayerActive ? this.app.event.trigger('dp.modal.player.show') : this.app.event.trigger('dp.modal.player.hide');
         }
 
         return this;
@@ -917,44 +1129,44 @@ class DPModal extends DPBase {
 class DPControl extends DPBase {
     constructor(app) {
         super();
-        this.config = app.config;
         this.app = app;
-        this.isMouseIn = false;
-        this.controlTime = null;
     }
 
     /**
      * Render
      */
     init() {
-        let dp = this;
-        let runner = this.config.runner(true);
-        let runnerDom = runner.get(0);
-        let control = this.config.get('elements.control', true);
+        this.isMouseIn = false;
+        this.controlTime = null;
+
+        let elRunner = this.app.config.runner(true);
+        let instance = this;
+        let runnerDom = elRunner.get(0);
+        let elControl = this.app.config.get('elements.control', true);
 
         // Event when hover on runner/container/control
-        $(this.config.get('elements.container')
-            + ',' + this.config.get('elements.control')
-            + ',' + this.config.runner()).mousemove(function () {
-            dp.open();
-            dp.isMouseIn = true;
+        $(this.app.config.get('elements.container', false)
+            + ',' + this.app.config.get('elements.control', false)
+            + ',' + this.app.config.runner()).mousemove(function () {
+            instance.openControl();
+            instance.isMouseIn = true;
         });
 
         $(window).scroll(function () {
-            dp.open();
+            instance.openControl();
         });
 
         // Event when out on runner/container/control
-        $(this.config.get('elements.container')
-            + ',' + this.config.get('elements.control')
-            + ',' + this.config.runner()).mouseleave(function () {
-            dp.hidden();
-            dp.isMouseIn = false;
+        $(this.app.config.get('elements.container', false)
+            + ',' + this.app.config.get('elements.control', false)
+            + ',' + this.app.config.runner()).mouseleave(function () {
+            instance.closeControl();
+            instance.isMouseIn = false;
         });
 
         // Event when runner pause or ended
-        runner.on('pause ended', function () {
-            control.addClass('active');
+        elRunner.on('pause ended', function () {
+            elControl.addClass('active');
         });
 
         // Default
@@ -966,18 +1178,21 @@ class DPControl extends DPBase {
     /**
      * Hidden
      */
-    hidden() {
-        let control = this.config.get('elements.control', true);
-        let runner = this.config.runner(true).get(0);
-        let container = this.config.get('elements.container', true);
+    closeControl() {
+        let elRunner = this.app.config.runner(true);
+        let elControl = this.app.config.get('elements.control', true);
+        let elContainer = this.app.config.get('elements.container', true);
+
+        let runner = elRunner.get(0);
 
         if (!runner.paused) {
-            control.removeClass('active');
+            elControl.removeClass('active');
+            this.app.event.trigger('dp.control.hide');
 
             if (this.isMouseIn) {
-                container.addClass('hidden-cursor');
+                elContainer.addClass('hidden-cursor');
             } else {
-                container.removeClass('hidden-cursor');
+                elContainer.removeClass('hidden-cursor');
             }
         }
     }
@@ -985,18 +1200,244 @@ class DPControl extends DPBase {
     /**
      * open
      */
-    open() {
-        let control = this.config.get('elements.control', true);
-        let container = this.config.get('elements.container', true);
-        let inst = this;
+    openControl() {
+        let instance = this;
+
+        let elControl = this.app.config.get('elements.control', true);
+        let elContainer = this.app.config.get('elements.container', true);
 
         window.clearTimeout(this.controlTime);
-        control.addClass('active');
-        container.removeClass('hidden-cursor');
+        elControl.addClass('active');
+        elContainer.removeClass('hidden-cursor');
+        this.app.event.trigger('dp.control.show');
 
         this.controlTime = window.setTimeout(function () {
-            inst.hidden();
+            instance.closeControl();
         }, 2000);
+    }
+}
+
+// ====================================================
+// Class {DPScreen}
+// ====================================================
+class DPScreen extends DPBase {
+    /**
+     * Constructor
+     * @param app
+     */
+    constructor(app) {
+        super();
+        this.app = app;
+    }
+
+    /**
+     * Default screen
+     */
+    defaultScreen() {
+        let sizeConfig = this.app.config.get('size', false);
+        let elObject = this.app.config.get('elements.object', true);
+
+        if (sizeConfig.height !== undefined) {
+            elObject.css({height: sizeConfig.height});
+
+            if (sizeConfig.width !== undefined) {
+                elObject.css({width: sizeConfig.width});
+            } else {
+                elObject.css({width: (elObject.height() * sizeConfig.rate) + 'px'});
+            }
+        } else {
+            elObject.css({width: sizeConfig.width});
+
+            if (sizeConfig.height !== undefined) {
+                elObject.css({height: sizeConfig.height});
+            } else {
+                elObject.css({height: (elObject.width() * sizeConfig.rate) + 'px'});
+            }
+        }
+
+        if (!this.defaultSize) {
+            this.defaultSize = {
+                width: elObject.width(),
+                height: elObject.height()
+            };
+        }
+
+        elObject.css({maxWidth: '100%'});
+        this.rateScreenSize();
+
+        return this;
+    }
+
+    /**
+     * Rate screen size
+     */
+    rateScreenSize() {
+        let elObject = this.app.config.get('elements.object', true);
+        let runnerSize = 0;
+        let h = 0;
+
+        if (this.isLarge) {
+            runnerSize = $(window).width();
+
+            elObject.width(runnerSize);
+            h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
+            let windowH = $(window).height() * 85 / 100;
+
+            if (h > windowH) {
+                h = windowH;
+            }
+        } else {
+            runnerSize = elObject.width();
+            h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
+        }
+
+        elObject.css({height: h + 'px'});
+        this.app.event.trigger('dp.screen.change');
+
+        return this;
+    }
+
+    /**
+     * Make icon
+     * @param isFull
+     */
+    makeIconForFullScreen(isFull) {
+        let icons = this.app.config.get('icons', false);
+        let elBtnFullScreen = this.app.config.get('elements.controlFullScreen', true);
+
+        if (isFull === undefined) {
+            isFull = document.fullscreenElement
+                || document.mozFullScreenElement
+                || document.webkitFullscreenElement;
+        }
+
+        if (isFull) {
+            elBtnFullScreen.html(icons.actualScreen);
+        } else {
+            elBtnFullScreen.html(icons.fullScreen);
+        }
+
+        return this;
+    }
+
+    /**
+     * Toggle
+     * @param event
+     */
+    toggleFullScreen() {
+        let elContainer = this.app.config.get('elements.container', true);
+        let isFullScreen = document.webkitIsFullScreen || document.mozFullScreen || false;
+        let container = elContainer.get(0);
+        let instance = this;
+
+        container.requestFullScreen = container.requestFullScreen || container.webkitRequestFullScreen || container.mozRequestFullScreen || function () {
+            return false;
+        };
+
+        document.cancelFullScreen = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || function () {
+            return false;
+        };
+
+        isFullScreen ? (function () {
+            instance.app.event.trigger('dp.screen.full.inactive');
+            document.cancelFullScreen();
+        })() : (function () {
+            instance.app.event.trigger('dp.screen.full.active');
+            container.requestFullScreen();
+        })();
+
+        return this;
+    }
+
+    /**
+     * Make icon
+     * @param isFull
+     */
+    makeIconForLargeScreen(isLg) {
+        let icons = this.app.config.get('icons', false);
+        let elBtnLargeScreen = this.app.config.get('elements.controlLargeScreen', true);
+
+        if (isLg === undefined) {
+            isLg = this.isLarge;
+        }
+
+        if (isLg) {
+            elBtnLargeScreen.html(icons.smallScreen);
+        } else {
+            elBtnLargeScreen.html(icons.largeScreen);
+        }
+
+        return this;
+    }
+
+    /**
+     * Toggle
+     * @param event
+     */
+    toggleLargeScreen() {
+        if (this.isLarge) {
+            this.isLarge = false;
+            this.app.event.trigger('dp.screen.large.inactive');
+            this.defaultScreen();
+        } else {
+            this.isLarge = true;
+            this.app.event.trigger('dp.screen.large.active');
+            this.rateScreenSize();
+        }
+
+        return this;
+    }
+
+    /**
+     * Init
+     * @return {DPScreen}
+     */
+    init() {
+        // Defined the common variable for object
+        this.isLarge = false;
+        this.defaultSize = null;
+
+        let elBtnFullScreen = this.app.config.get('elements.controlFullScreen', true);
+        let elBtnLargeScreen = this.app.config.get('elements.controlLargeScreen', true);
+        let largeScreen = this.app.config.get('largeScreen');
+        let instance = this;
+
+        // Event when click on button fullscreen
+        // Then call to check full or cancel
+        elBtnFullScreen.on('click', function (event) {
+            instance.toggleFullScreen();
+        });
+
+        // Event when click on button large
+        // Then call to check large or cancel
+        elBtnLargeScreen.on('click', function (event) {
+            instance.toggleLargeScreen();
+            instance.makeIconForLargeScreen();
+        });
+
+        // Event when change screen
+        // Then get status and change icon
+        $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
+            instance.makeIconForFullScreen();
+        });
+
+        // Event when window resize
+        $(window).resize(function () {
+            instance.rateScreenSize();
+        });
+
+        // Call when init screen
+        this.defaultScreen();
+        this.makeIconForFullScreen(false);
+
+        // Check if config is setting true large as default
+        if (largeScreen) {
+            instance.toggleLargeScreen();
+        }
+
+        this.makeIconForLargeScreen();
+
+        return this;
     }
 }
 
@@ -1006,21 +1447,22 @@ class DPControl extends DPBase {
 class DPSchedule extends DPBase {
     constructor(app) {
         super();
-        this.config = app.config;
         this.app = app;
-        this.helper = app.helper;
-        this.schedules = {};
-        this.alias = {};
-        this.lastTime = null;
     }
 
     /**
      * Run
      */
     init() {
-        let schedules = this.config.get('schedules');
+        // Common variable
+        this.helper = this.app.helper;
+        this.schedules = {};
+        this.alias = {};
+        this.lastTime = null;
+
+        let schedules = this.app.config.get('schedules');
         let dp = this;
-        let runner = this.config.runner(true);
+        let runner = this.app.config.runner(true);
         let runnerDom = runner.get(0);
 
         for (var i in schedules) {
@@ -1073,18 +1515,74 @@ class DPSchedule extends DPBase {
 class DPPlugin extends DPBase {
     constructor(app) {
         super();
-        this.config = app.config;
         this.app = app;
-        this.helper = app.helper;
     }
 
+    /**
+     * Init
+     * @return {Promise<DPPlugin>}
+     */
     async init() {
-        let list = this.config.get('plugins');
+        let list = this.app.config.get('plugins');
 
         for (let name in list) {
             this.app[name] = await eval('new ' + list[name].className + '(this.app)');
             this.app[name].init();
         }
+
+        return this;
+    }
+}
+
+// ====================================================
+// Plugin {DPSource}
+// ====================================================
+class DPSource extends DPBase {
+    /**
+     * Constructor
+     */
+    constructor(app) {
+        super();
+        this.app = app;
+    }
+
+    /**
+     * Load
+     * @param sources
+     */
+    load(sources) {
+        if (this.app.rendered && sources !== undefined) {
+            let runner = this.app.config.runner(true);
+
+            runner.html(this.app.translate.get('app.not_support'));
+
+            // Generate video from resources
+            if (typeof sources === 'string') {
+                runner.get(0).src = sources;
+            } else if (sources.length == 1) {
+                runner.get(0).src = sources[0].src;
+            } else {
+                for (var i in sources) {
+                    let source = document.createElement('source');
+                    $(source).attr({src: sources[i].src, type: sources[i].type});
+                    runner.append(source);
+                }
+            }
+
+            runner.get(0).load();
+        }
+
+        return this;
+    }
+
+    /**
+     * Init
+     * @return {DPSource}
+     */
+    init() {
+        // Get list of source
+        let sources = this.app.config.get('sources');
+        this.load(sources);
 
         return this;
     }
@@ -1105,14 +1603,21 @@ class DilationPlayer extends DPBase {
             config = {};
         }
 
-        config.object = object;
-        this.rendered = false;
+        config.elements = this.or(config.elements, {});
+        config.elements.object = object;
 
+        this.rendered = false;
         this.config = new DPConfig(config);
+        this.event = new DPEvent(this);
+        this.contextEvent();
+
         this.translate = new DPTranslator(this);
         this.helper = new DPHelper(this);
         this.view = new DPView(this);
+
+        this.source = new DPSource(this);
         this.control = new DPControl(this);
+        this.screen = new DPScreen(this);
         this.menu = new DPMenu(this);
         this.logo = new DPLogo(this);
         this.modal = new DPModal(this);
@@ -1123,32 +1628,20 @@ class DilationPlayer extends DPBase {
     }
 
     /**
-     * Load
-     * @param resources
-     */
-    load(resources) {
-        if (this.rendered) {
-            let runner = this.config.runner(true);
-            var source = document.createElement('source');
-            source.setAttribute('src', resources);
-            runner.appendChild(source);
-        }
-    }
-
-    /**
      * Apply
      */
     async apply() {
         await this.render();
 
         // Regist events
-        this.contextControl()
+        this.contextSource()
+            .contextModal()
+            .contextLogo()
+            .contextControl()
+            .contextScreen()
             .playPause()
-            .fullScreen()
             .progress()
             .sound()
-            .contextLogo()
-            .contextModal()
             .contextMenu()
             .contextPlugin()
             .contextSchedule();
@@ -1159,16 +1652,8 @@ class DilationPlayer extends DPBase {
      * @return {Promise<boolean>}
      */
     async render() {
-        let rendered = await this.view.render();
-        this.rendered = true;
-
-        let icons = this.config.get('icons');
-        let loaderIcon = this.config.get('elements.loaderModalIcon', true);
-        let playerIcon = this.config.get('elements.playerModalIcon', true);
-
-        // default
-        playerIcon.html(icons.playerModal);
-        loaderIcon.html(icons.loaderModal);
+        let rendered = await this.view.init().render();
+        this.rendered = rendered;
 
         return rendered;
     }
@@ -1244,213 +1729,6 @@ class DilationPlayer extends DPBase {
 
         // Init display icon in button play/pause
         helper.makeIcon();
-
-        return this;
-    }
-
-    /**
-     * Toggle full screen event
-     * @return {DilationPlayer}
-     */
-    fullScreen() {
-        // Defined elements
-        let element = this.config.get('elements.container', true).get(0);
-        let btnFull = this.config.get('elements.controlFullScreen', true);
-        let btnLarge = this.config.get('elements.controlLargeScreen', true);
-        let icons = this.config.get('icons');
-        let object = this.config.get('object', true);
-        let sizeConfig = this.config.get('size');
-        let defaultSize = null;
-        let largeScreen = this.config.get('largeScreen');
-        let dp = this;
-
-        /**
-         * Helper
-         * @type {{makeIcon: makeIcon, request: request, cancel: cancel}}
-         */
-        let helper = {
-            isLarge: false,
-
-            /**
-             * Default screen
-             */
-            defaultScreen: function () {
-                if (sizeConfig.height !== undefined) {
-                    object.css({height: sizeConfig.height});
-
-                    if (sizeConfig.width !== undefined) {
-                        object.css({width: sizeConfig.width});
-                    } else {
-                        object.css({width: (object.height() * sizeConfig.rate) + 'px'});
-                    }
-                } else {
-                    object.css({width: sizeConfig.width});
-
-                    if (sizeConfig.height !== undefined) {
-                        object.css({height: sizeConfig.height});
-                    } else {
-                        object.css({height: (object.width() * sizeConfig.rate) + 'px'});
-                    }
-                }
-
-                if (!defaultSize) {
-                    defaultSize = {
-                        width: object.width(),
-                        height: object.height()
-                    };
-                }
-
-                object.css({maxWidth: '100%'});
-                this.rateScreenSize();
-
-                return this;
-            },
-
-            /**
-             * Rate screen size
-             */
-            rateScreenSize: function (isLg) {
-                if (isLg == undefined) {
-                    isLg = this.isLarge;
-                }
-
-                let runnerSize = 0;
-                let h = 0;
-
-                if (this.isLarge) {
-                    runnerSize = $(window).width();
-
-                    object.width(runnerSize);
-                    h = (runnerSize * defaultSize.height / defaultSize.width);
-                    let windowH = $(window).height() * 85 / 100;
-
-                    if (h > windowH) {
-                        h = windowH;
-                    }
-                } else {
-                    runnerSize = object.width();
-                    h = (runnerSize * defaultSize.height / defaultSize.width);
-                }
-
-                object.css({height: h + 'px'});
-
-                return this;
-            },
-
-            /**
-             * Make icon
-             * @param isFull
-             */
-            makeIconForFullScreen: function (isFull) {
-                if (isFull === undefined) {
-                    isFull = document.fullscreenElement
-                        || document.mozFullScreenElement
-                        || document.webkitFullscreenElement;
-                }
-
-                if (isFull) {
-                    btnFull.html(icons.actualScreen);
-                } else {
-                    btnFull.html(icons.fullScreen);
-                }
-
-                return this;
-            },
-
-            /**
-             * Toggle
-             * @param event
-             */
-            toggleFullScreen: function () {
-                // Check if event is html element
-                // if (event instanceof HTMLElement) {
-                //   element = event;
-                // }
-
-                var isFullscreen = document.webkitIsFullScreen || document.mozFullScreen || false;
-
-                element.requestFullScreen = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || function () {
-                    return false;
-                };
-
-                document.cancelFullScreen = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || function () {
-                    return false;
-                };
-
-                isFullscreen ? document.cancelFullScreen() : element.requestFullScreen();
-
-                return this;
-            },
-
-            /**
-             * Make icon
-             * @param isFull
-             */
-            makeIconForLargeScreen: function (isLg) {
-                if (isLg === undefined) {
-                    isLg = this.isLarge;
-                }
-
-                if (isLg) {
-                    btnLarge.html(icons.smallScreen);
-                } else {
-                    btnLarge.html(icons.largeScreen);
-                }
-
-                return this;
-            },
-
-            /**
-             * Toggle
-             * @param event
-             */
-            toggleLargeScreen: function () {
-                if (this.isLarge) {
-                    this.isLarge = false;
-                    this.defaultScreen();
-                } else {
-                    this.isLarge = true;
-                    this.rateScreenSize();
-                }
-
-                dp.logo.resize();
-
-                return this;
-            }
-        };
-
-        // Event when click on button fullscreen
-        // Then call to check full or cancel
-        btnFull.on('click', function (event) {
-            helper.toggleFullScreen();
-        });
-
-        // Event when click on button large
-        // Then call to check large or cancel
-        btnLarge.on('click', function (event) {
-            helper.toggleLargeScreen();
-            helper.makeIconForLargeScreen();
-        });
-
-        // Event when change screen
-        // Then get status and change icon
-        $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
-            helper.makeIconForFullScreen();
-        });
-
-        // Event when window resize
-        $(window).resize(function () {
-            helper.rateScreenSize();
-        });
-
-        helper.defaultScreen();
-        helper.makeIconForFullScreen(false);
-
-        if (largeScreen) {
-            helper.toggleLargeScreen();
-        }
-
-        helper.makeIconForLargeScreen();
 
         return this;
     }
@@ -1718,6 +1996,33 @@ class DilationPlayer extends DPBase {
      */
     contextPlugin() {
         this.plugin.init();
+        return this;
+    }
+
+    /**
+     * Event
+     * @return {DilationPlayer}
+     */
+    contextEvent() {
+        this.event.init();
+        return this;
+    }
+
+    /**
+     * Screen
+     * @return {DilationPlayer}
+     */
+    contextScreen() {
+        this.screen.init();
+        return this;
+    }
+
+    /**
+     * Source
+     * @return {DilationPlayer}
+     */
+    contextSource() {
+        this.source.init();
         return this;
     }
 }
