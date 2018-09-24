@@ -405,7 +405,8 @@ class DPEvent extends DPBase {
             .menuEvents()
             .controlEvents()
             .screenEvents()
-            .modalEvents();
+            .modalEvents()
+            .sourceEvents();
     }
 
     /**
@@ -549,6 +550,28 @@ class DPEvent extends DPBase {
     }
 
     /**
+     * sourceEvents
+     * @return {DPEvent}
+     */
+    sourceEvents() {
+        let instance = this;
+
+        this.events['dp.source.play'] = function (parameters) {
+            return instance.createEvent('dp.source.play', parameters);
+        };
+
+        this.events['dp.source.pause'] = function (parameters) {
+            return instance.createEvent('dp.source.pause', parameters);
+        };
+
+        this.events['dp.source.ended'] = function (parameters) {
+            return instance.createEvent('dp.source.ended', parameters);
+        };
+
+        return this;
+    }
+
+    /**
      * Create event
      * @param name
      * @param parameters
@@ -563,7 +586,14 @@ class DPEvent extends DPBase {
      * @param parameters
      */
     trigger(name, parameters) {
-        let events = this.events[name](this.or(parameters, {}));
+        let events = null;
+
+        if (this.events[name] !== undefined) {
+            events = this.events[name](this.or(parameters, {}));
+        } else {
+            events = this.createEvent(name, this.or(parameters, {}));
+        }
+
         let ob = this.app.config.get('elements.object', true);
         let dom = ob.get(0);
 
@@ -1576,13 +1606,58 @@ class DPSource extends DPBase {
     }
 
     /**
+     * Play
+     * @return {DPSource}
+     */
+    play(){
+        if (this.app.rendered) {
+            let runner = this.app.config.runner(true).get(0);
+            runner.play();
+        }
+
+        return this;
+    }
+
+    /**
+     * Pause
+     * @return {DPSource}
+     */
+    pause(){
+        if (this.app.rendered) {
+            let runner = this.app.config.runner(true).get(0);
+            runner.pause();
+        }
+
+        return this;
+    }
+
+    /**
      * Init
      * @return {DPSource}
      */
     init() {
         // Get list of source
         let sources = this.app.config.get('sources');
+        let runner = this.app.config.runner(true);
+        let event = this.app.event;
+
         this.load(sources);
+
+        // Event when video play
+        // Event when runner play
+        runner.on('play', function () {
+            event.trigger('dp.source.play');
+        });
+
+        // Event when runner pause or ended
+        runner.on('pause', function () {
+            event.trigger('dp.source.pause');
+        });
+
+        // Event when runner pause or ended
+        runner.on('ended', function () {
+            event.trigger('dp.source.ended');
+        });
 
         return this;
     }
