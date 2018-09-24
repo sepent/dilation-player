@@ -23,7 +23,7 @@ let DPTranslateData = {
         }
     }
 }
-let dp = {
+let __dp = {
     pad: function(n, width, z) {
         z = z || '0';
         n = n + '';
@@ -1015,7 +1015,7 @@ class DPMenu extends DPBase {
         });
 
         // Event when click out menu
-        dp.node(window).on('click', function (event) {
+        __dp.node(window).on('click', function (event) {
             if (elMenuList.has(event.target).length == 0
                 && !elMenuList.is(event.target)) {
                 instance.closeMenu();
@@ -1064,10 +1064,10 @@ class DPMenu extends DPBase {
 
         if (runner.loop) {
             runner.loop = false;
-            dp.node(item).removeClass('active');
+            __dp.node(item).removeClass('active');
         } else {
             runner.loop = true;
-            dp.node(item).addClass('active');
+            __dp.node(item).addClass('active');
         }
 
         this.closeMenu();
@@ -1271,19 +1271,19 @@ class DPControl extends DPBase {
         let runnerDom = elRunner.get(0);
 
         // Event when hover on runner/container/control
-        dp.node(this.app.config.get('elements.container', false)
+        __dp.node(this.app.config.get('elements.container', false)
             + ',' + this.app.config.get('elements.control', false)
             + ',' + this.app.config.runner()).on('mousemove', function () {
             instance.openControl();
             instance.isMouseIn = true;
         });
 
-        dp.node(window).scroll(function () {
+        __dp.node(window).scroll(function () {
             instance.openControl();
         });
 
         // Event when out on runner/container/control
-        dp.node(this.app.config.get('elements.container', false)
+        __dp.node(this.app.config.get('elements.container', false)
             + ',' + this.app.config.get('elements.control', false)
             + ',' + this.app.config.runner()).on('mouseleave', function () {
             instance.closeControl();
@@ -1410,11 +1410,11 @@ class DPScreen extends DPBase {
         let h = 0;
 
         if (this.isLarge) {
-            runnerSize = dp.node(window).width();
+            runnerSize = __dp.node(window).width();
 
             elObject.width(runnerSize);
             h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
-            let windowH = dp.node(window).height() * 85 / 100;
+            let windowH = __dp.node(window).height() * 85 / 100;
 
             if (h > windowH) {
                 h = windowH;
@@ -1550,12 +1550,12 @@ class DPScreen extends DPBase {
 
         // Event when change screen
         // Then get status and change icon
-        dp.node(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
+        __dp.node(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
             instance.makeIconForFullScreen();
         });
 
         // Event when window resize
-        dp.node(window).on('resize', function () {
+        __dp.node(window).on('resize', function () {
             instance.rateScreenSize();
         });
 
@@ -1612,7 +1612,7 @@ class DPSchedule extends DPBase {
         // Event when timeupdate
         runner.on('timeupdate ', function (e) {
             let current = runnerDom.currentTime;
-            let time = dp.parseTime(current);
+            let time = __dp.parseTime(current);
 
             if (this.lastTime === time) {
                 return;
@@ -1697,7 +1697,7 @@ class DPSource extends DPBase {
             } else {
                 for (var i in sources) {
                     let source = document.createElement('source');
-                    dp.node(source).attr({src: sources[i].src, type: sources[i].type});
+                    __dp.node(source).attr({src: sources[i].src, type: sources[i].type});
                     runner.append(source);
                 }
             }
@@ -1933,7 +1933,7 @@ class DilationPlayer extends DPBase {
 
         runner.find('source').each(function (num, val) {
             var source = document.createElement('source');
-            dp.node(source).prop('src', dp.node(this).attr('src'));
+            __dp.node(source).prop('src', __dp.node(this).attr('src'));
             runnerPreview.append(source);
         });
 
@@ -1960,8 +1960,8 @@ class DilationPlayer extends DPBase {
              * @param duration
              */
             setTimer: function (current, duration) {
-                current = dp.parseTime(current);
-                duration = dp.parseTime(duration);
+                current = __dp.parseTime(current);
+                duration = __dp.parseTime(duration);
                 timer.html(current + ' / ' + duration);
             },
 
@@ -1989,7 +1989,7 @@ class DilationPlayer extends DPBase {
         // Then get position of mouse and count the time go to
         progressBar.on("click", function (e) {
             if (!isNaN(runnerDom.duration)) {
-                let offset = dp.node(this).offset();
+                let offset = __dp.node(this).offset();
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
@@ -2007,13 +2007,13 @@ class DilationPlayer extends DPBase {
                 progressTimerTooltipText.show();
                 progressTimerTooltipImage.show();
 
-                let offset = dp.node(this).offset();
+                let offset = __dp.node(this).offset();
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
                 let current = runnerDom.duration * percentage;
 
-                let parseTime = dp.parseTime(current);
+                let parseTime = __dp.parseTime(current);
                 progressTimerTooltipText.css('left', left + 'px').text(parseTime);
                 progressTimerTooltipImage.css('left', left + 'px');
 
@@ -2106,7 +2106,7 @@ class DilationPlayer extends DPBase {
         // Event when change input of range
         // Then call change volume and icon
         volumeRange.on('change', function () {
-            let range = dp.node(this).val();
+            let range = __dp.node(this).val();
             helper.setVolume(range);
         });
 
