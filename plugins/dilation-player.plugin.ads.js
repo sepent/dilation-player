@@ -58,8 +58,13 @@ class DPAdsPlugin extends DPBase {
         if (this.currentSetting.type === 'line') {
             let control = this.config.get('elements.control', true);
             let ads = this.config.get('elements.ads', true);
-            let height = control.height();
-            ads.css('bottom', (height + 1)+'px');
+
+            if (control.hasClass('active')) {
+                let height = control.height();
+                ads.css('bottom', (height + 1)+'px');
+            } else {
+                ads.css('bottom', '10px');
+            }
         }
     }
 
