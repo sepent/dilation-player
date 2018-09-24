@@ -1212,7 +1212,14 @@ class DPControl extends DPBase {
 
         // Event when runner pause or ended
         elRunner.on('pause ended', function () {
-            elControl.addClass('active');
+            instance.openControl();
+        });
+
+        // Event when runner pause or ended
+        elRunner.on('play', function () {
+            if (!instance.isMouseIn) {
+                instance.closeControl();
+            }
         });
 
         // Default
