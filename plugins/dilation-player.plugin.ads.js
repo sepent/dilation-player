@@ -24,7 +24,7 @@ class DPAdsPlugin extends DPBase {
         let close = this.config.get('elements.adsClose', true);
         let ads = this.config.get('elements.ads');
         let instance = this;
-        let runner = this.config.runner(true).get();
+        let runner = this.config.runner(true).get(0);
         let isPlay = !runner.paused;
 
         // Event when click on button close
@@ -65,7 +65,7 @@ class DPAdsPlugin extends DPBase {
         let ads = this.config.get('elements.ads', true);
         let adsClose = this.config.get('elements.adsClose', true);
         let adsContent = this.config.get('elements.adsContent', true);
-        let runner = this.config.runner(true).get();
+        let runner = this.config.runner(true).get(0);
         let instance = this;
         let isPlay = !runner.paused;
 
