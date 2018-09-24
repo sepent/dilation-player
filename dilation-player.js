@@ -606,6 +606,22 @@ class DPEvent extends DPBase {
             dom.dispatchEvent(events);
             ob.trigger(events.type);
         }
+
+        return this;
+    }
+
+    /**
+     * Trigger event
+     * @param name
+     * @param parameters
+     */
+    listen(name, call) {
+        let ob = this.app.config.get('elements.object', true);
+        let dom = ob.get(0);
+
+        dom.addEventListener(name, call);
+
+        return this;
     }
 }
 

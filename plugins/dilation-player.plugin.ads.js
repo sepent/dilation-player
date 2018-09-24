@@ -38,9 +38,15 @@ class DPAdsPlugin extends DPBase {
 
         close.html(icon);
 
-        $(window).resize(function(){
+        function __callResize(){
             instance.resize();
-        });
+        }
+
+        $(window).resize(__callResize);
+
+        // Event when control change
+        this.app.event.listen('dp.control.hide', __callResize)
+                .listen('dp.control.show', __callResize);
 
         return this;
     }
