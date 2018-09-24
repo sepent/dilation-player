@@ -23,6 +23,26 @@ let DPTranslateData = {
         }
     }
 }
+let dp = {
+    pad: function(n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    },
+
+    parseTime: function(times) {
+        let hours = Math.floor(times / 3600);
+        let minutes = Math.floor((times - hours * 3600) / 60);
+        let seconds = Math.floor(times - (minutes * 60 + hours * 3600));
+        let format = (hours > 0 ? (this.pad(hours, 2) + ':') : '') + this.pad(minutes, 2) + ':' + this.pad(seconds, 2);
+
+        return format;
+    },
+
+    node: function(element){
+        return new DPNode(element);
+    }
+};
 
 // ====================================================
 // Class {Base}
@@ -36,6 +56,64 @@ class DPBase {
      */
     or(value, or) {
         return value === undefined ? or : value;
+    }
+}
+
+// ====================================================
+// Class {DPNode}
+// ====================================================
+class DPNode extends DPBase {
+    /**
+     * Constructor
+     * @param element
+     */
+    constructor(element) {
+        super();
+
+        if (typeof element === 'string') {
+            this.element = element;
+            this.selectors = document.querySelectorAll(this.element);
+        } else {
+            this.element = null;
+            this.selectors = [element];
+        }
+    }
+
+    /**
+     * Dom
+     * @param position
+     * @return {object}
+     */
+    get(position, reset) {
+        if (reset === true) {
+            this.selectors = document.querySelectorAll(this.element);
+        }
+
+        let rs = null;
+
+        if (position instanceof Array) {
+            rs = [];
+
+            for (var i in position) {
+                rs[position[i]] = this.selectors[position[i]];
+            }
+        } else if (position !== undefined) {
+            return this.selectors[position];
+        }
+
+        return rs;
+    }
+
+    find(element){
+        return new DPNode(this.element + ' ' + element);
+    }
+
+    height(){
+        return this.get(0).innerHeight;
+    }
+
+    width(){
+        return this.get(0).innerWidth;
     }
 }
 
@@ -329,7 +407,7 @@ class DPConfig extends DPBase {
         if (dom === true) {
             // Check if is object elements
             if (key === 'elements.object' && (this.cache.dom[key] === undefined || !cache)) {
-                this.cache.dom[key] = $(config);
+                this.cache.dom[key] = new DPNode(config);
 
                 return this.cache.dom[key];
             }
@@ -380,6 +458,10 @@ class DPHelper extends DPBase {
         let format = (hours > 0 ? (this.pad(hours, 2) + ':') : '') + this.pad(minutes, 2) + ':' + this.pad(seconds, 2);
 
         return format;
+    }
+
+    node(element){
+        return new DPNode(element);
     }
 }
 
@@ -651,9 +733,9 @@ class DPView extends DPBase {
      * @return {DPView}
      */
     async render() {
+        let elObject = this.app.config.get('elements.object', true);
         let viewConfig = this.app.config.get('view', false);
         let posterUrl = this.app.config.get('poster', false);
-        let elObject = this.app.config.get('elements.object', true);
         let sizeConfig = this.app.config.get('size', false);
 
         this.app.event.trigger('dp.view.rendering');
@@ -821,11 +903,10 @@ class DPMenu extends DPBase {
 
         for (var name in menuList) {
             let div = document.createElement('div');
-            $(div).addClass(menuItemClass)
-                .attr('dp-menu:name', name)
-                .html(this.app.translate.get(menuList[name].text));
-
-            elMenuList.append(div);
+            div.classList.add(menuItemClass);
+            div.setAttribute('dp-menu:name', name);
+            div.innerHTML = this.app.translate.get(menuList[name].text);
+            elMenuList.appendChild(div.firstChild);
         }
 
         this.events();
@@ -851,8 +932,8 @@ class DPMenu extends DPBase {
         let height = elMenuList.height();
         let width = elMenuList.width();
 
-        let cheight = $(window).height();
-        let cwidth = $(window).width();
+        let cheight = window.innerHeight;
+        let cwidth = window.innerWidth;
 
         let left = event.pageX;
         let top = event.pageY;
@@ -903,7 +984,7 @@ class DPMenu extends DPBase {
         let elContainer = this.app.config.get('elements.container', true);
 
         // Event when right click or open menu
-        elContainer.mousedown(function (event) {
+        elContainer.on('mousedown', function (event) {
             var isRightMB;
             event = event || window.event;
 
@@ -934,7 +1015,7 @@ class DPMenu extends DPBase {
         });
 
         // Event when click out menu
-        $(window).click(function (event) {
+        dp.node(window).on('click', function (event) {
             if (elMenuList.has(event.target).length == 0
                 && !elMenuList.is(event.target)) {
                 instance.closeMenu();
@@ -942,8 +1023,8 @@ class DPMenu extends DPBase {
         });
 
         // Event when click menu item
-        elMenuItem.click(function () {
-            let name = $(this).attr('dp-menu:name');
+        elMenuItem.on('click', function () {
+            let name = elMenuItem.attr('dp-menu:name');
             instance.execute(this, name);
         });
 
@@ -983,10 +1064,10 @@ class DPMenu extends DPBase {
 
         if (runner.loop) {
             runner.loop = false;
-            $(item).removeClass('active');
+            dp.node(item).removeClass('active');
         } else {
             runner.loop = true;
-            $(item).addClass('active');
+            dp.node(item).addClass('active');
         }
 
         this.closeMenu();
@@ -1083,7 +1164,7 @@ class DPLogo extends DPBase {
         elLogo.css({backgroundImage: 'url(\'' + logoConfig.url + '\')'});
 
         // Event when screen change
-        elObject.on('dp.screen.change', function () {
+        this.app.event.listen('dp.screen.change', function () {
             instance.resize();
         });
 
@@ -1188,24 +1269,23 @@ class DPControl extends DPBase {
         let elRunner = this.app.config.runner(true);
         let instance = this;
         let runnerDom = elRunner.get(0);
-        let elControl = this.app.config.get('elements.control', true);
 
         // Event when hover on runner/container/control
-        $(this.app.config.get('elements.container', false)
+        dp.node(this.app.config.get('elements.container', false)
             + ',' + this.app.config.get('elements.control', false)
-            + ',' + this.app.config.runner()).mousemove(function () {
+            + ',' + this.app.config.runner()).on('mousemove', function () {
             instance.openControl();
             instance.isMouseIn = true;
         });
 
-        $(window).scroll(function () {
+        dp.node(window).scroll(function () {
             instance.openControl();
         });
 
         // Event when out on runner/container/control
-        $(this.app.config.get('elements.container', false)
+        dp.node(this.app.config.get('elements.container', false)
             + ',' + this.app.config.get('elements.control', false)
-            + ',' + this.app.config.runner()).mouseleave(function () {
+            + ',' + this.app.config.runner()).on('mouseleave', function () {
             instance.closeControl();
             instance.isMouseIn = false;
         });
@@ -1330,11 +1410,11 @@ class DPScreen extends DPBase {
         let h = 0;
 
         if (this.isLarge) {
-            runnerSize = $(window).width();
+            runnerSize = dp.node(window).width();
 
             elObject.width(runnerSize);
             h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
-            let windowH = $(window).height() * 85 / 100;
+            let windowH = dp.node(window).height() * 85 / 100;
 
             if (h > windowH) {
                 h = windowH;
@@ -1470,12 +1550,12 @@ class DPScreen extends DPBase {
 
         // Event when change screen
         // Then get status and change icon
-        $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
+        dp.node(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
             instance.makeIconForFullScreen();
         });
 
         // Event when window resize
-        $(window).resize(function () {
+        dp.node(window).on('resize', function () {
             instance.rateScreenSize();
         });
 
@@ -1514,7 +1594,7 @@ class DPSchedule extends DPBase {
         this.lastTime = null;
 
         let schedules = this.app.config.get('schedules');
-        let dp = this;
+        let instance = this;
         let runner = this.app.config.runner(true);
         let runnerDom = runner.get(0);
 
@@ -1532,7 +1612,7 @@ class DPSchedule extends DPBase {
         // Event when timeupdate
         runner.on('timeupdate ', function (e) {
             let current = runnerDom.currentTime;
-            let time = dp.helper.parseTime(current);
+            let time = dp.parseTime(current);
 
             if (this.lastTime === time) {
                 return;
@@ -1540,13 +1620,13 @@ class DPSchedule extends DPBase {
 
             this.lastTime = time;
 
-            let list = dp.or(dp.schedules[time], []);
+            let list = instance.or(dp.schedules[time], []);
 
             for (let i in list) {
-                dp.execute(list[i].name);
+                instance.execute(list[i].name);
 
                 if (list[i].loop !== true) {
-                    delete dp.schedules[time][i];
+                    delete instance.schedules[time][i];
                 }
             }
         });
@@ -1617,7 +1697,7 @@ class DPSource extends DPBase {
             } else {
                 for (var i in sources) {
                     let source = document.createElement('source');
-                    $(source).attr({src: sources[i].src, type: sources[i].type});
+                    dp.node(source).attr({src: sources[i].src, type: sources[i].type});
                     runner.append(source);
                 }
             }
@@ -1767,7 +1847,7 @@ class DilationPlayer extends DPBase {
         let btn = this.config.get('elements.controlPlayPause', true);
         let icons = this.config.get('icons');
         let runnerDom = runner.get(0);
-        let dp = this;
+        let instance = this;
 
         /**
          * Helper
@@ -1797,21 +1877,21 @@ class DilationPlayer extends DPBase {
                     btn.html(icons.pause);
                 }
 
-                dp.modal.toggle();
+                instance.modal.toggle();
             }
         };
 
         // Event when click on button play/pause
-        btn.click(function () {
+        btn.on('click', function () {
             helper.toggle();
         });
 
-        player.click(function () {
+        player.on('click', function () {
             helper.toggle();
         });
 
         // Event when click on runner
-        runner.click(function () {
+        runner.on('click', function () {
             helper.toggle();
         });
 
@@ -1836,7 +1916,7 @@ class DilationPlayer extends DPBase {
      * @return {DilationPlayer}
      */
     progress() {
-        let dp = this;
+        let instance = this;
         let runner = this.config.runner(true);
         let runnerDom = runner.get(0);
         let progressBar = this.config.get('elements.progress', true);
@@ -1853,7 +1933,7 @@ class DilationPlayer extends DPBase {
 
         runner.find('source').each(function (num, val) {
             var source = document.createElement('source');
-            $(source).prop('src', $(this).attr('src'));
+            dp.node(source).prop('src', dp.node(this).attr('src'));
             runnerPreview.append(source);
         });
 
@@ -1880,8 +1960,8 @@ class DilationPlayer extends DPBase {
              * @param duration
              */
             setTimer: function (current, duration) {
-                current = dp.helper.parseTime(current);
-                duration = dp.helper.parseTime(duration);
+                current = dp.parseTime(current);
+                duration = dp.parseTime(duration);
                 timer.html(current + ' / ' + duration);
             },
 
@@ -1902,21 +1982,21 @@ class DilationPlayer extends DPBase {
         // Event when timeupdate
         runner.on('timeupdate ', function (e) {
             helper.display();
-            dp.modal.toggle({loader: false});
+            instance.modal.toggle({loader: false});
         });
 
         // Event when click on progress bar
         // Then get position of mouse and count the time go to
         progressBar.on("click", function (e) {
             if (!isNaN(runnerDom.duration)) {
-                let offset = $(this).offset();
+                let offset = dp.node(this).offset();
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
                 let vidTime = runnerDom.duration * percentage;
                 runnerDom.currentTime = vidTime;
                 helper.setLoaded(left, totalWidth);
-                dp.modal.toggle({loader: true});
+                instance.modal.toggle({loader: true});
             }
         });
 
@@ -1927,13 +2007,13 @@ class DilationPlayer extends DPBase {
                 progressTimerTooltipText.show();
                 progressTimerTooltipImage.show();
 
-                let offset = $(this).offset();
+                let offset = dp.node(this).offset();
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
                 let current = runnerDom.duration * percentage;
 
-                let parseTime = dp.helper.parseTime(current);
+                let parseTime = dp.parseTime(current);
                 progressTimerTooltipText.css('left', left + 'px').text(parseTime);
                 progressTimerTooltipImage.css('left', left + 'px');
 
@@ -1950,12 +2030,12 @@ class DilationPlayer extends DPBase {
         // Then call display information on screen
         runner.on('loadeddata', function (e) {
             helper.display();
-            dp.modal.toggle({loader: false});
+            instance.modal.toggle({loader: false});
         });
 
         // Event when start load data
         runner.on('loadstart', function (e) {
-            dp.modal.toggle({loader: true});
+            instance.modal.toggle({loader: true});
         });
 
         return this;
@@ -1973,6 +2053,7 @@ class DilationPlayer extends DPBase {
         let volumeRange = this.config.get('elements.controlVolumeRange', true);
         let range = this.config.get('volume');
         let icons = this.config.get('icons');
+        let instance = this;
 
         /**
          * Helper
@@ -2025,7 +2106,7 @@ class DilationPlayer extends DPBase {
         // Event when change input of range
         // Then call change volume and icon
         volumeRange.on('change', function () {
-            let range = $(this).val();
+            let range = dp.node(this).val();
             helper.setVolume(range);
         });
 
