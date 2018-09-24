@@ -30,7 +30,7 @@ class DPAdsPlugin extends DPBase {
             $(this).closest(ads).removeClass('active');
 
             if (this.currentSetting.type === 'full') {
-                this.app.source.play();
+                instance.app.source.play();
             }
         });
 
