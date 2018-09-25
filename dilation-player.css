@@ -145,27 +145,26 @@ html, body {
     background-color: black;
     color: #fff;
     text-align: center;
-    border-radius: 6px;
     padding: 1px 5px;
     position: absolute;
     z-index: 1;
-    top: -1.6em;
+    top: -1.8em;
     transform: translateX(-50%);
 }
 
-.dp .dp-control .dp-progress .dp-progress-tooltip-text::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 4px 5px 0 5px;
-    border-color: black transparent transparent transparent;
-}
+/*.dp .dp-control .dp-progress .dp-progress-tooltip-text::after {*/
+    /*content: '';*/
+    /*display: block;*/
+    /*position: absolute;*/
+    /*top: 100%;*/
+    /*left: 50%;*/
+    /*transform: translateX(-50%);*/
+    /*width: 0;*/
+    /*height: 0;*/
+    /*border-style: solid;*/
+    /*border-width: 4px 5px 0 5px;*/
+    /*border-color: black transparent transparent transparent;*/
+/*}*/
 
 .dp .dp-control .dp-progress:hover .dp-progress-tooltip-text.active {
     display: inline-block;
@@ -181,8 +180,8 @@ html, body {
     z-index: 1;
     top: calc(-48px + -1.8em);
     transform: translateX(-50%);
-    width: 90px;
-    height: 70px;
+    width: 100px;
+    height: 80px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
