@@ -12,14 +12,13 @@
 </head>
 <body>
 <div style="width: 600px; height: 400px; background-color: #000; color: #fff; margin: auto" id="dilation-player"></div>
-<script src="http://cdn.lib.cobonla.org/jquery/v3.3.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
 <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/plugins/dilation-player.plugin.ads.js"></script>
 <script type="text/javascript">
-    $(function () {
+    window.onload = function(){
         var dilationPlayer = new DilationPlayer('#dilation-player', {
             view: {
-                import: 'http://cdn.lib.cobonla.org/dilation-player.template.html'
+                import: 'http://cdn.lib.cobonla.org/dilation-player/dilation-player.template.html'
             },
             locale: 'en',
             logo: {height: '10%', rate: 1, url: 'http://cobonla.org/logo-base.png'},
@@ -65,7 +64,7 @@
                 },
             ]
         });
-    });
+    };
 </script>
 </body>
 </html>

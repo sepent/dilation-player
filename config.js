@@ -1,25 +1,25 @@
 addClas
-css
 removeClass
-mousedown
-
-has
-is
-click
+css
 attr
-bind
-unbind
-on
 html
 hasClass
-removeClass
-mousemove
-mouseleave
-fullscreenchange webkitfullscreenchange mozfullscreenchange
-hide
-show
+active
+isActive
 val
-scroll
-resize
 offset
-prop
+is
+has
+
+Events
+ - mousedown
+ - mousemove
+ - mouseleave
+ - click
+ - fullscreenchange webkitfullscreenchange mozfullscreenchange
+ - scroll
+ - resize
+
+
+appendChild
+text

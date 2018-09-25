@@ -167,7 +167,7 @@ html, body {
     border-color: black transparent transparent transparent;
 }
 
-.dp .dp-control .dp-progress:hover .dp-progress-tooltip-text {
+.dp .dp-control .dp-progress:hover .dp-progress-tooltip-text.active {
     display: inline-block;
 }
 
@@ -188,7 +188,7 @@ html, body {
     background-size: cover;
 }
 
-.dp .dp-control .dp-progress:hover .dp-progress-tooltip-image {
+.dp .dp-control .dp-progress:hover .dp-progress-tooltip-image.active {
     display: inline-block;
 }
 
