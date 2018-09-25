@@ -2,9 +2,6 @@
 
 DilationPlayer is object, It provide methods to play video/audio. **[Video demo](http://dilationplayer.cobonla.org/)**
 
-**Platform**
-- Jquery
-
 **Using**
 
 Import file DilationPlayer.js to your html page.
@@ -19,7 +16,6 @@ Html page:
 </head>
 <body>
     <div id="video-container"></div>
-    <script src="http://cdn.lib.cobonla.org/jquery/v3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
 </body>
 ```
@@ -131,7 +127,6 @@ Full source code after config:
 </head>
 <body>
     <div id="video-container"></div>
-    <script src="http://cdn.lib.cobonla.org/jquery/v3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
     <script>
     var player = new DilationPlayer('#video-container', {
