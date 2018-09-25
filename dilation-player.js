@@ -2285,7 +2285,29 @@ class DilationPlayer extends DPBase {
 
                 let parseTime = __dp.parseTime(current);
                 progressTimerTooltipText.css('left', left + 'px').text(parseTime);
-                progressTimerTooltipImage.css('left', left + 'px');
+
+                // Set position for image
+                let width = progressTimerTooltipImage.width()/2;
+                let ileft = left;
+                if (left > (totalWidth - width)) {
+                    ileft = totalWidth - width;
+                } else if (left < width) {
+                    ileft = width;
+                }
+
+                progressTimerTooltipImage.css('left', ileft + 'px');
+
+                // Set position for text
+                width = progressTimerTooltipText.width()/2;
+                let tleft = left;
+
+                if (left > (totalWidth - width - 2)) {
+                    tleft = totalWidth - width - 2;
+                } else if (left < (width + 2)) {
+                    tleft = width + 2;
+                }
+
+                progressTimerTooltipText.css('left', tleft + 'px');
 
                 // Get picture
                 //runnerPreview.currentTime = current;
