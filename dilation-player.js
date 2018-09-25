@@ -144,7 +144,21 @@ class DPNode extends DPBase {
      */
     height(value) {
         if (value === undefined) {
-            return this.node().getBoundingClientRect().height;
+            let node = this.node();
+
+            return node.getBoundingClientRect !== undefined ? node.getBoundingClientRect().height : (function () {
+                var myHeight = 0;
+
+                if (typeof(window.innerWidth) == 'number') {
+                    myHeight = window.innerHeight;
+                } else if (document.documentElement && document.documentElement.clientHeight) {
+                    myHeight = document.documentElement.clientHeight;
+                } else if (document.body && document.body.clientHeight) {
+                    myHeight = document.body.clientHeight;
+                }
+
+                return myHeight;
+            })();
         }
 
         this.node().style.height = value;
@@ -159,7 +173,21 @@ class DPNode extends DPBase {
      */
     width(value) {
         if (value === undefined) {
-            return this.node().getBoundingClientRect().width;
+            let node = this.node();
+
+            return node.getBoundingClientRect !== undefined ? node.getBoundingClientRect().width : (function () {
+                var myWidth = 0;
+
+                if (typeof(window.innerWidth) == 'number') {
+                    myWidth = window.innerWidth;
+                } else if (document.documentElement && document.documentElement.clientWidth) {
+                    myWidth = document.documentElement.clientWidth;
+                } else if (document.body && document.body.clientWidth) {
+                    myWidth = document.body.clientWidth;
+                }
+
+                return myWidth;
+            })();
         }
 
         this.node().style.width = value;
@@ -1683,8 +1711,8 @@ class DPScreen extends DPBase {
 
         if (this.isLarge) {
             runnerSize = __dp.node(window).width();
+            elObject.css({width: runnerSize + 'px'})
 
-            elObject.width(runnerSize);
             h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
             let windowH = __dp.node(window).height() * 85 / 100;
 
@@ -2287,7 +2315,7 @@ class DilationPlayer extends DPBase {
                 progressTimerTooltipText.css('left', left + 'px').text(parseTime);
 
                 // Set position for image
-                let width = progressTimerTooltipImage.width()/2;
+                let width = progressTimerTooltipImage.width() / 2;
                 let ileft = left;
                 if (left > (totalWidth - width)) {
                     ileft = totalWidth - width;
@@ -2298,7 +2326,7 @@ class DilationPlayer extends DPBase {
                 progressTimerTooltipImage.css('left', ileft + 'px');
 
                 // Set position for text
-                width = progressTimerTooltipText.width()/2;
+                width = progressTimerTooltipText.width() / 2;
                 let tleft = left;
 
                 if (left > (totalWidth - width - 2)) {
