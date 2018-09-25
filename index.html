@@ -35,33 +35,24 @@
             },
             schedules: [
                 {
-                    name: 'toi',
-                    at: '00:05',
-                    loop: true,
-                    execute: function (app) {
-                        app.ads.show('<div style="height: 100%; overflow: hidden; text-align: center"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL9vphuP475tkW9tWoxOFMxtTafe8OZEXxnjRJUGpGyzSl8JXj" style="height: 100%"></div>');
-                    }
-                },
-
-                {
-                    at: '00:20',
-                    loop: true,
-                    execute: function (app) {
-                        app.ads.show();
-                    }
-                },
-
-
-                {
-                    at: '00:10',
+                    at: '00:00',
                     loop: true,
                     execute: function (app) {
                         app.ads.show('<div style="height: 100%; overflow: hidden; text-align: center"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL9vphuP475tkW9tWoxOFMxtTafe8OZEXxnjRJUGpGyzSl8JXj" style="height: 100%"></div>', {
                             type: 'full',
-                            time: 3000
+                            time: 10000
                         });
                     }
                 },
+
+                {
+                    name: 'toi',
+                    at: '00:10',
+                    loop: true,
+                    execute: function (app) {
+                        app.ads.show('<div style="height: 100%; overflow: hidden; text-align: center"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL9vphuP475tkW9tWoxOFMxtTafe8OZEXxnjRJUGpGyzSl8JXj" style="height: 100%"></div>', {type: 'line'});
+                    }
+                }
             ]
         });
     };

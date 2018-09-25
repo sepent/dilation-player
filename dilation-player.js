@@ -1278,12 +1278,12 @@ class DPMenu extends DPBase {
         let elContainer = this.app.config.get('elements.container', true);
 
         // Event when open context menu
-        elContainer.listen('contextmenu', function () {
+        elContainer.listen('contextmenu', function (e) {
             if (instance.status) {
                 instance.openMenu(event);
             }
 
-            return false;
+            e.preventDefault();
         });
 
         // Event when click out menu
