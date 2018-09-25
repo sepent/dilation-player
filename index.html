@@ -12,14 +12,13 @@
 </head>
 <body>
 <div style="width: 600px; height: 400px; background-color: #000; color: #fff; margin: auto" id="dilation-player"></div>
-<script src="http://cdn.lib.cobonla.org/jquery/v3.3.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
 <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/plugins/dilation-player.plugin.ads.js"></script>
 <script type="text/javascript">
-    $(function () {
+    window.onload = function(){
         var dilationPlayer = new DilationPlayer('#dilation-player', {
             view: {
-                import: 'http://cdn.lib.cobonla.org/dilation-player.template.html'
+                import: 'http://cdn.lib.cobonla.org/dilation-player/dilation-player.template.html'
             },
             locale: 'en',
             logo: {height: '10%', rate: 1, url: 'http://cobonla.org/logo-base.png'},
@@ -36,36 +35,27 @@
             },
             schedules: [
                 {
-                    name: 'toi',
-                    at: '00:05',
-                    loop: true,
-                    execute: function (app) {
-                        app.ads.show('<div style="height: 100%; overflow: hidden; text-align: center"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL9vphuP475tkW9tWoxOFMxtTafe8OZEXxnjRJUGpGyzSl8JXj" style="height: 100%"></div>');
-                    }
-                },
-
-                {
-                    at: '00:20',
-                    loop: true,
-                    execute: function (app) {
-                        app.ads.show();
-                    }
-                },
-
-
-                {
-                    at: '00:10',
+                    at: '00:00',
                     loop: true,
                     execute: function (app) {
                         app.ads.show('<div style="height: 100%; overflow: hidden; text-align: center"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL9vphuP475tkW9tWoxOFMxtTafe8OZEXxnjRJUGpGyzSl8JXj" style="height: 100%"></div>', {
                             type: 'full',
-                            time: 3000
+                            time: 10000
                         });
                     }
                 },
+
+                {
+                    name: 'toi',
+                    at: '00:10',
+                    loop: true,
+                    execute: function (app) {
+                        app.ads.show('<div style="height: 100%; overflow: hidden; text-align: center"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL9vphuP475tkW9tWoxOFMxtTafe8OZEXxnjRJUGpGyzSl8JXj" style="height: 100%"></div>', {type: 'line'});
+                    }
+                }
             ]
         });
-    });
+    };
 </script>
 </body>
 </html>

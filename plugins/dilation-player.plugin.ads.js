@@ -24,12 +24,14 @@ class DPAdsPlugin extends DPBase {
         let close = this.config.get('elements.adsClose', true);
         let ads = this.config.get('elements.ads');
         let instance = this;
-        let runner = this.config.runner(true).get(0);
+        let runner = this.config.runner(true).node();
         this.isPlay = !runner.paused;
+        this.runningAds = null;
 
         // Event when click on button close
-        close.on('click', function () {
-            $(this).closest(ads).removeClass('active');
+        close.listen('click', function () {
+            window.clearTimeout(this.runningAds);
+            __dp.node(this).closest(ads).removeClass('active');
 
             if (instance.currentSetting.type === 'full' && instance.isPlay) {
                 instance.app.source.play();
@@ -42,7 +44,7 @@ class DPAdsPlugin extends DPBase {
             instance.resize();
         }
 
-        $(window).resize(__callResize);
+        __dp.node(window).listen('resize', __callResize);
 
         // Event when control change
         this.app.event.listen('dp.control.hide', __callResize)
@@ -76,7 +78,7 @@ class DPAdsPlugin extends DPBase {
         let ads = this.config.get('elements.ads', true);
         let adsClose = this.config.get('elements.adsClose', true);
         let adsContent = this.config.get('elements.adsContent', true);
-        let runner = this.config.runner(true).get(0);
+        let runner = this.config.runner(true).node();
         let instance = this;
         this.isPlay = !runner.paused;
 
@@ -100,7 +102,7 @@ class DPAdsPlugin extends DPBase {
         if (this.currentSetting.type === 'full') {
             this.app.source.pause();
 
-            window.setTimeout(function(){
+            this.runningAds = window.setTimeout(function(){
                 ads.removeClass('active');
 
                 if (instance.isPlay) {

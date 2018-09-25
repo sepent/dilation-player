@@ -23,6 +23,26 @@ let DPTranslateData = {
         }
     }
 }
+let __dp = {
+    pad: function (n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    },
+
+    parseTime: function (times) {
+        let hours = Math.floor(times / 3600);
+        let minutes = Math.floor((times - hours * 3600) / 60);
+        let seconds = Math.floor(times - (minutes * 60 + hours * 3600));
+        let format = (hours > 0 ? (this.pad(hours, 2) + ':') : '') + this.pad(minutes, 2) + ':' + this.pad(seconds, 2);
+
+        return format;
+    },
+
+    node: function (element) {
+        return new DPNode(element);
+    }
+};
 
 // ====================================================
 // Class {Base}
@@ -36,6 +56,372 @@ class DPBase {
      */
     or(value, or) {
         return value === undefined ? or : value;
+    }
+}
+
+// ====================================================
+// Class {DPNode}
+// ====================================================
+class DPNode extends DPBase {
+    /**
+     * Constructor
+     * @param selector
+     */
+    constructor(selector) {
+        super();
+        this.setSelector(selector);
+    }
+
+    /**
+     * Convert to array
+     * @param selector
+     * @return {string|Array|*[]}
+     */
+    convertToArray(selector) {
+        if (selector instanceof NodeList) {
+            for (var a = [], l = selector.length; l--; a[l] = selector[l]) ;
+            selector = a;
+        } else if (typeof selector !== 'string'
+            && !(selector instanceof Array)) {
+            selector = [selector];
+        }
+
+        return selector;
+    }
+
+    /**
+     * Set selector
+     * @param selector
+     * @return {DPNode}
+     */
+    setSelector(selector) {
+        this.selectors = this.convertToArray(selector);
+
+        return this;
+    }
+
+    /**
+     * Get selectors
+     * @return {*[]|NodeListOf<HTMLElementTagNameMap[keyof HTMLElementTagNameMap]>|*}
+     */
+    nodes() {
+        if (typeof this.selectors === 'string') {
+            let nodes = document.querySelectorAll(this.selectors);
+            return this.convertToArray(nodes);
+        }
+
+        return this.selectors;
+    }
+
+    /**
+     * Get selector
+     * @return {*}
+     */
+    node() {
+        if (typeof this.selectors === 'string') {
+            return document.querySelector(this.selectors);
+        }
+
+        return this.selectors[0];
+    }
+
+    /**
+     * Find elements
+     * @param selector
+     * @return {DPNode}
+     */
+    find(selector) {
+        let children = this.node().querySelectorAll(selector);
+        children = this.convertToArray(children);
+
+        return new DPNode(children);
+    }
+
+    /**
+     * Get/set height of element
+     * @param value
+     * @return {*}
+     */
+    height(value) {
+        if (value === undefined) {
+            return this.node().getBoundingClientRect().height;
+        }
+
+        this.node().style.height = value;
+
+        return this;
+    }
+
+    /**
+     * Get/set width of element
+     * @return {number}
+     * @return {*}
+     */
+    width(value) {
+        if (value === undefined) {
+            return this.node().getBoundingClientRect().width;
+        }
+
+        this.node().style.width = value;
+
+        return this;
+    }
+
+    /**
+     * Add class to element
+     * @param name
+     */
+    addClass(name) {
+        let selectors = this.nodes();
+
+        for (var i = 0; i < selectors.length; ++i) {
+            selectors[i].classList.add(name);
+        }
+
+        return this;
+    }
+
+    /**
+     * Remove class
+     * @param name
+     */
+    removeClass(name) {
+        let selectors = this.nodes();
+
+        for (var i = 0; i < selectors.length; ++i) {
+            if (selectors[i].classList.contains(name)) {
+                selectors[i].classList.remove(name);
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * CSS
+     * @param key
+     * @param value
+     * @return {*}
+     */
+    css(key, value) {
+        // Check if is get CSS
+        if (typeof key === 'string' && value === undefined) {
+            return this.node().style[key];
+        }
+
+        let selectors = this.nodes();
+        let values = {};
+
+        if (typeof key === 'string') {
+            values[key] = value;
+        } else {
+            values = key;
+        }
+
+        for (let i = 0; i < selectors.length; i++) {
+            for (let vKey in values) {
+                selectors[i].style[vKey] = values[vKey];
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Get attribute
+     * @param key
+     * @param value
+     * @return {*}
+     */
+    attr(key, value) {
+        // Check if is get value
+        if (typeof key === "string" && value === undefined) {
+            return this.node().getAttribute(key);
+        }
+
+        let selectors = this.nodes();
+        let values = [];
+
+        if (typeof key === 'string') {
+            let val = {};
+            val[key] = value;
+            values.push(val);
+        } else {
+            values = key;
+        }
+
+        for (let i = 0; i < selectors.length; i++) {
+            for (let vKey in values) {
+                selectors[i].setAttribute(vKey, values[vKey]);
+            }
+        }
+    }
+
+    /***
+     * Get/set html
+     * @param value
+     * @return *
+     */
+    html(value) {
+        if (value === undefined) {
+            return this.node().innerHTML;
+        }
+
+        let selectors = this.nodes();
+
+        for (let i = 0; i < selectors.length; i++) {
+            selectors[i].innerHTML = value;
+        }
+
+        return this;
+    }
+
+    /**
+     * Has Class
+     * @param name
+     * @return {boolean}
+     */
+    hasClass(name) {
+        return this.node().classList.contains(name);
+    }
+
+    /**
+     * Active status
+     * @param status
+     * @return {DPNode}
+     */
+    active(status) {
+        let selectors = this.nodes();
+
+        for (let i = 0; i < selectors.length; i++) {
+            if (status) {
+                selectors[i].classList.add('active');
+            } else if (selectors[i].classList.contains('active')) {
+                selectors[i].classList.remove('active');
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Is active
+     * @return {boolean}
+     */
+    isActive() {
+        return this.hasClass('active');
+    }
+
+    /**
+     * Events
+     * @param name
+     * @param call
+     */
+    listen(key, call) {
+        let keys = key.trim().replace(' ', ',').split(',');
+        let selectors = this.nodes();
+
+        for (let i = 0; i < selectors.length; i++) {
+            for (let j = 0; j < keys.length; j++) {
+                selectors[i].addEventListener(keys[j], call);
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Get value
+     * @param value
+     * @return {DPNode}
+     */
+    val(value) {
+        if (value === undefined) {
+            return this.node().value;
+        }
+
+        let selectors = this.nodes();
+
+        for (let i = 0; i < selectors.length; i++) {
+            selectors[i].value = value;
+        }
+
+        return this;
+    }
+
+    /**
+     * Get offset
+     * @return {{}}
+     */
+    offset() {
+        let bound = this.node().getBoundingClientRect();
+
+        return {
+            left: bound.left,
+            top: bound.top,
+            right: bound.right,
+            bottom: bound.bottom
+        };
+    }
+
+    /**
+     * Has
+     * @param selector
+     * @return {boolean}
+     */
+    has(selector) {
+        return this.node().contains(selector);
+    }
+
+    /**
+     * is
+     * @param selector
+     */
+    is(selector) {
+        return this.node().isSameNode(selector);
+    }
+
+    /**
+     * Closest
+     * @param selector
+     * @return {*|HTMLElementTagNameMap[keyof HTMLElementTagNameMap]|Element|SVGElementTagNameMap[keyof SVGElementTagNameMap]}
+     */
+    closest(selector) {
+        return new DPNode(this.node().closest(selector));
+    }
+
+    /**
+     * Append child
+     * @param node
+     * @return {DPNode}
+     */
+    append(node) {
+        let selectors = this.nodes();
+
+        for (let i = 0; i < selectors.length; i++) {
+            selectors[i].appendChild(node);
+        }
+
+        return this;
+    }
+
+    /**
+     * Text
+     * @param value
+     * @return {*}
+     */
+    text(value) {
+        if (value === undefined) {
+            return this.node().textContent;
+        }
+
+        let selectors = this.nodes();
+
+        for (let i = 0; i < selectors.length; i++) {
+            selectors[i].textContent = value;
+        }
+
+        return this;
     }
 }
 
@@ -329,8 +715,7 @@ class DPConfig extends DPBase {
         if (dom === true) {
             // Check if is object elements
             if (key === 'elements.object' && (this.cache.dom[key] === undefined || !cache)) {
-                this.cache.dom[key] = $(config);
-
+                this.cache.dom[key] = new DPNode(config);
                 return this.cache.dom[key];
             }
             // Check get dom is true and dom is created
@@ -355,31 +740,6 @@ class DPConfig extends DPBase {
     runner(isDom, cache) {
         let type = this.get('type');
         return this.get('elements.' + type, isDom, cache);
-    }
-}
-
-// ====================================================
-// Class {DPHelper}
-// ====================================================
-class DPHelper extends DPBase {
-    constructor(app) {
-        super();
-        this.app = app;
-    }
-
-    pad(n, width, z) {
-        z = z || '0';
-        n = n + '';
-        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-    }
-
-    parseTime(times) {
-        let hours = Math.floor(times / 3600);
-        let minutes = Math.floor((times - hours * 3600) / 60);
-        let seconds = Math.floor(times - (minutes * 60 + hours * 3600));
-        let format = (hours > 0 ? (this.pad(hours, 2) + ':') : '') + this.pad(minutes, 2) + ':' + this.pad(seconds, 2);
-
-        return format;
     }
 }
 
@@ -595,16 +955,14 @@ class DPEvent extends DPBase {
         }
 
         let ob = this.app.config.get('elements.object', true);
-        let dom = ob.get(0);
+        let dom = ob.node();
 
         if (events instanceof Array) {
             events.forEach(function (item, index) {
                 dom.dispatchEvent(item);
-                ob.trigger(item.type);
             });
         } else {
             dom.dispatchEvent(events);
-            ob.trigger(events.type);
         }
 
         return this;
@@ -617,7 +975,7 @@ class DPEvent extends DPBase {
      */
     listen(name, call) {
         let ob = this.app.config.get('elements.object', true);
-        let dom = ob.get(0);
+        let dom = ob.node();
 
         dom.addEventListener(name, call);
 
@@ -651,9 +1009,9 @@ class DPView extends DPBase {
      * @return {DPView}
      */
     async render() {
+        let elObject = this.app.config.get('elements.object', true);
         let viewConfig = this.app.config.get('view', false);
         let posterUrl = this.app.config.get('poster', false);
-        let elObject = this.app.config.get('elements.object', true);
         let sizeConfig = this.app.config.get('size', false);
 
         this.app.event.trigger('dp.view.rendering');
@@ -683,19 +1041,7 @@ class DPView extends DPBase {
         if (!viewConfig.content) {
             if (viewConfig.import) {
                 elObject.html(this.app.translate.get('app.loading'));
-
-                let response = await $.ajax({
-                    url: viewConfig.import,
-                    data: {},
-                    method: 'GET',
-                    success: function (response) {
-                        return response;
-                    },
-                    error: function () {
-                        return null;
-                    }
-                });
-
+                let response = await this.loadTemplate();
                 let content = this.replace(response);
                 elObject.html(content);
             }
@@ -707,12 +1053,42 @@ class DPView extends DPBase {
         // Render the poster for video
         if (this.poster) {
             let runner = this.app.config.runner(true);
-            runner.get(0).poster = posterUrl;
+            runner.node().poster = posterUrl;
         }
 
         this.app.event.trigger('dp.view.rendered');
 
         return true;
+    }
+
+    /**
+     * Load template
+     * @return {Promise<any>}
+     */
+    async loadTemplate() {
+        let viewConfig = this.app.config.get('view', false);
+
+        return new Promise(function (resolve, reject) {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', viewConfig.import);
+            xhr.onload = function () {
+                if (this.status >= 200 && this.status < 300) {
+                    resolve(xhr.response);
+                } else {
+                    reject({
+                        status: this.status,
+                        statusText: xhr.statusText
+                    });
+                }
+            };
+            xhr.onerror = function () {
+                reject({
+                    status: this.status,
+                    statusText: xhr.statusText
+                });
+            };
+            xhr.send();
+        });
     }
 
     /**
@@ -821,10 +1197,9 @@ class DPMenu extends DPBase {
 
         for (var name in menuList) {
             let div = document.createElement('div');
-            $(div).addClass(menuItemClass)
-                .attr('dp-menu:name', name)
-                .html(this.app.translate.get(menuList[name].text));
-
+            div.classList.add(menuItemClass);
+            div.setAttribute('dp-menu:name', name);
+            div.innerHTML = this.app.translate.get(menuList[name].text);
             elMenuList.append(div);
         }
 
@@ -846,13 +1221,13 @@ class DPMenu extends DPBase {
         let elMenu = this.app.config.get('elements.menu', true);
         let elMenuList = this.app.config.get('elements.menuList', true);
 
-        elMenu.addClass('active');
+        elMenu.active(true);
 
         let height = elMenuList.height();
         let width = elMenuList.width();
 
-        let cheight = $(window).height();
-        let cwidth = $(window).width();
+        let cheight = window.innerHeight;
+        let cwidth = window.innerWidth;
 
         let left = event.pageX;
         let top = event.pageY;
@@ -884,7 +1259,7 @@ class DPMenu extends DPBase {
             return this;
         }
 
-        elMenu.removeClass('active');
+        elMenu.active(false);
 
         this.app.event.trigger('dp.menu.close');
 
@@ -902,48 +1277,26 @@ class DPMenu extends DPBase {
         let elMenuItem = this.app.config.get('elements.menuItem', true);
         let elContainer = this.app.config.get('elements.container', true);
 
-        // Event when right click or open menu
-        elContainer.mousedown(function (event) {
-            var isRightMB;
-            event = event || window.event;
-
-            if (event.which === 3) {
-                elContainer.bind('contextmenu', function () {
-                    return false;
-                });
-            }
-            else {
-                elContainer.unbind('contextmenu');
-            }
-
-            if (!instance.status) {
-                return;
-            }
-
-            // Gecko (Firefox), WebKit (Safari/Chrome) & Opera
-            if ("which" in event)
-                isRightMB = event.which == 3;
-            // IE, Opera
-            else if ("button" in event)
-                isRightMB = event.button == 2;
-
-            // Open menu
-            if (isRightMB) {
+        // Event when open context menu
+        elContainer.listen('contextmenu', function (e) {
+            if (instance.status) {
                 instance.openMenu(event);
             }
+
+            e.preventDefault();
         });
 
         // Event when click out menu
-        $(window).click(function (event) {
-            if (elMenuList.has(event.target).length == 0
+        __dp.node(window).listen('click', function (event) {
+            if (!elMenuList.has(event.target)
                 && !elMenuList.is(event.target)) {
                 instance.closeMenu();
             }
         });
 
         // Event when click menu item
-        elMenuItem.click(function () {
-            let name = $(this).attr('dp-menu:name');
+        elMenuItem.listen('click', function () {
+            let name = elMenuItem.attr('dp-menu:name');
             instance.execute(this, name);
         });
 
@@ -979,14 +1332,14 @@ class DPMenu extends DPBase {
         }
 
         let elRunner = this.app.config.runner(true);
-        let runner = elRunner.get(0);
+        let runner = elRunner.node();
 
         if (runner.loop) {
             runner.loop = false;
-            $(item).removeClass('active');
+            __dp.node(item).active(false);
         } else {
             runner.loop = true;
-            $(item).addClass('active');
+            __dp.node(item).active(true);
         }
 
         this.closeMenu();
@@ -1004,7 +1357,7 @@ class DPMenu extends DPBase {
         }
 
         let elRunner = this.app.config.runner(true);
-        let runner = elRunner.get(0);
+        let runner = elRunner.node();
 
         this.closeMenu();
 
@@ -1075,15 +1428,15 @@ class DPLogo extends DPBase {
         // Check if logo is hidden
         if (logoConfig === false) {
             this.status = false;
-            elLogo.removeClass('active');
+            elLogo.active(false);
             return this;
         }
 
-        elLogo.addClass('active');
+        elLogo.active(true);
         elLogo.css({backgroundImage: 'url(\'' + logoConfig.url + '\')'});
 
         // Event when screen change
-        elObject.on('dp.screen.change', function () {
+        this.app.event.listen('dp.screen.change', function () {
             instance.resize();
         });
 
@@ -1132,36 +1485,36 @@ class DPModal extends DPBase {
         let elModal = this.app.config.get('elements.modal', true);
         let elRunner = this.app.config.runner(true);
 
-        let runnerDom = elRunner.get(0);
-        let isLoaderActive = elLoaderModal.hasClass('active');
-        let isPlayerActive = elPlayerModal.hasClass('active');
+        let runnerDom = elRunner.node();
+        let isLoaderActive = elLoaderModal.isActive();
+        let isPlayerActive = elPlayerModal.isActive();
 
-        elModal.removeClass('active');
+        elModal.active(false);
 
         if (config === undefined) {
             if (!isNaN(runnerDom.duration)) {
                 if (runnerDom.paused) {
-                    elPlayerModal.addClass('active');
+                    elPlayerModal.active(true);
                 } else {
-                    elPlayerModal.removeClass('active');
+                    elPlayerModal.active(false);
                 }
             } else {
-                elLoaderModal.addClass('active');
+                elLoaderModal.active(true);
             }
         } else {
             if (config.loader === true) {
-                elLoaderModal.addClass('active');
+                elLoaderModal.active(true);
             } else if (config.player === true || runnerDom.paused) {
-                elPlayerModal.addClass('active');
+                elPlayerModal.active(true);
             }
         }
 
         // Check event
-        if (elLoaderModal.hasClass('active') !== isLoaderActive) {
+        if (elLoaderModal.isActive() !== isLoaderActive) {
             !isLoaderActive ? this.app.event.trigger('dp.modal.loader.show') : this.app.event.trigger('dp.modal.loader.hide');
         }
 
-        if (elPlayerModal.hasClass('active') !== isPlayerActive) {
+        if (elPlayerModal.isActive() !== isPlayerActive) {
             !isPlayerActive ? this.app.event.trigger('dp.modal.player.show') : this.app.event.trigger('dp.modal.player.hide');
         }
 
@@ -1187,36 +1540,35 @@ class DPControl extends DPBase {
 
         let elRunner = this.app.config.runner(true);
         let instance = this;
-        let runnerDom = elRunner.get(0);
-        let elControl = this.app.config.get('elements.control', true);
+        let runnerDom = elRunner.node();
 
         // Event when hover on runner/container/control
-        $(this.app.config.get('elements.container', false)
+        __dp.node(this.app.config.get('elements.container', false)
             + ',' + this.app.config.get('elements.control', false)
-            + ',' + this.app.config.runner()).mousemove(function () {
+            + ',' + this.app.config.runner()).listen('mousemove', function () {
             instance.openControl();
             instance.isMouseIn = true;
         });
 
-        $(window).scroll(function () {
+        __dp.node(window).listen('scroll', function () {
             instance.openControl();
         });
 
         // Event when out on runner/container/control
-        $(this.app.config.get('elements.container', false)
+        __dp.node(this.app.config.get('elements.container', false)
             + ',' + this.app.config.get('elements.control', false)
-            + ',' + this.app.config.runner()).mouseleave(function () {
+            + ',' + this.app.config.runner()).listen('mouseleave', function () {
             instance.closeControl();
             instance.isMouseIn = false;
         });
 
         // Event when runner pause or ended
-        elRunner.on('pause ended', function () {
+        elRunner.listen('pause ended', function () {
             instance.openControl();
         });
 
         // Event when runner pause or ended
-        elRunner.on('play', function () {
+        elRunner.listen('play', function () {
             if (!instance.isMouseIn) {
                 instance.closeControl();
             }
@@ -1236,10 +1588,10 @@ class DPControl extends DPBase {
         let elControl = this.app.config.get('elements.control', true);
         let elContainer = this.app.config.get('elements.container', true);
 
-        let runner = elRunner.get(0);
+        let runner = elRunner.node();
 
         if (!runner.paused) {
-            elControl.removeClass('active');
+            elControl.active(false);
             this.app.event.trigger('dp.control.hide');
 
             if (this.isMouseIn) {
@@ -1260,7 +1612,7 @@ class DPControl extends DPBase {
         let elContainer = this.app.config.get('elements.container', true);
 
         window.clearTimeout(this.controlTime);
-        elControl.addClass('active');
+        elControl.active(true);
         elContainer.removeClass('hidden-cursor');
         this.app.event.trigger('dp.control.show');
 
@@ -1330,11 +1682,11 @@ class DPScreen extends DPBase {
         let h = 0;
 
         if (this.isLarge) {
-            runnerSize = $(window).width();
+            runnerSize = __dp.node(window).width();
 
             elObject.width(runnerSize);
             h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
-            let windowH = $(window).height() * 85 / 100;
+            let windowH = __dp.node(window).height() * 85 / 100;
 
             if (h > windowH) {
                 h = windowH;
@@ -1380,7 +1732,7 @@ class DPScreen extends DPBase {
     toggleFullScreen() {
         let elContainer = this.app.config.get('elements.container', true);
         let isFullScreen = document.webkitIsFullScreen || document.mozFullScreen || false;
-        let container = elContainer.get(0);
+        let container = elContainer.node();
         let instance = this;
 
         container.requestFullScreen = container.requestFullScreen || container.webkitRequestFullScreen || container.mozRequestFullScreen || function () {
@@ -1457,25 +1809,25 @@ class DPScreen extends DPBase {
 
         // Event when click on button fullscreen
         // Then call to check full or cancel
-        elBtnFullScreen.on('click', function (event) {
+        elBtnFullScreen.listen('click', function (event) {
             instance.toggleFullScreen();
         });
 
         // Event when click on button large
         // Then call to check large or cancel
-        elBtnLargeScreen.on('click', function (event) {
+        elBtnLargeScreen.listen('click', function (event) {
             instance.toggleLargeScreen();
             instance.makeIconForLargeScreen();
         });
 
         // Event when change screen
         // Then get status and change icon
-        $(document).on("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
+        __dp.node(document).listen("fullscreenchange webkitfullscreenchange mozfullscreenchange", function () {
             instance.makeIconForFullScreen();
         });
 
         // Event when window resize
-        $(window).resize(function () {
+        __dp.node(window).listen('resize', function () {
             instance.rateScreenSize();
         });
 
@@ -1514,9 +1866,9 @@ class DPSchedule extends DPBase {
         this.lastTime = null;
 
         let schedules = this.app.config.get('schedules');
-        let dp = this;
+        let instance = this;
         let runner = this.app.config.runner(true);
-        let runnerDom = runner.get(0);
+        let runnerDom = runner.node();
 
         for (var i in schedules) {
             // Add schedule to progress bar
@@ -1530,9 +1882,9 @@ class DPSchedule extends DPBase {
         }
 
         // Event when timeupdate
-        runner.on('timeupdate ', function (e) {
+        runner.listen('timeupdate ', function (e) {
             let current = runnerDom.currentTime;
-            let time = dp.helper.parseTime(current);
+            let time = __dp.parseTime(current);
 
             if (this.lastTime === time) {
                 return;
@@ -1540,13 +1892,13 @@ class DPSchedule extends DPBase {
 
             this.lastTime = time;
 
-            let list = dp.or(dp.schedules[time], []);
+            let list = instance.or(instance.schedules[time], []);
 
             for (let i in list) {
-                dp.execute(list[i].name);
+                instance.execute(list[i].name);
 
                 if (list[i].loop !== true) {
-                    delete dp.schedules[time][i];
+                    delete instance.schedules[time][i];
                 }
             }
         });
@@ -1611,18 +1963,18 @@ class DPSource extends DPBase {
 
             // Generate video from resources
             if (typeof sources === 'string') {
-                runner.get(0).src = sources;
+                runner.node().src = sources;
             } else if (sources.length == 1) {
-                runner.get(0).src = sources[0].src;
+                runner.node().src = sources[0].src;
             } else {
                 for (var i in sources) {
                     let source = document.createElement('source');
-                    $(source).attr({src: sources[i].src, type: sources[i].type});
+                    __dp.node(source).attr({src: sources[i].src, type: sources[i].type});
                     runner.append(source);
                 }
             }
 
-            runner.get(0).load();
+            runner.node().load();
         }
 
         return this;
@@ -1632,9 +1984,9 @@ class DPSource extends DPBase {
      * Play
      * @return {DPSource}
      */
-    play(){
+    play() {
         if (this.app.rendered) {
-            let runner = this.app.config.runner(true).get(0);
+            let runner = this.app.config.runner(true).node();
             runner.play();
         }
 
@@ -1645,9 +1997,9 @@ class DPSource extends DPBase {
      * Pause
      * @return {DPSource}
      */
-    pause(){
+    pause() {
         if (this.app.rendered) {
-            let runner = this.app.config.runner(true).get(0);
+            let runner = this.app.config.runner(true).node();
             runner.pause();
         }
 
@@ -1668,17 +2020,17 @@ class DPSource extends DPBase {
 
         // Event when video play
         // Event when runner play
-        runner.on('play', function () {
+        runner.listen('play', function () {
             event.trigger('dp.source.play');
         });
 
         // Event when runner pause or ended
-        runner.on('pause', function () {
+        runner.listen('pause', function () {
             event.trigger('dp.source.pause');
         });
 
         // Event when runner pause or ended
-        runner.on('ended', function () {
+        runner.listen('ended', function () {
             event.trigger('dp.source.ended');
         });
 
@@ -1710,7 +2062,6 @@ class DilationPlayer extends DPBase {
         this.contextEvent();
 
         this.translate = new DPTranslator(this);
-        this.helper = new DPHelper(this);
         this.view = new DPView(this);
 
         this.source = new DPSource(this);
@@ -1766,8 +2117,8 @@ class DilationPlayer extends DPBase {
         let player = this.config.get('elements.playerModal', true);
         let btn = this.config.get('elements.controlPlayPause', true);
         let icons = this.config.get('icons');
-        let runnerDom = runner.get(0);
-        let dp = this;
+        let runnerDom = runner.node();
+        let instance = this;
 
         /**
          * Helper
@@ -1797,31 +2148,31 @@ class DilationPlayer extends DPBase {
                     btn.html(icons.pause);
                 }
 
-                dp.modal.toggle();
+                instance.modal.toggle();
             }
         };
 
         // Event when click on button play/pause
-        btn.click(function () {
+        btn.listen('click', function () {
             helper.toggle();
         });
 
-        player.click(function () {
+        player.listen('click', function () {
             helper.toggle();
         });
 
         // Event when click on runner
-        runner.click(function () {
+        runner.listen('click', function () {
             helper.toggle();
         });
 
         // Event when runner play
-        runner.on('play', function () {
+        runner.listen('play', function () {
             helper.makeIcon();
         });
 
         // Event when runner pause or ended
-        runner.on('pause ended', function () {
+        runner.listen('pause ended', function () {
             helper.makeIcon();
         });
 
@@ -1836,29 +2187,28 @@ class DilationPlayer extends DPBase {
      * @return {DilationPlayer}
      */
     progress() {
-        let dp = this;
+        let instance = this;
         let runner = this.config.runner(true);
-        let runnerDom = runner.get(0);
+        let runnerDom = runner.node();
         let progressBar = this.config.get('elements.progress', true);
         let playing = this.config.get('elements.progressPlaying', true);
         let timer = this.config.get('elements.controlTimer', true);
         let progressTimerTooltipText = this.config.get('elements.progressHoverTooltipText', true);
         let progressTimerTooltipImage = this.config.get('elements.progressToverTooltipImage', true);
-        let tooltipCanvas = progressTimerTooltipImage.find('canvas').get(0);
+        let tooltipCanvas = progressTimerTooltipImage.find('canvas').node();
         tooltipCanvas.width = 90;
         tooltipCanvas.height = 70;
 
         // Create preview elements
         let runnerPreview = document.createElement('video');
 
-        runner.find('source').each(function (num, val) {
-            var source = document.createElement('source');
-            $(source).prop('src', $(this).attr('src'));
-            runnerPreview.append(source);
-        });
+        // runner.find('source').each(function (num, val) {
+        //     var source = document.createElement('source');
+        //     source.src = __dp.node(this).attr('src');
+        //     runnerPreview.append(source);
+        // });
 
         runnerPreview.load();
-        // runnerPreview.pause();
 
         /**
          * Helper object
@@ -1880,8 +2230,8 @@ class DilationPlayer extends DPBase {
              * @param duration
              */
             setTimer: function (current, duration) {
-                current = dp.helper.parseTime(current);
-                duration = dp.helper.parseTime(duration);
+                current = __dp.parseTime(current);
+                duration = __dp.parseTime(duration);
                 timer.html(current + ' / ' + duration);
             },
 
@@ -1900,40 +2250,40 @@ class DilationPlayer extends DPBase {
         };
 
         // Event when timeupdate
-        runner.on('timeupdate ', function (e) {
+        runner.listen('timeupdate ', function (e) {
             helper.display();
-            dp.modal.toggle({loader: false});
+            instance.modal.toggle({loader: false});
         });
 
         // Event when click on progress bar
         // Then get position of mouse and count the time go to
-        progressBar.on("click", function (e) {
+        progressBar.listen("click", function (e) {
             if (!isNaN(runnerDom.duration)) {
-                let offset = $(this).offset();
+                let offset = __dp.node(this).offset();
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
                 let vidTime = runnerDom.duration * percentage;
                 runnerDom.currentTime = vidTime;
                 helper.setLoaded(left, totalWidth);
-                dp.modal.toggle({loader: true});
+                instance.modal.toggle({loader: true});
             }
         });
 
         // Event when hover on progress
         // Then get position of mouse, count the time go to and get information
-        progressBar.on("mousemove", function (e) {
+        progressBar.listen("mousemove", function (e) {
             if (!isNaN(runnerDom.duration)) {
-                progressTimerTooltipText.show();
-                progressTimerTooltipImage.show();
+                progressTimerTooltipText.active(true);
+                progressTimerTooltipImage.active(true);
 
-                let offset = $(this).offset();
+                let offset = __dp.node(this).offset();
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
                 let current = runnerDom.duration * percentage;
 
-                let parseTime = dp.helper.parseTime(current);
+                let parseTime = __dp.parseTime(current);
                 progressTimerTooltipText.css('left', left + 'px').text(parseTime);
                 progressTimerTooltipImage.css('left', left + 'px');
 
@@ -1941,21 +2291,21 @@ class DilationPlayer extends DPBase {
                 //runnerPreview.currentTime = current;
                 //tooltipCanvas.getContext('2d').drawImage(runnerPreview, 0, 0, tooltipCanvas.width, tooltipCanvas.height);
             } else {
-                progressTimerTooltipText.hide();
-                progressTimerTooltipImage.hide();
+                progressTimerTooltipText.active(false);
+                progressTimerTooltipImage.active(false);
             }
         });
 
         // Event when loaded data
         // Then call display information on screen
-        runner.on('loadeddata', function (e) {
+        runner.listen('loadeddata', function (e) {
             helper.display();
-            dp.modal.toggle({loader: false});
+            instance.modal.toggle({loader: false});
         });
 
         // Event when start load data
-        runner.on('loadstart', function (e) {
-            dp.modal.toggle({loader: true});
+        runner.listen('loadstart', function (e) {
+            instance.modal.toggle({loader: true});
         });
 
         return this;
@@ -1968,11 +2318,12 @@ class DilationPlayer extends DPBase {
     sound() {
         // Defined elements
         let runner = this.config.runner(true);
-        let runnerDom = runner.get(0);
+        let runnerDom = runner.node();
         let volume = this.config.get('elements.controlVolume', true);
         let volumeRange = this.config.get('elements.controlVolumeRange', true);
         let range = this.config.get('volume');
         let icons = this.config.get('icons');
+        let instance = this;
 
         /**
          * Helper
@@ -2018,19 +2369,19 @@ class DilationPlayer extends DPBase {
 
 
         // Event click on button
-        volume.on('click', function () {
+        volume.listen('click', function () {
             helper.toggleMute();
         });
 
         // Event when change input of range
         // Then call change volume and icon
-        volumeRange.on('change', function () {
-            let range = $(this).val();
+        volumeRange.listen('change', function () {
+            let range = __dp.node(this).val();
             helper.setVolume(range);
         });
 
         // Event when volume change
-        runner.on('volumechange', function () {
+        runner.listen('volumechange', function () {
             helper.makeIcon();
         });
 
