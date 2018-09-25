@@ -43,6 +43,79 @@ let __dp = {
         return new DPNode(element);
     }
 };
+__dp.defaultConfig = {
+    elements: {
+        object: null,
+        container: '.dp',
+        video: '.dp-video',
+        audio: '.dp-audio',
+        logo: '.dp-logo',
+        progress: '.dp-progress',
+        progressLoading: '.dp-progress .dp-loading',
+        progressPlaying: '.dp-progress .dp-playing',
+        progressHoverTooltipText: '.dp-progress-tooltip-text',
+        progressToverTooltipImage: '.dp-progress-tooltip-image',
+        control: '.dp-control',
+        button: '.dp-button',
+        controlPlayPause: '.dp-btn-play',
+        controlFullScreen: '.dp-btn-fullscreen',
+        controlLargeScreen: '.dp-btn-largescreen',
+        controlVolume: '.dp-btn-volume',
+        controlVolumeTooltip: '.dp-volume-tooltip',
+        controlVolumeRange: '.dp-volume-range',
+        controlTimer: '.dp-timer',
+        modal: '.dp-modal',
+        loaderModal: '.dp-modal-loader',
+        loaderModalIcon: '.dp-modal-loader-icon',
+        playerModal: '.dp-modal-player',
+        playerModalIcon: '.dp-modal-player-icon',
+        menu: '.dp-menu',
+        menuList: '.dp-menu-list',
+        menuItem: '.dp-menu-item',
+        menuItemLoop: '.dp-menu-item-loop',
+        menuItemCopyUrl: '.dp-menu-item-copy-url',
+        ads: '.dp-ads',
+        adsItem: '.dp-ads .dp-ads-item',
+        adsContent: '.dp-ads .dp-ads-content',
+        adsClose: '.dp-ads .dp-ads-close',
+    },
+    icons: {
+        loaderModal: '<i class="fa fa-spin fa-spinner"></i>',
+        playerModal: '<i class="icons icon-control-play"></i>',
+        fullScreen: '<i class="icons icon-size-fullscreen"></i>',
+        actualScreen: '<i class="icons icon-size-actual"></i>',
+        largeScreen: '<i class="icons icon-frame"></i>',
+        smallScreen: '<i class="icons icon-frame"></i>',
+        pause: '<i class="icons icon-control-pause"></i>',
+        play: '<i class="icons icon-control-play"></i>',
+        volumeMute: '<i class="icons icon-volume-off"></i>',
+        volume1: '<i class="icons icon-volume-1"></i>',
+        volume2: '<i class="icons icon-volume-2"></i>',
+        volume3: '<i class="icons icon-volume-3"></i>',
+        close: '[X]'
+    },
+    volume: 100,
+    view: {
+        content: null,
+        import: null
+    },
+    sources: {},
+    logo: {
+        height: '10%',
+        rate: 1
+    },
+    size: {
+        width: '100%',
+        rate: 2 / 3
+    },
+    largeScreen: false,
+    locale: 'en',
+    menu: {},
+    poster: null,
+    schedules: [],
+    type: 'video',
+    plugins: {}
+};
 
 // ====================================================
 // Class {Base}
@@ -474,17 +547,17 @@ class DPConfig extends DPBase {
             // Config for icon
             icons: this.mergeIcons(config),
             // Config default
-            volume: this.or(config.volume, 100),
+            volume: this.or(config.volume, __dp.defaultConfig.volume),
             view: this.mergeView(config),
-            sources: this.or(config.sources, []),
+            sources: this.or(config.sources, __dp.defaultConfig.sources),
             logo: this.mergeLogo(config),
             size: this.mergeSize(config),
-            largeScreen: this.or(config.largeScreen, false),
-            locale: this.or(config.locale, 'en'),
+            largeScreen: this.or(config.largeScreen, __dp.defaultConfig.largeScreen),
+            locale: this.or(config.locale, __dp.defaultConfig.locale),
             menu: this.mergeMenu(config),
-            poster: this.or(config.poster, null),
+            poster: this.or(config.poster, __dp.defaultConfig.poster),
             schedules: this.mergeSchedules(config),
-            type: this.or(config.type, 'video'), // audio or video
+            type: this.or(config.type, __dp.defaultConfig.type), // audio or video
             plugins: this.mergePlugins(config)
         };
 
@@ -506,7 +579,7 @@ class DPConfig extends DPBase {
             return false;
         }
 
-        let rs = this.or(config.menu, {});
+        let rs = this.or(config.menu, __dp.defaultConfig.menu);
 
         rs.loop = this.or(rs.loop, {
             text: 'menu.loop',
@@ -535,39 +608,39 @@ class DPConfig extends DPBase {
         config.elements = this.or(config.elements, {});
 
         return {
-            object: this.or(config.elements.object, null),
-            container: this.or(config.elements.container, '.dp'),
-            video: this.or(config.elements.video, '.dp-video'),
-            audio: this.or(config.elements.audio, '.dp-audio'),
-            logo: this.or(config.elements.logo, '.dp-logo'),
-            progress: this.or(config.elements.progress, '.dp-progress'),
-            progressLoading: this.or(config.elements.progressLoading, '.dp-progress .dp-loading'),
-            progressPlaying: this.or(config.elements.progressPlaying, '.dp-progress .dp-playing'),
-            progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, '.dp-progress-tooltip-text'),
-            progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, '.dp-progress-tooltip-image'),
-            control: this.or(config.elements.control, '.dp-control'),
-            button: this.or(config.elements.button, '.dp-button'),
-            controlPlayPause: this.or(config.elements.controlPlayPause, '.dp-btn-play'),
-            controlFullScreen: this.or(config.elements.controlFullScreen, '.dp-btn-fullscreen'),
-            controlLargeScreen: this.or(config.elements.controlLargeScreen, '.dp-btn-largescreen'),
-            controlVolume: this.or(config.elements.controlVolume, '.dp-btn-volume'),
-            controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, '.dp-volume-tooltip'),
-            controlVolumeRange: this.or(config.elements.controlVolumeRange, '.dp-volume-range'),
-            controlTimer: this.or(config.elements.controlTimer, '.dp-timer'),
-            modal: this.or(config.elements.modal, '.dp-modal'),
-            loaderModal: this.or(config.elements.loaderModal, '.dp-modal-loader'),
-            loaderModalIcon: this.or(config.elements.loaderModalIcon, '.dp-modal-loader-icon'),
-            playerModal: this.or(config.elements.playerModal, '.dp-modal-player'),
-            playerModalIcon: this.or(config.elements.playerModalIcon, '.dp-modal-player-icon'),
-            menu: this.or(config.elements.menu, '.dp-menu'),
-            menuList: this.or(config.elements.menuList, '.dp-menu-list'),
-            menuItem: this.or(config.elements.menuItem, '.dp-menu-item'),
-            menuItemLoop: this.or(config.elements.menuItemLoop, '.dp-menu-item-loop'),
-            menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, '.dp-menu-item-copy-url'),
-            ads: this.or(config.elements.ads, '.dp-ads'),
-            adsItem: this.or(config.elements.adsItem, '.dp-ads .dp-ads-item'),
-            adsContent: this.or(config.elements.adsContent, '.dp-ads .dp-ads-content'),
-            adsClose: this.or(config.elements.adsClose, '.dp-ads .dp-ads-close'),
+            object: this.or(config.elements.object, __dp.defaultConfig.elements.object),
+            container: this.or(config.elements.container, __dp.defaultConfig.elements.container),
+            video: this.or(config.elements.video, __dp.defaultConfig.elements.video),
+            audio: this.or(config.elements.audio, __dp.defaultConfig.elements.audio),
+            logo: this.or(config.elements.logo, __dp.defaultConfig.elements.logo),
+            progress: this.or(config.elements.progress, __dp.defaultConfig.elements.progress),
+            progressLoading: this.or(config.elements.progressLoading, __dp.defaultConfig.elements.progressLoading),
+            progressPlaying: this.or(config.elements.progressPlaying, __dp.defaultConfig.elements.progressPlaying),
+            progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, __dp.defaultConfig.elements.progressHoverTooltipText),
+            progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, __dp.defaultConfig.elements.progressToverTooltipImage),
+            control: this.or(config.elements.control, __dp.defaultConfig.elements.control),
+            button: this.or(config.elements.button, __dp.defaultConfig.elements.button),
+            controlPlayPause: this.or(config.elements.controlPlayPause, __dp.defaultConfig.elements.controlPlayPause),
+            controlFullScreen: this.or(config.elements.controlFullScreen, __dp.defaultConfig.elements.controlFullScreen),
+            controlLargeScreen: this.or(config.elements.controlLargeScreen, __dp.defaultConfig.elements.controlLargeScreen),
+            controlVolume: this.or(config.elements.controlVolume, __dp.defaultConfig.elements.controlVolume),
+            controlVolumeTooltip: this.or(config.elements.controlVolumeTooltip, __dp.defaultConfig.elements.controlVolumeTooltip),
+            controlVolumeRange: this.or(config.elements.controlVolumeRange, __dp.defaultConfig.elements.controlVolumeRange),
+            controlTimer: this.or(config.elements.controlTimer, __dp.defaultConfig.elements.controlTimer),
+            modal: this.or(config.elements.modal, __dp.defaultConfig.elements.modal),
+            loaderModal: this.or(config.elements.loaderModal, __dp.defaultConfig.elements.loaderModal),
+            loaderModalIcon: this.or(config.elements.loaderModalIcon, __dp.defaultConfig.elements.loaderModalIcon),
+            playerModal: this.or(config.elements.playerModal, __dp.defaultConfig.elements.playerModal),
+            playerModalIcon: this.or(config.elements.playerModalIcon, __dp.defaultConfig.elements.playerModalIcon),
+            menu: this.or(config.elements.menu, __dp.defaultConfig.elements.menu),
+            menuList: this.or(config.elements.menuList, __dp.defaultConfig.elements.menuList),
+            menuItem: this.or(config.elements.menuItem, __dp.defaultConfig.elements.menuItem),
+            menuItemLoop: this.or(config.elements.menuItemLoop, __dp.defaultConfig.elements.menuItemLoop),
+            menuItemCopyUrl: this.or(config.elements.menuItemCopyUrl, __dp.defaultConfig.elements.menuItemCopyUrl),
+            ads: this.or(config.elements.ads, __dp.defaultConfig.elements.ads),
+            adsItem: this.or(config.elements.adsItem, __dp.defaultConfig.elements.adsItem),
+            adsContent: this.or(config.elements.adsContent, __dp.defaultConfig.elements.adsContent),
+            adsClose: this.or(config.elements.adsClose, __dp.defaultConfig.elements.adsClose),
         };
     }
 
@@ -579,19 +652,19 @@ class DPConfig extends DPBase {
         config.icons = this.or(config.icons, {});
 
         return {
-            loaderModal: this.or(config.icons.loaderModal, '<i class="fa fa-spin fa-spinner"></i>'),
-            playerModal: this.or(config.icons.loaderModal, '<i class="icons icon-control-play"></i>'),
-            fullScreen: this.or(config.icons.fullScreen, '<i class="icons icon-size-fullscreen"></i>'),
-            actualScreen: this.or(config.icons.actualScreen, '<i class="icons icon-size-actual"></i>'),
-            largeScreen: this.or(config.icons.largeScreen, '<i class="icons icon-frame"></i>'),
-            smallScreen: this.or(config.icons.smallScreen, '<i class="icons icon-frame"></i>'),
-            pause: this.or(config.icons.pause, '<i class="icons icon-control-pause"></i>'),
-            play: this.or(config.icons.play, '<i class="icons icon-control-play"></i>'),
-            volumeMute: this.or(config.icons.volumeMute, '<i class="icons icon-volume-off"></i>'),
-            volume1: this.or(config.icons.volume1, '<i class="icons icon-volume-1"></i>'),
-            volume2: this.or(config.icons.volume2, '<i class="icons icon-volume-2"></i>'),
-            volume3: this.or(config.icons.volume3, '<i class="icons icon-volume-3"></i>'),
-            close: this.or(config.icons.close, '[X]')
+            loaderModal: this.or(config.icons.loaderModal, __dp.defaultConfig.icons.loaderModal),
+            playerModal: this.or(config.icons.loaderModal, __dp.defaultConfig.icons.playerModal),
+            fullScreen: this.or(config.icons.fullScreen, __dp.defaultConfig.icons.fullScreen),
+            actualScreen: this.or(config.icons.actualScreen, __dp.defaultConfig.icons.actualScreen),
+            largeScreen: this.or(config.icons.largeScreen, __dp.defaultConfig.icons.largeScreen),
+            smallScreen: this.or(config.icons.smallScreen, __dp.defaultConfig.icons.smallScreen),
+            pause: this.or(config.icons.pause, __dp.defaultConfig.icons.pause),
+            play: this.or(config.icons.play, __dp.defaultConfig.icons.play),
+            volumeMute: this.or(config.icons.volumeMute, __dp.defaultConfig.icons.volumeMute),
+            volume1: this.or(config.icons.volume1, __dp.defaultConfig.icons.volume1),
+            volume2: this.or(config.icons.volume2, __dp.defaultConfig.icons.volume2),
+            volume3: this.or(config.icons.volume3, __dp.defaultConfig.icons.volume3),
+            close: this.or(config.icons.close, __dp.defaultConfig.icons.close)
         };
     }
 
@@ -616,7 +689,7 @@ class DPConfig extends DPBase {
             if (config.logo.width !== undefined) {
                 rs.width = config.logo.width;
             } else {
-                rs.rate = this.or(config.logo.rate, 1);
+                rs.rate = this.or(config.logo.rate, __dp.defaultConfig.logo.rate);
             }
         } else if (config.logo.width !== undefined) {
             rs.width = config.logo.width;
@@ -624,11 +697,11 @@ class DPConfig extends DPBase {
             if (config.logo.height !== undefined) {
                 rs.height = config.logo.height;
             } else {
-                rs.rate = this.or(config.logo.rate, 1);
+                rs.rate = this.or(config.logo.rate, __dp.defaultConfig.logo.rate);
             }
         } else {
-            rs.height = '10%';
-            rs.rate = 1;
+            rs.height = __dp.defaultConfig.logo.height;
+            rs.rate = __dp.defaultConfig.logo.rate;
         }
 
         rs.url = this.or(config.logo.url, null);
@@ -650,7 +723,7 @@ class DPConfig extends DPBase {
             if (config.size.width !== undefined) {
                 rs.width = config.size.width;
             } else {
-                rs.rate = this.or(config.size.rate, 3 / 2);
+                rs.rate = this.or(config.size.rate, __dp.defaultConfig.size.rate);
             }
         } else if (config.size.width !== undefined) {
             rs.width = config.size.width;
@@ -658,11 +731,11 @@ class DPConfig extends DPBase {
             if (config.size.height !== undefined) {
                 rs.height = config.size.height;
             } else {
-                rs.rate = this.or(config.size.rate, 2 / 3);
+                rs.rate = this.or(config.size.rate, __dp.defaultConfig.size.rate);
             }
         } else {
-            rs.width = '100%';
-            rs.rate = 2 / 3;
+            rs.width = __dp.defaultConfig.size.width;
+            rs.rate = __dp.defaultConfig.size.rate;
         }
 
         return rs;
@@ -679,8 +752,8 @@ class DPConfig extends DPBase {
         }
 
         return {
-            content: this.or(config.view.content, null),
-            import: this.or(config.view.import, null)
+            content: this.or(config.view.content, __dp.defaultConfig.view.content),
+            import: this.or(config.view.import, __dp.defaultConfig.view.import)
         };
     }
 
@@ -694,7 +767,7 @@ class DPConfig extends DPBase {
             return [];
         }
 
-        let rs = this.or(config.schedules, []);
+        let rs = this.or(config.schedules, __dp.defaultConfig.schedules);
 
         return rs;
     }
@@ -705,7 +778,7 @@ class DPConfig extends DPBase {
      * @return {object}
      */
     mergePlugins(config) {
-        return this.or(config.plugins, {});
+        return this.or(config.plugins, __dp.defaultConfig.plugins);
     }
 
     /**
@@ -1053,7 +1126,7 @@ class DPView extends DPBase {
             if (sizeConfig.width !== undefined) {
                 elObject.css({width: sizeConfig.width});
             } else {
-                elObject.css({width: (elObject.height() * sizeConfig.rate) + 'px'});
+                elObject.css({width: (elObject.height() / sizeConfig.rate) + 'px'});
             }
         } else {
             elObject.css({width: sizeConfig.width});
@@ -1424,7 +1497,7 @@ class DPLogo extends DPBase {
             if (logoConfig.width !== undefined) {
                 elLogo.css({width: logoConfig.width});
             } else {
-                elLogo.css({width: (elLogo.height() * logoConfig.rate) + 'px'});
+                elLogo.css({width: (elLogo.height() / logoConfig.rate) + 'px'});
             }
         } else {
             elLogo.css({width: logoConfig.width});
@@ -1450,7 +1523,6 @@ class DPLogo extends DPBase {
 
         let elLogo = this.app.config.get('elements.logo', true);
         let logoConfig = this.app.config.get('logo', false);
-        let elObject = this.app.config.get('elements.object', true);
         let instance = this;
 
         // Check if logo is hidden
@@ -1676,7 +1748,7 @@ class DPScreen extends DPBase {
             if (sizeConfig.width !== undefined) {
                 elObject.css({width: sizeConfig.width});
             } else {
-                elObject.css({width: (elObject.height() * sizeConfig.rate) + 'px'});
+                elObject.css({width: (elObject.height() / sizeConfig.rate) + 'px'});
             }
         } else {
             elObject.css({width: sizeConfig.width});

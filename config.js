@@ -1,25 +1,73 @@
-addClas
-removeClass
-css
-attr
-html
-hasClass
-active
-isActive
-val
-offset
-is
-has
-
-Events
- - mousedown
- - mousemove
- - mouseleave
- - click
- - fullscreenchange webkitfullscreenchange mozfullscreenchange
- - scroll
- - resize
-
-
-appendChild
-text
+__dp.defaultConfig = {
+    elements: {
+        object: null,
+        container: '.dp',
+        video: '.dp-video',
+        audio: '.dp-audio',
+        logo: '.dp-logo',
+        progress: '.dp-progress',
+        progressLoading: '.dp-progress .dp-loading',
+        progressPlaying: '.dp-progress .dp-playing',
+        progressHoverTooltipText: '.dp-progress-tooltip-text',
+        progressToverTooltipImage: '.dp-progress-tooltip-image',
+        control: '.dp-control',
+        button: '.dp-button',
+        controlPlayPause: '.dp-btn-play',
+        controlFullScreen: '.dp-btn-fullscreen',
+        controlLargeScreen: '.dp-btn-largescreen',
+        controlVolume: '.dp-btn-volume',
+        controlVolumeTooltip: '.dp-volume-tooltip',
+        controlVolumeRange: '.dp-volume-range',
+        controlTimer: '.dp-timer',
+        modal: '.dp-modal',
+        loaderModal: '.dp-modal-loader',
+        loaderModalIcon: '.dp-modal-loader-icon',
+        playerModal: '.dp-modal-player',
+        playerModalIcon: '.dp-modal-player-icon',
+        menu: '.dp-menu',
+        menuList: '.dp-menu-list',
+        menuItem: '.dp-menu-item',
+        menuItemLoop: '.dp-menu-item-loop',
+        menuItemCopyUrl: '.dp-menu-item-copy-url',
+        ads: '.dp-ads',
+        adsItem: '.dp-ads .dp-ads-item',
+        adsContent: '.dp-ads .dp-ads-content',
+        adsClose: '.dp-ads .dp-ads-close',
+    },
+    icons: {
+        loaderModal: '<i class="fa fa-spin fa-spinner"></i>',
+        playerModal: '<i class="icons icon-control-play"></i>',
+        fullScreen: '<i class="icons icon-size-fullscreen"></i>',
+        actualScreen: '<i class="icons icon-size-actual"></i>',
+        largeScreen: '<i class="icons icon-frame"></i>',
+        smallScreen: '<i class="icons icon-frame"></i>',
+        pause: '<i class="icons icon-control-pause"></i>',
+        play: '<i class="icons icon-control-play"></i>',
+        volumeMute: '<i class="icons icon-volume-off"></i>',
+        volume1: '<i class="icons icon-volume-1"></i>',
+        volume2: '<i class="icons icon-volume-2"></i>',
+        volume3: '<i class="icons icon-volume-3"></i>',
+        close: '[X]'
+    },
+    volume: 100,
+    view: {
+        content: null,
+        import: null
+    },
+    sources: {},
+    logo: {
+        height: '10%',
+        rate: 1
+    },
+    size: {
+        width: '100%',
+        rate: 2 / 3
+    },
+    largeScreen: false,
+    locale: 'en',
+    menu: {},
+    poster: null,
+    schedules: [],
+    type: 'video',
+    plugins: {}
+};
