@@ -118,6 +118,31 @@ __dp.defaultConfig = {
     startAt: 0
 };
 
+__dp.translateData = {
+    en: {
+        menu: {
+            loop: 'Loop this video',
+            copy_url: 'Copy video\'s url'
+        },
+
+        app: {
+            loading: 'Loading...',
+            not_support: 'This browser not support player'
+        }
+    },
+    vi: {
+        menu: {
+            loop: 'Lặp video này',
+            copy_url: 'Copy đường dẫn video'
+        },
+
+        app: {
+            loading: 'Đang tải...',
+            not_support: 'Trình duyệt không hỗ trợ player'
+        }
+    }
+};
+
 // ====================================================
 // Class {Base}
 // ====================================================
@@ -1213,14 +1238,11 @@ class DPTranslator extends DPBase {
      */
     constructor(app) {
         super();
-        this.config = app.config;
         this.app = app;
 
-        if (typeof DPTranslateData !== 'undefined') {
-            this.languages = DPTranslateData;
-        } else {
-            this.languages = {};
-        }
+        // Get local config
+        let locale = this.app.config.get('locale');
+        this.languages = this.or(__dp.translateData[locale], {});
     }
 
     /**
@@ -1235,7 +1257,7 @@ class DPTranslator extends DPBase {
         }
 
         var keys = key.split('.');
-        var messages = this.or(this.languages[this.config.get('locale')], {});
+        var messages = this.languages;
         let message = messages;
 
         // Get message format
