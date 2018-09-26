@@ -9,7 +9,7 @@ __dp.defaultConfig = {
         progressLoading: '.dp-progress .dp-loading',
         progressPlaying: '.dp-progress .dp-playing',
         progressHoverTooltipText: '.dp-progress-tooltip-text',
-        progressToverTooltipImage: '.dp-progress-tooltip-image',
+        progressHoverTooltipImage: '.dp-progress-tooltip-image',
         control: '.dp-control',
         button: '.dp-button',
         controlPlayPause: '.dp-btn-play',

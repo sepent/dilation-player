@@ -195,7 +195,7 @@ html, body {
     height: 100%;
 }
 
-.dp .dp-control .dp-progress .dp-line div {
+.dp .dp-control .dp-progress .dp-line > div {
     height: 100%;
     width: 100%;
     position: absolute;
@@ -214,7 +214,7 @@ html, body {
     z-index: 1;
 }
 
-/* CSS for button */
+/* ======================= CSS for button ========================== */
 .dp .dp-control .dp-button {
     height: 88%;
     background-color: rgba(0, 0, 0, 0.5);

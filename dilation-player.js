@@ -1,28 +1,3 @@
-let DPTranslateData = {
-    en: {
-        menu: {
-            loop: 'Loop this video',
-            copy_url: 'Copy video\'s url'
-        },
-
-        app: {
-            loading: 'Loading...',
-            not_support: 'This browser not support player'
-        }
-    },
-
-    vi: {
-        menu: {
-            loop: 'Lặp video này',
-            copy_url: 'Copy đường dẫn video'
-        },
-
-        app: {
-            loading: 'Đang tải...',
-            not_support: 'Trình duyệt không hỗ trợ player'
-        }
-    }
-}
 let __dp = {
     pad: function (n, width, z) {
         z = z || '0';
@@ -54,7 +29,7 @@ __dp.defaultConfig = {
         progressLoading: '.dp-progress .dp-loading',
         progressPlaying: '.dp-progress .dp-playing',
         progressHoverTooltipText: '.dp-progress-tooltip-text',
-        progressToverTooltipImage: '.dp-progress-tooltip-image',
+        progressHoverTooltipImage: '.dp-progress-tooltip-image',
         control: '.dp-control',
         button: '.dp-button',
         controlPlayPause: '.dp-btn-play',
@@ -117,7 +92,6 @@ __dp.defaultConfig = {
     plugins: {},
     startAt: 0
 };
-
 __dp.translateData = {
     en: {
         menu: {
@@ -644,7 +618,7 @@ class DPConfig extends DPBase {
             progressLoading: this.or(config.elements.progressLoading, __dp.defaultConfig.elements.progressLoading),
             progressPlaying: this.or(config.elements.progressPlaying, __dp.defaultConfig.elements.progressPlaying),
             progressHoverTooltipText: this.or(config.elements.progressHoverTooltipText, __dp.defaultConfig.elements.progressHoverTooltipText),
-            progressToverTooltipImage: this.or(config.elements.progressToverTooltipImage, __dp.defaultConfig.elements.progressToverTooltipImage),
+            progressHoverTooltipImage: this.or(config.elements.progressHoverTooltipImage, __dp.defaultConfig.elements.progressHoverTooltipImage),
             control: this.or(config.elements.control, __dp.defaultConfig.elements.control),
             button: this.or(config.elements.button, __dp.defaultConfig.elements.button),
             controlPlayPause: this.or(config.elements.controlPlayPause, __dp.defaultConfig.elements.controlPlayPause),
@@ -2347,7 +2321,7 @@ class DilationPlayer extends DPBase {
         let playing = this.config.get('elements.progressPlaying', true);
         let timer = this.config.get('elements.controlTimer', true);
         let progressTimerTooltipText = this.config.get('elements.progressHoverTooltipText', true);
-        let progressTimerTooltipImage = this.config.get('elements.progressToverTooltipImage', true);
+        let progressTimerTooltipImage = this.config.get('elements.progressHoverTooltipImage', true);
         let tooltipCanvas = progressTimerTooltipImage.find('canvas').node();
         tooltipCanvas.width = 90;
         tooltipCanvas.height = 70;
@@ -2423,7 +2397,7 @@ class DilationPlayer extends DPBase {
             }
         });
 
-        // Event when hover on progress
+        // Event when move on progress
         // Then get position of mouse, count the time go to and get information
         progressBar.listen("mousemove", function (e) {
             if (!isNaN(runnerDom.duration)) {
