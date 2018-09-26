@@ -69,5 +69,6 @@ __dp.defaultConfig = {
     poster: null,
     schedules: [],
     type: 'video',
-    plugins: {}
+    plugins: {},
+    startAt: 0
 };

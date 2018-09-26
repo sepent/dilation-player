@@ -114,7 +114,8 @@ __dp.defaultConfig = {
     poster: null,
     schedules: [],
     type: 'video',
-    plugins: {}
+    plugins: {},
+    startAt: 0
 };
 
 // ====================================================
@@ -558,7 +559,8 @@ class DPConfig extends DPBase {
             poster: this.or(config.poster, __dp.defaultConfig.poster),
             schedules: this.mergeSchedules(config),
             type: this.or(config.type, __dp.defaultConfig.type), // audio or video
-            plugins: this.mergePlugins(config)
+            plugins: this.mergePlugins(config),
+            startAt: this.or(config.startAt, __dp.defaultConfig.startAt)
         };
 
         // Function
@@ -2107,6 +2109,31 @@ class DPSource extends DPBase {
     }
 
     /**
+     * Start At
+     * @param time
+     * @return {DPSource}
+     */
+    to(time) {
+        let runner = this.app.config.runner(true).node();
+
+        if (isNaN(time)) {
+            time = time.split(':');
+
+            if (time.length === 3) {
+                time = time[2]*1 + time[1]*60 + time[0]*3600;
+            } else if (time.length === 2) {
+                time = time[1]*1 + time[0]*60;
+            } else {
+                time = time[0]*1;
+            }
+        }
+
+        runner.currentTime = time;
+
+        return this;
+    }
+
+    /**
      * Init
      * @return {DPSource}
      */
@@ -2115,6 +2142,7 @@ class DPSource extends DPBase {
         let sources = this.app.config.get('sources');
         let runner = this.app.config.runner(true);
         let event = this.app.event;
+        let startAt = this.app.config.get('startAt');
 
         this.load(sources);
 
@@ -2133,6 +2161,9 @@ class DPSource extends DPBase {
         runner.listen('ended', function () {
             event.trigger('dp.source.ended');
         });
+
+        // Start
+        this.to(startAt);
 
         return this;
     }
@@ -2364,7 +2395,7 @@ class DilationPlayer extends DPBase {
                 let totalWidth = progressBar.width();
                 let percentage = (left / totalWidth);
                 let vidTime = runnerDom.duration * percentage;
-                runnerDom.currentTime = vidTime;
+                instance.source.to(vidTime);
                 helper.setLoaded(left, totalWidth);
                 instance.modal.toggle({loader: true});
             }
