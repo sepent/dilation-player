@@ -1566,13 +1566,48 @@ class DPModal extends DPBase {
      * Render
      */
     init() {
+        let instance = this;
         let icons = this.app.config.get('icons', false);
         let elLoaderIcon = this.app.config.get('elements.loaderModalIcon', true);
         let elPlayerIcon = this.app.config.get('elements.playerModalIcon', true);
+        let runner = this.app.config.runner(true);
 
         // default
         elPlayerIcon.html(icons.playerModal);
         elLoaderIcon.html(icons.loaderModal);
+
+        // Event when start load data
+        runner.listen('loadstart', function (e) {
+            instance.toggle({loader: true});
+        });
+
+        // Event when runner play
+        runner.listen('play', function () {
+            instance.toggle();
+        });
+
+        // Event when runner pause or ended
+        runner.listen('pause ended', function () {
+            instance.toggle();
+        });
+
+        // Event when timeupdate
+        runner.listen('timeupdate ', function (e) {
+            instance.toggle({loader: false});
+        });
+
+        // Event when loaded data
+        // Then call display information on screen
+        runner.listen('loadeddata', function (e) {
+            instance.toggle({loader: false});
+        });
+
+        // Event when loading
+        runner.listen('progress', function(){
+            instance.toggle({loader: true});
+        });
+
+        instance.toggle();
 
         return this;
     }
@@ -2278,8 +2313,6 @@ class DilationPlayer extends DPBase {
                 } else {
                     btn.html(icons.pause);
                 }
-
-                instance.modal.toggle();
             }
         };
 
@@ -2383,7 +2416,6 @@ class DilationPlayer extends DPBase {
         // Event when timeupdate
         runner.listen('timeupdate ', function (e) {
             helper.display();
-            instance.modal.toggle({loader: false});
         });
 
         // Event when click on progress bar
@@ -2397,7 +2429,6 @@ class DilationPlayer extends DPBase {
                 let vidTime = runnerDom.duration * percentage;
                 instance.source.to(vidTime);
                 helper.setLoaded(left, totalWidth);
-                instance.modal.toggle({loader: true});
             }
         });
 
@@ -2453,12 +2484,6 @@ class DilationPlayer extends DPBase {
         // Then call display information on screen
         runner.listen('loadeddata', function (e) {
             helper.display();
-            instance.modal.toggle({loader: false});
-        });
-
-        // Event when start load data
-        runner.listen('loadstart', function (e) {
-            instance.modal.toggle({loader: true});
         });
 
         return this;
