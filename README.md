@@ -12,11 +12,13 @@ Html page:
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/dilation-player.css">
+    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.css">
 </head>
 <body>
     <div id="video-container"></div>
-    <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
+    <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.js"></script>
+    <script type="text/javascript"
+        src="http://cdn.lib.cobonla.org/dilation-player/1.0.0/plugins/dilation-player.plugin.ads.min.js"></script>
 </body>
 ```
 
@@ -31,12 +33,16 @@ Then it auto apply to your elements. If you want to custom, then change **json_c
 ```
 {
     elements: {
+        object: null,
         container: '.dp',
         video: '.dp-video',
+        audio: '.dp-audio',
         logo: '.dp-logo',
         progress: '.dp-progress',
+        progressLoading: '.dp-progress .dp-loading',
+        progressPlaying: '.dp-progress .dp-playing',
         progressHoverTooltipText: '.dp-progress-tooltip-text',
-        progressToverTooltipImage: '.dp-progress-tooltip-image',
+        progressHoverTooltipImage: '.dp-progress-tooltip-image',
         control: '.dp-control',
         button: '.dp-button',
         controlPlayPause: '.dp-btn-play',
@@ -56,6 +62,10 @@ Then it auto apply to your elements. If you want to custom, then change **json_c
         menuItem: '.dp-menu-item',
         menuItemLoop: '.dp-menu-item-loop',
         menuItemCopyUrl: '.dp-menu-item-copy-url',
+        ads: '.dp-ads',
+        adsItem: '.dp-ads .dp-ads-item',
+        adsContent: '.dp-ads .dp-ads-content',
+        adsClose: '.dp-ads .dp-ads-close',
     },
     icons: {
         loaderModal: '<i class="fa fa-spin fa-spinner"></i>',
@@ -69,35 +79,31 @@ Then it auto apply to your elements. If you want to custom, then change **json_c
         volumeMute: '<i class="icons icon-volume-off"></i>',
         volume1: '<i class="icons icon-volume-1"></i>',
         volume2: '<i class="icons icon-volume-2"></i>',
-        volume3: '<i class="icons icon-volume-3"></i>'
+        volume3: '<i class="icons icon-volume-3"></i>',
+        close: '[X]'
     },
     volume: 100,
     view: {
         content: null,
         import: null
     },
-    sources: [],
+    sources: {},
     logo: {
         height: '10%',
-        width: undefined,
         rate: 1
     },
     size: {
-        height: undefined,
         width: '100%',
         rate: 2 / 3
     },
     largeScreen: false,
     locale: 'en',
-    menu: {
-        name: {
-            text: 'translate.key',
-            element: 'class_name',
-            execute: function (item, menu, config) {
-            }
-        }
-    },
-    poster: null
+    menu: {},
+    poster: null,
+    schedules: [],
+    type: 'video',
+    plugins: {},
+    startAt: 0
 }
 ```
 
@@ -123,11 +129,13 @@ Full source code after config:
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/dilation-player.css">
+    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.css">
 </head>
 <body>
     <div id="video-container"></div>
-    <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
+    <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.js"></script>
+    <script type="text/javascript"
+        src="http://cdn.lib.cobonla.org/dilation-player/1.0.0/plugins/dilation-player.plugin.ads.min.js"></script>
     <script>
     var player = new DilationPlayer('#video-container', {
         poster: 'https://mywebsite.com/poster.png',
