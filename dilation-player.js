@@ -1603,7 +1603,7 @@ class DPModal extends DPBase {
         });
 
         // Event when loading
-        runner.listen('progress', function(){
+        runner.listen('waiting', function(){
             instance.toggle({loader: true});
         });
 
