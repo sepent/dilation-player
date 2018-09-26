@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Video Demo</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet"
@@ -13,9 +13,10 @@
 <body>
 <div style="width: 600px; height: 400px; background-color: #000; color: #fff; margin: auto" id="dilation-player"></div>
 <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/dilation-player.js"></script>
-<script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/plugins/dilation-player.plugin.ads.js"></script>
+<script type="text/javascript"
+        src="http://cdn.lib.cobonla.org/dilation-player/plugins/dilation-player.plugin.ads.js"></script>
 <script type="text/javascript">
-    window.onload = function(){
+    __dp.ready(function () {
         var dilationPlayer = new DilationPlayer('#dilation-player', {
             view: {
                 import: 'http://cdn.lib.cobonla.org/dilation-player/dilation-player.template.html'
@@ -56,7 +57,7 @@
                 }
             ]
         });
-    };
+    });
 </script>
 </body>
 </html>

@@ -16,6 +16,10 @@ let __dp = {
 
     node: function (element) {
         return new DPNode(element);
+    },
+
+    ready: function(call){
+        this.node(window).listen('load', call);
     }
 };
 __dp.defaultConfig = {
