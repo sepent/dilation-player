@@ -204,7 +204,7 @@ html, body {
 }
 
 .dp .dp-control .dp-progress .dp-line .dp-playing {
-    background-color: #46d2e0;
+    background-color: #FF5722;
     z-index: 3;
 }
 
@@ -309,7 +309,7 @@ html, body {
     appearance: none;
     width: 10px;
     height: 10px;
-    background: #46d2e0;
+    background: #FF5722;
     cursor: pointer;
     border-radius: 50%;
 }
@@ -317,7 +317,7 @@ html, body {
 .dp .dp-control .dp-button .dp-group .dp-volume-range::-moz-range-thumb {
     width: 10px;
     height: 10px;
-    background: #46d2e0;
+    background: #FF5722;
     cursor: pointer;
     border-radius: 50%;
 }

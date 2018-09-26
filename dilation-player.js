@@ -18,7 +18,7 @@ let __dp = {
         return new DPNode(element);
     },
 
-    ready: function(call){
+    ready: function (call) {
         this.node(window).listen('load', call);
     }
 };
@@ -1576,38 +1576,46 @@ class DPModal extends DPBase {
         elPlayerIcon.html(icons.playerModal);
         elLoaderIcon.html(icons.loaderModal);
 
+        this.toggle({loader: false, player: false});
+
         // Event when start load data
         runner.listen('loadstart', function (e) {
-            instance.toggle({loader: true});
+            instance.toggle({loader: true, player: false});
         });
 
         // Event when runner play
         runner.listen('play', function () {
-            instance.toggle();
+            instance.toggle({loader: isNaN(runner.node().duration), player: false});
         });
 
         // Event when runner pause or ended
         runner.listen('pause ended', function () {
-            instance.toggle();
+            instance.toggle({loader: isNaN(runner.node().duration), player: true});
         });
 
         // Event when timeupdate
         runner.listen('timeupdate ', function (e) {
-            instance.toggle({loader: false});
+            instance.toggle({loader: false, player: runner.node().paused});
         });
 
         // Event when loaded data
         // Then call display information on screen
         runner.listen('loadeddata', function (e) {
-            instance.toggle({loader: false});
+            instance.toggle({loader: false, player: runner.node().paused});
         });
 
         // Event when loading
-        runner.listen('waiting', function(){
-            instance.toggle({loader: true});
+        runner.listen('waiting', function () {
+            instance.toggle({loader: true, player: false});
         });
 
-        instance.toggle();
+        runner.listen('seeking', function () {
+            instance.toggle({loader: true, player: false});
+        });
+
+        runner.listen('seeked', function () {
+            instance.toggle({loader: false, player: runner.node().paused});
+        });
 
         return this;
     }
@@ -1620,31 +1628,12 @@ class DPModal extends DPBase {
         let elLoaderModal = this.app.config.get('elements.loaderModal', true);
         let elPlayerModal = this.app.config.get('elements.playerModal', true);
         let elModal = this.app.config.get('elements.modal', true);
-        let elRunner = this.app.config.runner(true);
-
-        let runnerDom = elRunner.node();
         let isLoaderActive = elLoaderModal.isActive();
         let isPlayerActive = elPlayerModal.isActive();
 
         elModal.active(false);
-
-        if (config === undefined) {
-            if (!isNaN(runnerDom.duration)) {
-                if (runnerDom.paused) {
-                    elPlayerModal.active(true);
-                } else {
-                    elPlayerModal.active(false);
-                }
-            } else {
-                elLoaderModal.active(true);
-            }
-        } else {
-            if (config.loader === true) {
-                elLoaderModal.active(true);
-            } else if (config.player === true || runnerDom.paused) {
-                elPlayerModal.active(true);
-            }
-        }
+        elLoaderModal.active(config.loader === true);
+        elPlayerModal.active(config.player === true);
 
         // Check event
         if (elLoaderModal.isActive() !== isLoaderActive) {
@@ -2155,11 +2144,11 @@ class DPSource extends DPBase {
             time = time.split(':');
 
             if (time.length === 3) {
-                time = time[2]*1 + time[1]*60 + time[0]*3600;
+                time = time[2] * 1 + time[1] * 60 + time[0] * 3600;
             } else if (time.length === 2) {
-                time = time[1]*1 + time[0]*60;
+                time = time[1] * 1 + time[0] * 60;
             } else {
-                time = time[0]*1;
+                time = time[0] * 1;
             }
         }
 
@@ -2315,6 +2304,15 @@ class DilationPlayer extends DPBase {
                 }
             }
         };
+
+        // Event when loader show/hide
+        this.event.listen('dp.modal.loader.show', function(){
+            btn.html(icons.play);
+        });
+
+        this.event.listen('dp.modal.loader.hide', function(){
+            helper.makeIcon();
+        });
 
         // Event when click on button play/pause
         btn.listen('click', function () {
