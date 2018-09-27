@@ -1,6 +1,6 @@
 # DilationPlayer
 
-DilationPlayer is object, It provide methods to play video/audio. **[Video demo](http://dilationplayer.cobonla.org/)**
+DilationPlayer is object, It provide methods to play video/audio. **[Video demo](https://dilationplayer.cobonla.org/)**
 
 **Using**
 
@@ -12,13 +12,13 @@ Html page:
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.css">
 </head>
 <body>
     <div id="video-container"></div>
-    <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.js"></script>
+    <script type="text/javascript" src="https://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.js"></script>
     <script type="text/javascript"
-        src="http://cdn.lib.cobonla.org/dilation-player/1.0.0/plugins/dilation-player.plugin.ads.min.js"></script>
+        src="https://cdn.lib.cobonla.org/dilation-player/1.0.0/plugins/dilation-player.plugin.ads.min.js"></script>
 </body>
 ```
 
@@ -129,13 +129,13 @@ Full source code after config:
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="http://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.css">
 </head>
 <body>
     <div id="video-container"></div>
-    <script type="text/javascript" src="http://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.js"></script>
+    <script type="text/javascript" src="https://cdn.lib.cobonla.org/dilation-player/1.0.0/dilation-player.min.js"></script>
     <script type="text/javascript"
-        src="http://cdn.lib.cobonla.org/dilation-player/1.0.0/plugins/dilation-player.plugin.ads.min.js"></script>
+        src="https://cdn.lib.cobonla.org/dilation-player/1.0.0/plugins/dilation-player.plugin.ads.min.js"></script>
     <script>
     var player = new DilationPlayer('#video-container', {
         poster: 'https://mywebsite.com/poster.png',
