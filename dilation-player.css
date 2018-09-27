@@ -134,7 +134,7 @@ html, body {
 
 .dp .dp-control .dp-progress .dp-line {
     width: 100%;
-    height: 60%;
+    height: 40%;
     transition: all 0.2s linear;
     position: absolute;
     bottom: 0px;
@@ -142,7 +142,7 @@ html, body {
 }
 
 .dp .dp-control .dp-progress:hover .dp-line {
-    /*height: 100%;*/
+    height: 60%;
 }
 
 .dp .dp-control .dp-progress .dp-line > div {
