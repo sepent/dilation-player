@@ -1651,7 +1651,7 @@ class DPModal extends DPBase {
 }
 
 // ====================================================
-// Class {DPModal}
+// Class {DPControl}
 // ====================================================
 class DPControl extends DPBase {
     constructor(app) {
@@ -2043,7 +2043,7 @@ class DPSchedule extends DPBase {
 }
 
 // ====================================================
-// Plugin {DPAds}
+// Class {DPPlugin}
 // ====================================================
 class DPPlugin extends DPBase {
     constructor(app) {
@@ -2068,7 +2068,7 @@ class DPPlugin extends DPBase {
 }
 
 // ====================================================
-// Plugin {DPSource}
+// Class {DPSource}
 // ====================================================
 class DPSource extends DPBase {
     /**
