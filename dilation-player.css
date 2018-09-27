@@ -141,6 +141,29 @@ html, body {
     left: 0px;
 }
 
+.dp .dp-control .dp-progress:hover .dp-line {
+    /*height: 100%;*/
+}
+
+.dp .dp-control .dp-progress .dp-line > div {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
+
+.dp .dp-control .dp-progress .dp-line .dp-playing {
+    background-color: #FF5722;
+    z-index: 3;
+}
+
+.dp .dp-control .dp-progress .dp-line .dp-loading {
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    z-index: 1;
+}
+
 .dp .dp-control .dp-progress .dp-progress-tooltip-text {
     display: none;
     background-color: black;
@@ -190,29 +213,6 @@ html, body {
 
 .dp .dp-control .dp-progress:hover .dp-progress-tooltip-image.active {
     display: inline-block;
-}
-
-.dp .dp-control .dp-progress:hover .dp-line {
-    height: 100%;
-}
-
-.dp .dp-control .dp-progress .dp-line > div {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-}
-
-.dp .dp-control .dp-progress .dp-line .dp-playing {
-    background-color: #FF5722;
-    z-index: 3;
-}
-
-.dp .dp-control .dp-progress .dp-line .dp-loading {
-    background-color: rgba(255, 255, 255, 0.5);
-    width: 100%;
-    z-index: 1;
 }
 
 /* ======================= CSS for button ========================== */
