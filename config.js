@@ -70,5 +70,6 @@ __dp.defaultConfig = {
     schedules: [],
     type: 'video',
     plugins: {},
-    startAt: 0
+    startAt: 0,
+    preview: true
 };

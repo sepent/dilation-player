@@ -94,7 +94,8 @@ __dp.defaultConfig = {
     schedules: [],
     type: 'video',
     plugins: {},
-    startAt: 0
+    startAt: 0,
+    preview: true
 };
 __dp.translateData = {
     en: {
@@ -563,7 +564,8 @@ class DPConfig extends DPBase {
             schedules: this.mergeSchedules(config),
             type: this.or(config.type, __dp.defaultConfig.type), // audio or video
             plugins: this.mergePlugins(config),
-            startAt: this.or(config.startAt, __dp.defaultConfig.startAt)
+            startAt: this.or(config.startAt, __dp.defaultConfig.startAt),
+            preview: this.or(config.preview, __dp.defaultConfig.preview)
         };
 
         // Function
@@ -2362,7 +2364,7 @@ class DilationPlayer extends DPBase {
         tooltipCanvas.height = 70;
 
         // Create preview elements
-        let runnerPreview = document.createElement('video');
+        // let runnerPreview = document.createElement('video');
 
         // runner.find('source').each(function (num, val) {
         //     var source = document.createElement('source');
@@ -2377,6 +2379,8 @@ class DilationPlayer extends DPBase {
          * @type {{pad: (function(*, *, *=): *), setLoaded: setLoaded, setTimer: setTimer, display: display}}
          */
         let helper = {
+            isShowImage: this.config.get('preview', false),
+
             /**
              * Set loaded data
              * @param current
@@ -2395,6 +2399,39 @@ class DilationPlayer extends DPBase {
                 current = __dp.parseTime(current);
                 duration = __dp.parseTime(duration);
                 timer.html(current + ' / ' + duration);
+            },
+
+            showImage: function(left){
+                if (this.isShowImage) {
+                    let totalWidth = progressBar.width();
+                    let width = progressTimerTooltipImage.width() / 2;
+                    let iLeft = left;
+                    if (left > (totalWidth - width)) {
+                        iLeft = totalWidth - width;
+                    } else if (left < width) {
+                        iLeft = width;
+                    }
+
+                    progressTimerTooltipImage.css('left', iLeft + 'px');
+                    //progressTimerTooltipImage.active(true);
+                } else {
+                    //progressTimerTooltipImage.active(false);
+                }
+            },
+
+            showTime: function(left, time) {
+                let totalWidth = progressBar.width();
+                let width = progressTimerTooltipText.width() / 2;
+                let tLeft = left;
+
+                if (left > (totalWidth - width - 2)) {
+                    tLeft = totalWidth - width - 2;
+                } else if (left < (width + 2)) {
+                    tLeft = width + 2;
+                }
+
+                let parseTime = __dp.parseTime(time);
+                progressTimerTooltipText.css('left', tLeft + 'px').text(parseTime);
             },
 
             /**
@@ -2443,35 +2480,9 @@ class DilationPlayer extends DPBase {
                 let percentage = (left / totalWidth);
                 let current = runnerDom.duration * percentage;
 
-                let parseTime = __dp.parseTime(current);
-                progressTimerTooltipText.css('left', left + 'px').text(parseTime);
-
                 // Set position for image
-                let width = progressTimerTooltipImage.width() / 2;
-                let ileft = left;
-                if (left > (totalWidth - width)) {
-                    ileft = totalWidth - width;
-                } else if (left < width) {
-                    ileft = width;
-                }
-
-                progressTimerTooltipImage.css('left', ileft + 'px');
-
-                // Set position for text
-                width = progressTimerTooltipText.width() / 2;
-                let tleft = left;
-
-                if (left > (totalWidth - width - 2)) {
-                    tleft = totalWidth - width - 2;
-                } else if (left < (width + 2)) {
-                    tleft = width + 2;
-                }
-
-                progressTimerTooltipText.css('left', tleft + 'px');
-
-                // Get picture
-                //runnerPreview.currentTime = current;
-                //tooltipCanvas.getContext('2d').drawImage(runnerPreview, 0, 0, tooltipCanvas.width, tooltipCanvas.height);
+                helper.showImage(left, current);
+                helper.showTime(left, current);
             } else {
                 progressTimerTooltipText.active(false);
                 progressTimerTooltipImage.active(false);
