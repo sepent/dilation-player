@@ -98,6 +98,9 @@ class DPAdsPlugin extends DPBase {
             this.runningAds = window.setTimeout(function(){
                 instance.close();
             }, this.currentSetting.time);
+        } else if (this.currentSetting.type === this.types.full) {
+            this.app.source.pause();
+            adsClose.active(true);
         } else {
             adsClose.active(true);
         }
@@ -117,7 +120,9 @@ class DPAdsPlugin extends DPBase {
         window.clearTimeout(this.runningAds);
         ads.active(false);
 
-        if (this.currentSetting.type === this.types.require && this.isPlay) {
+        if ((this.currentSetting.type === this.types.require
+            || this.currentSetting.type === this.types.full)
+            && this.isPlay) {
             this.app.source.play();
         }
     }
