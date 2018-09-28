@@ -1428,7 +1428,7 @@ class DPMenu extends DPBase {
 
         // Event when click menu item
         elMenuItem.listen('click', function () {
-            let name = elMenuItem.attr('dp-menu:name');
+            let name = __dp.node(this).attr('dp-menu:name');
             instance.execute(this, name);
         });
 
