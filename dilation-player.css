@@ -256,6 +256,11 @@ html, body {
     transition: opacity .1s cubic-bezier(0.4, 0.0, 1, 1);
     line-height: inherit;
     float: left;
+    padding: 0;
+}
+
+.dp .dp-control .dp-button button path {
+    fill: #ffffff;
 }
 
 .dp .dp-control .dp-button button.dp-btn-largescreen,
@@ -354,10 +359,16 @@ html, body {
 }
 
 .dp .dp-modal .dp-modal-player-icon > * {
-    padding: 20px 18px 20px 22px;
     border: 2px solid #fff;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.3);
+    padding: 2px 1px 2px 3px;
+    width: 40%;
+    color: #fff;
+}
+
+.dp .dp-modal path {
+    fill: #ffffff;
 }
 
 /* ======================== CSS for ADS ============== */
@@ -420,9 +431,11 @@ html, body {
     outline: 0;
     cursor: pointer;
     border: none;
-    padding: 3px;
     color: #000;
     display: none;
+    height: 17px;
+    width: 17px;
+    padding: 0;
 }
 
 .dp .dp-ads .dp-ads-close.active {
