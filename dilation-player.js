@@ -1750,9 +1750,11 @@ class DPControl extends DPBase {
             this.app.event.trigger('dp.control.hide');
 
             if (this.isMouseIn) {
-                elContainer.addClass('hidden-cursor');
+                elContainer.node().style.cursor = "none";
+                //elContainer.addClass('hidden-cursor');
             } else {
-                elContainer.removeClass('hidden-cursor');
+                elContainer.node().style.cursor = "default";
+                //elContainer.removeClass('hidden-cursor');
             }
         }
     }
@@ -1768,7 +1770,8 @@ class DPControl extends DPBase {
 
         window.clearTimeout(this.controlTime);
         elControl.active(true);
-        elContainer.removeClass('hidden-cursor');
+        elContainer.node().style.cursor = "default";
+        // elContainer.removeClass('hidden-cursor');
         this.app.event.trigger('dp.control.show');
 
         this.controlTime = window.setTimeout(function () {
