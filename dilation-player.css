@@ -23,7 +23,6 @@ html, body {
     background-color: #000;
     position: relative;
     overflow: hidden;
-    z-index: 9;
 }
 
 .dp .dp-video,
@@ -116,6 +115,8 @@ html, body {
     max-height: 70px;
     transform: translateY(88%);
     transition: all 0.2s ease;
+    background-color: transparent;
+    background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8));
 }
 
 .dp .dp-control.active {
@@ -217,7 +218,7 @@ html, body {
 /* ======================= CSS for button ========================== */
 .dp .dp-control .dp-button {
     height: 88%;
-    background-color: rgba(0, 0, 0, 0.5);
+    /*background-color: rgba(0, 0, 0, 0.5);*/
     width: 100%;
     position: relative;
 }
