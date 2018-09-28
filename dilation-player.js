@@ -572,7 +572,7 @@ class DPConfig extends DPBase {
 
         // Init cache
         this.cache = {
-            dom: {},
+            node: {},
             config: {}
         };
     }
@@ -789,55 +789,65 @@ class DPConfig extends DPBase {
     }
 
     /**
+     * Access array
+     * @param key
+     * @return {*}
+     */
+    access(key) {
+        let config = this.config;
+        let keys = key.split('.');
+
+        for (let i in keys) {
+            if (config[keys[i]] === undefined) {
+                config = undefined;
+                break;
+            }
+
+            config = config[keys[i]];
+        }
+
+        return config;
+    }
+
+    /**
      * Get config
      * @param key
      * @return mixed
      */
-    get(key, dom, cache) {
-        let config = null;
+    get(key, cache) {
         cache = cache !== undefined ? cache : true;
 
         // Get config cache
-        if (this.cache.config[key] !== undefined && cache) {
-            config = this.cache.config[key];
+        if (!(this.cache.config[key] !== undefined && cache)) {
+            this.cache.config[key] = this.access(key);
         }
 
-        // Config not in cache then read
-        // Split key string to array
-        else {
-            var keys = key.split('.');
-            config = this.config;
+        return this.cache.config[key];
+    }
 
-            for (var i in keys) {
-                if (config[keys[i]] == undefined) {
-                    config = undefined;
-                    break;
-                }
+    /**
+     * Get node
+     * @param key
+     * @param cache
+     * @return {*|undefined}
+     */
+    el(key, cache){
+        cache = cache !== undefined ? cache : true;
+        let config = this.get(key, cache);
 
-                config = config[keys[i]];
-            }
-
-            this.cache.config[key] = config;
+        // Check if is object elements
+        if (key === 'elements.object' && (this.cache.node[key] === undefined || !cache)) {
+            this.cache.node[key] = new DPNode(config);
         }
-
-        if (dom === true) {
-            // Check if is object elements
-            if (key === 'elements.object' && (this.cache.dom[key] === undefined || !cache)) {
-                this.cache.dom[key] = new DPNode(config);
-                return this.cache.dom[key];
-            }
-            // Check get dom is true and dom is created
-            // Then return dom in cache
-            else if (typeof config === 'string') {
-                if (this.cache.dom[key] === undefined || !cache) {
-                    this.cache.dom[key] = this.cache.dom['elements.object'].find(config);
-                }
-
-                return this.cache.dom[key];
+        // Check get dom is true and dom is created
+        // Then return dom in cache
+        else if (typeof config === 'string') {
+            if (this.cache.node[key] === undefined || !cache) {
+                this.cache.node[key] = this.cache.node['elements.object'].find(config);
             }
         }
 
-        return config;
+        return this.cache.node[key];
     }
 
     /**
@@ -847,7 +857,12 @@ class DPConfig extends DPBase {
      */
     runner(isDom, cache) {
         let type = this.get('type');
-        return this.get('elements.' + type, isDom, cache);
+
+        if (isDom) {
+            return this.el('elements.' + type, cache);
+        }
+
+        return this.get('elements.' + type, cache);
     }
 }
 
@@ -1062,7 +1077,7 @@ class DPEvent extends DPBase {
             events = this.createEvent(name, this.or(parameters, {}));
         }
 
-        let ob = this.app.config.get('elements.object', true);
+        let ob = this.app.config.el('elements.object');
         let dom = ob.node();
 
         if (events instanceof Array) {
@@ -1082,7 +1097,7 @@ class DPEvent extends DPBase {
      * @param parameters
      */
     listen(name, call) {
-        let ob = this.app.config.get('elements.object', true);
+        let ob = this.app.config.el('elements.object');
         let dom = ob.node();
 
         dom.addEventListener(name, call);
@@ -1117,10 +1132,10 @@ class DPView extends DPBase {
      * @return {DPView}
      */
     async render() {
-        let elObject = this.app.config.get('elements.object', true);
-        let viewConfig = this.app.config.get('view', false);
-        let posterUrl = this.app.config.get('poster', false);
-        let sizeConfig = this.app.config.get('size', false);
+        let elObject = this.app.config.el('elements.object');
+        let viewConfig = this.app.config.get('view');
+        let posterUrl = this.app.config.get('poster');
+        let sizeConfig = this.app.config.get('size');
 
         this.app.event.trigger('dp.view.rendering');
 
@@ -1174,7 +1189,7 @@ class DPView extends DPBase {
      * @return {Promise<any>}
      */
     async loadTemplate() {
-        let viewConfig = this.app.config.get('view', false);
+        let viewConfig = this.app.config.get('view');
 
         return new Promise(function (resolve, reject) {
             let xhr = new XMLHttpRequest();
@@ -1290,15 +1305,15 @@ class DPMenu extends DPBase {
     init() {
         this.status = true;
 
-        let menuList = this.app.config.get('menu', false);
-        let elMenuList = this.app.config.get('elements.menuList', true);
+        let menuList = this.app.config.get('menu');
+        let elMenuList = this.app.config.el('elements.menuList');
 
         if (menuList === false) {
             this.status = false;
             return this;
         }
 
-        let menuItemClass = this.app.config.get('elements.menuItem', false).replace('.', '');
+        let menuItemClass = this.app.config.get('elements.menuItem').replace('.', '');
 
         for (var name in menuList) {
             let div = document.createElement('div');
@@ -1323,8 +1338,8 @@ class DPMenu extends DPBase {
             return this;
         }
 
-        let elMenu = this.app.config.get('elements.menu', true);
-        let elMenuList = this.app.config.get('elements.menuList', true);
+        let elMenu = this.app.config.el('elements.menu');
+        let elMenuList = this.app.config.el('elements.menuList');
 
         elMenu.active(true);
 
@@ -1358,7 +1373,7 @@ class DPMenu extends DPBase {
      * @return {DPMenu}
      */
     closeMenu() {
-        let elMenu = this.app.config.get('elements.menu', true);
+        let elMenu = this.app.config.el('elements.menu');
 
         if (!this.status) {
             return this;
@@ -1378,9 +1393,9 @@ class DPMenu extends DPBase {
      */
     events() {
         let instance = this;
-        let elMenuList = this.app.config.get('elements.menuList', true);
-        let elMenuItem = this.app.config.get('elements.menuItem', true);
-        let elContainer = this.app.config.get('elements.container', true);
+        let elMenuList = this.app.config.el('elements.menuList');
+        let elMenuItem = this.app.config.el('elements.menuItem');
+        let elContainer = this.app.config.el('elements.container');
 
         // Event when open context menu
         elContainer.listen('contextmenu', function (e) {
@@ -1492,8 +1507,8 @@ class DPLogo extends DPBase {
             return this;
         }
 
-        let elLogo = this.app.config.get('elements.logo', true);
-        let logoConfig = this.app.config.get('logo', false);
+        let elLogo = this.app.config.el('elements.logo');
+        let logoConfig = this.app.config.get('logo');
 
         if (logoConfig.height !== undefined) {
             elLogo.css({height: logoConfig.height});
@@ -1525,8 +1540,8 @@ class DPLogo extends DPBase {
     init() {
         this.status = true;
 
-        let elLogo = this.app.config.get('elements.logo', true);
-        let logoConfig = this.app.config.get('logo', false);
+        let elLogo = this.app.config.el('elements.logo');
+        let logoConfig = this.app.config.get('logo');
         let instance = this;
 
         // Check if logo is hidden
@@ -1569,9 +1584,9 @@ class DPModal extends DPBase {
      */
     init() {
         let instance = this;
-        let icons = this.app.config.get('icons', false);
-        let elLoaderIcon = this.app.config.get('elements.loaderModalIcon', true);
-        let elPlayerIcon = this.app.config.get('elements.playerModalIcon', true);
+        let icons = this.app.config.get('icons');
+        let elLoaderIcon = this.app.config.el('elements.loaderModalIcon');
+        let elPlayerIcon = this.app.config.el('elements.playerModalIcon');
         let runner = this.app.config.runner(true);
 
         // default
@@ -1627,9 +1642,9 @@ class DPModal extends DPBase {
      * @param config
      */
     toggle(config) {
-        let elLoaderModal = this.app.config.get('elements.loaderModal', true);
-        let elPlayerModal = this.app.config.get('elements.playerModal', true);
-        let elModal = this.app.config.get('elements.modal', true);
+        let elLoaderModal = this.app.config.el('elements.loaderModal');
+        let elPlayerModal = this.app.config.el('elements.playerModal');
+        let elModal = this.app.config.el('elements.modal');
         let isLoaderActive = elLoaderModal.isActive();
         let isPlayerActive = elPlayerModal.isActive();
 
@@ -1671,8 +1686,8 @@ class DPControl extends DPBase {
         let runnerDom = elRunner.node();
 
         // Event when hover on runner/container/control
-        __dp.node(this.app.config.get('elements.container', false)
-            + ',' + this.app.config.get('elements.control', false)
+        __dp.node(this.app.config.get('elements.container')
+            + ',' + this.app.config.get('elements.control')
             + ',' + this.app.config.runner()).listen('mousemove', function () {
             instance.openControl();
             instance.isMouseIn = true;
@@ -1683,8 +1698,8 @@ class DPControl extends DPBase {
         });
 
         // Event when out on runner/container/control
-        __dp.node(this.app.config.get('elements.container', false)
-            + ',' + this.app.config.get('elements.control', false)
+        __dp.node(this.app.config.get('elements.container')
+            + ',' + this.app.config.get('elements.control')
             + ',' + this.app.config.runner()).listen('mouseleave', function () {
             instance.closeControl();
             instance.isMouseIn = false;
@@ -1713,8 +1728,8 @@ class DPControl extends DPBase {
      */
     closeControl() {
         let elRunner = this.app.config.runner(true);
-        let elControl = this.app.config.get('elements.control', true);
-        let elContainer = this.app.config.get('elements.container', true);
+        let elControl = this.app.config.el('elements.control');
+        let elContainer = this.app.config.el('elements.container');
 
         let runner = elRunner.node();
 
@@ -1736,8 +1751,8 @@ class DPControl extends DPBase {
     openControl() {
         let instance = this;
 
-        let elControl = this.app.config.get('elements.control', true);
-        let elContainer = this.app.config.get('elements.container', true);
+        let elControl = this.app.config.el('elements.control');
+        let elContainer = this.app.config.el('elements.container');
 
         window.clearTimeout(this.controlTime);
         elControl.active(true);
@@ -1767,8 +1782,8 @@ class DPScreen extends DPBase {
      * Default screen
      */
     defaultScreen() {
-        let sizeConfig = this.app.config.get('size', false);
-        let elObject = this.app.config.get('elements.object', true);
+        let sizeConfig = this.app.config.get('size');
+        let elObject = this.app.config.el('elements.object');
 
         if (sizeConfig.height !== undefined) {
             elObject.css({height: sizeConfig.height});
@@ -1805,7 +1820,7 @@ class DPScreen extends DPBase {
      * Rate screen size
      */
     rateScreenSize() {
-        let elObject = this.app.config.get('elements.object', true);
+        let elObject = this.app.config.el('elements.object');
         let runnerSize = 0;
         let h = 0;
 
@@ -1835,8 +1850,8 @@ class DPScreen extends DPBase {
      * @param isFull
      */
     makeIconForFullScreen(isFull) {
-        let icons = this.app.config.get('icons', false);
-        let elBtnFullScreen = this.app.config.get('elements.controlFullScreen', true);
+        let icons = this.app.config.get('icons');
+        let elBtnFullScreen = this.app.config.el('elements.controlFullScreen');
 
         if (isFull === undefined) {
             isFull = document.fullscreenElement
@@ -1858,7 +1873,7 @@ class DPScreen extends DPBase {
      * @param event
      */
     toggleFullScreen() {
-        let elContainer = this.app.config.get('elements.container', true);
+        let elContainer = this.app.config.el('elements.container');
         let isFullScreen = document.webkitIsFullScreen || document.mozFullScreen || false;
         let container = elContainer.node();
         let instance = this;
@@ -1887,8 +1902,8 @@ class DPScreen extends DPBase {
      * @param isFull
      */
     makeIconForLargeScreen(isLg) {
-        let icons = this.app.config.get('icons', false);
-        let elBtnLargeScreen = this.app.config.get('elements.controlLargeScreen', true);
+        let icons = this.app.config.get('icons');
+        let elBtnLargeScreen = this.app.config.el('elements.controlLargeScreen');
 
         if (isLg === undefined) {
             isLg = this.isLarge;
@@ -1930,8 +1945,8 @@ class DPScreen extends DPBase {
         this.isLarge = false;
         this.defaultSize = null;
 
-        let elBtnFullScreen = this.app.config.get('elements.controlFullScreen', true);
-        let elBtnLargeScreen = this.app.config.get('elements.controlLargeScreen', true);
+        let elBtnFullScreen = this.app.config.el('elements.controlFullScreen');
+        let elBtnLargeScreen = this.app.config.el('elements.controlLargeScreen');
         let largeScreen = this.app.config.get('largeScreen');
         let instance = this;
 
@@ -2271,8 +2286,8 @@ class DilationPlayer extends DPBase {
     playPause() {
         // Defined elements
         let runner = this.config.runner(true);
-        let player = this.config.get('elements.playerModal', true);
-        let btn = this.config.get('elements.controlPlayPause', true);
+        let player = this.config.el('elements.playerModal');
+        let btn = this.config.el('elements.controlPlayPause');
         let icons = this.config.get('icons');
         let runnerDom = runner.node();
         let instance = this;
@@ -2354,11 +2369,11 @@ class DilationPlayer extends DPBase {
         let instance = this;
         let runner = this.config.runner(true);
         let runnerDom = runner.node();
-        let progressBar = this.config.get('elements.progress', true);
-        let playing = this.config.get('elements.progressPlaying', true);
-        let timer = this.config.get('elements.controlTimer', true);
-        let progressTimerTooltipText = this.config.get('elements.progressHoverTooltipText', true);
-        let progressTimerTooltipImage = this.config.get('elements.progressHoverTooltipImage', true);
+        let progressBar = this.config.el('elements.progress');
+        let playing = this.config.el('elements.progressPlaying');
+        let timer = this.config.el('elements.controlTimer');
+        let progressTimerTooltipText = this.config.el('elements.progressHoverTooltipText');
+        let progressTimerTooltipImage = this.config.el('elements.progressHoverTooltipImage');
         let tooltipCanvas = progressTimerTooltipImage.find('canvas').node();
         tooltipCanvas.width = 90;
         tooltipCanvas.height = 70;
@@ -2379,7 +2394,7 @@ class DilationPlayer extends DPBase {
          * @type {{pad: (function(*, *, *=): *), setLoaded: setLoaded, setTimer: setTimer, display: display}}
          */
         let helper = {
-            isShowImage: this.config.get('preview', false),
+            isShowImage: this.config.get('preview'),
 
             /**
              * Set loaded data
@@ -2504,8 +2519,8 @@ class DilationPlayer extends DPBase {
         // Defined elements
         let runner = this.config.runner(true);
         let runnerDom = runner.node();
-        let volume = this.config.get('elements.controlVolume', true);
-        let volumeRange = this.config.get('elements.controlVolumeRange', true);
+        let volume = this.config.el('elements.controlVolume');
+        let volumeRange = this.config.el('elements.controlVolumeRange');
         let range = this.config.get('volume');
         let icons = this.config.get('icons');
         // let instance = this;

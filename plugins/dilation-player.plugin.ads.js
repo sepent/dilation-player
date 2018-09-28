@@ -19,7 +19,7 @@ class DPAdsPlugin extends DPBase {
      */
     init() {
         let icon = this.app.config.get('icons.close');
-        let close = this.app.config.get('elements.adsClose', true);
+        let close = this.app.config.el('elements.adsClose');
         let instance = this;
         let runner = this.app.config.runner(true).node();
         this.isPlay = !runner.paused;
@@ -51,8 +51,8 @@ class DPAdsPlugin extends DPBase {
      */
     resize(){
         if (this.currentSetting.type === 'line') {
-            let control = this.app.config.get('elements.control', true);
-            let ads = this.app.config.get('elements.ads', true);
+            let control = this.app.config.el('elements.control');
+            let ads = this.app.config.el('elements.ads');
 
             if (control.hasClass('active')) {
                 let height = control.height();
@@ -68,9 +68,9 @@ class DPAdsPlugin extends DPBase {
      * @return {DilationPlayerPluginsAds}
      */
     open(content, conf) {
-        let ads = this.app.config.get('elements.ads', true);
-        let adsClose = this.app.config.get('elements.adsClose', true);
-        let adsContent = this.app.config.get('elements.adsContent', true);
+        let ads = this.app.config.el('elements.ads');
+        let adsClose = this.app.config.el('elements.adsClose');
+        let adsContent = this.app.config.el('elements.adsContent');
         let runner = this.app.config.runner(true).node();
         let instance = this;
         this.isPlay = !runner.paused;
@@ -109,7 +109,7 @@ class DPAdsPlugin extends DPBase {
      * @return {DilationPlayerPluginsAds}
      */
     close(){
-        let ads = this.app.config.get('elements.ads', true);
+        let ads = this.app.config.el('elements.ads');
 
         window.clearTimeout(this.runningAds);
         ads.active(false);
