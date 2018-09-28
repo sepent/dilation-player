@@ -436,7 +436,7 @@ class DPNode extends DPBase {
      * @param call
      */
     listen(key, call) {
-        let keys = key.trim().replace(' ', ',').split(',');
+        let keys = key.trim().replace(/\s/gi, ',').split(',');
         let selectors = this.nodes();
 
         for (let i = 0; i < selectors.length; i++) {
