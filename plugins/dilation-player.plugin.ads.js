@@ -51,8 +51,8 @@ class DPAdsPlugin extends DPBase {
      */
     resize(){
         if (this.currentSetting.type === 'line') {
-            let control = this.config.get('elements.control', true);
-            let ads = this.config.get('elements.ads', true);
+            let control = this.app.config.get('elements.control', true);
+            let ads = this.app.config.get('elements.ads', true);
 
             if (control.hasClass('active')) {
                 let height = control.height();
