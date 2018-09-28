@@ -216,6 +216,14 @@ class DPNode extends DPBase {
     }
 
     /**
+     * Get parent
+     * @return {DPNode}
+     */
+    parent() {
+        return new DPNode(this.node().parentNode);
+    }
+
+    /**
      * Get/set height of element
      * @param value
      * @return {*}
@@ -1400,7 +1408,7 @@ class DPMenu extends DPBase {
         // Event when open context menu
         elContainer.listen('contextmenu', function (e) {
             if (instance.status) {
-                instance.openMenu(event);
+                instance.openMenu(e);
             }
 
             e.preventDefault();
@@ -1825,7 +1833,7 @@ class DPScreen extends DPBase {
         let h = 0;
 
         if (this.isLarge) {
-            runnerSize = __dp.node(window).width();
+            runnerSize = elObject.parent().width();
             elObject.css({width: runnerSize + 'px'})
 
             h = (runnerSize * this.defaultSize.height / this.defaultSize.width);
