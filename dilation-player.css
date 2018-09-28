@@ -381,7 +381,8 @@ html, body {
     width: 100%;
 }
 
-.dp .dp-ads.full {
+.dp .dp-ads.full,
+.dp .dp-ads.require{
     position: absolute;
     top: 0;
     left: 0;
@@ -394,9 +395,17 @@ html, body {
     margin: auto;
     position: relative;
     display: block;
-    width: fit-content;
     max-width: 100%;
     height: 100%;
+}
+
+.dp .dp-ads.line .dp-ads-item{
+    width: fit-content;
+}
+
+.dp .dp-ads.full .dp-ads-item,
+.dp .dp-ads.require .dp-ads-item{
+    width: 100%;
 }
 
 .dp .dp-ads .dp-ads-content {

@@ -83,8 +83,9 @@ class DPAdsPlugin extends DPBase {
 
         ads.removeClass(this.types.line)
             .removeClass(this.types.full)
-            .removeClass(this.types.require)
-            .addClass(this.currentSetting.type);
+            .removeClass(this.types.require);
+
+        ads.addClass(this.currentSetting.type);
         ads.active(true);
 
         if (content !== undefined) {
