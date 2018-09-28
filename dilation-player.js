@@ -6,6 +6,10 @@ let __dp = {
     },
 
     parseTime: function (times) {
+        if (times < 0) {
+            times = 0;
+        }
+
         let hours = Math.floor(times / 3600);
         let minutes = Math.floor((times - hours * 3600) / 60);
         let seconds = Math.floor(times - (minutes * 60 + hours * 3600));
@@ -1354,18 +1358,18 @@ class DPMenu extends DPBase {
         let height = elMenuList.height();
         let width = elMenuList.width();
 
-        let cheight = window.innerHeight;
-        let cwidth = window.innerWidth;
+        let cHeight = window.innerHeight;
+        let cWidth = window.innerWidth;
 
-        let left = event.pageX;
-        let top = event.pageY;
+        let left = event.clientX;
+        let top = event.clientY;
 
-        if ((cheight - top) < height) {
-            top = cheight - height;
+        if ((cHeight - top) < height) {
+            top = cHeight - height;
         }
 
-        if ((cwidth - left) < width) {
-            left = cwidth - width;
+        if ((cWidth - left) < width) {
+            left = cWidth - width;
         }
 
         elMenuList.css({left: left + 'px', top: top + 'px'});
