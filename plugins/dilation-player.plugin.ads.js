@@ -8,9 +8,7 @@ class DPAdsPlugin extends DPBase {
      */
     constructor(app) {
         super();
-        this.config = app.config;
         this.app = app;
-        this.helper = app.helper;
         this.currentSetting = {};
         this.usedType = [];
     }
@@ -20,23 +18,17 @@ class DPAdsPlugin extends DPBase {
      * @return {DilationPlayerPluginsAds}
      */
     init() {
-        let icon = this.config.get('icons.close');
-        let close = this.config.get('elements.adsClose', true);
-        let ads = this.config.get('elements.ads');
+        let icon = this.app.config.get('icons.close');
+        let close = this.app.config.get('elements.adsClose', true);
         let instance = this;
-        let runner = this.config.runner(true).node();
+        let runner = this.app.config.runner(true).node();
         this.isPlay = !runner.paused;
         this.runningAds = null;
         this.types = {full: 'full', line: 'line'};
 
         // Event when click on button close
         close.listen('click', function () {
-            window.clearTimeout(this.runningAds);
-            __dp.node(this).closest(ads).removeClass('active');
-
-            if (instance.currentSetting.type === this.types.full && instance.isPlay) {
-                instance.app.source.play();
-            }
+            instance.close();
         });
 
         close.html(icon);
@@ -75,11 +67,11 @@ class DPAdsPlugin extends DPBase {
      * Run
      * @return {DilationPlayerPluginsAds}
      */
-    show(content, conf) {
-        let ads = this.config.get('elements.ads', true);
-        let adsClose = this.config.get('elements.adsClose', true);
-        let adsContent = this.config.get('elements.adsContent', true);
-        let runner = this.config.runner(true).node();
+    open(content, conf) {
+        let ads = this.app.config.get('elements.ads', true);
+        let adsClose = this.app.config.get('elements.adsClose', true);
+        let adsContent = this.app.config.get('elements.adsContent', true);
+        let runner = this.app.config.runner(true).node();
         let instance = this;
         this.isPlay = !runner.paused;
 
@@ -103,16 +95,27 @@ class DPAdsPlugin extends DPBase {
             this.app.source.pause();
 
             this.runningAds = window.setTimeout(function(){
-                ads.removeClass('active');
-
-                if (instance.isPlay) {
-                    instance.app.source.play();
-                }
+                instance.close();
             }, this.currentSetting.time);
         }
 
         this.resize();
 
         return this;
+    }
+
+    /**
+     * Close
+     * @return {DilationPlayerPluginsAds}
+     */
+    close(){
+        let ads = this.app.config.get('elements.ads', true);
+
+        window.clearTimeout(this.runningAds);
+        ads.active(false);
+
+        if (this.currentSetting.type === this.types.full && this.isPlay) {
+            this.app.source.play();
+        }
     }
 }
