@@ -35,6 +35,15 @@
                 }
             },
             startAt: '00:05',
+            menu: {
+                custom: {
+                    text: 'My custom menu',
+                    execute: function(item, menu, config){
+                        menu.closeMenu();
+                        alert('this is test my custom menu');
+                    }
+                }
+            },
             schedules: [
                 {
                     at: '00:00',

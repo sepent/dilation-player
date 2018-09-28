@@ -196,19 +196,18 @@ html, body {
 
 .dp .dp-control .dp-progress .dp-progress-tooltip-image {
     display: none;
-    background-color: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.6) no-repeat center;
     color: #fff;
     text-align: center;
-    border: 1px solid #ddd;
+    border: 1px solid #000;
     position: absolute;
     z-index: 1;
     top: calc(-58px + -1.8em);
     transform: translateX(-50%);
     width: 100px;
     height: 80px;
-    background-position: center;
-    background-repeat: no-repeat;
     background-size: cover;
+    border-radius: 2px;
 }
 
 .dp .dp-control .dp-progress:hover .dp-progress-tooltip-image.active {

@@ -2372,7 +2372,7 @@ class DilationPlayer extends DPBase {
         //     runnerPreview.append(source);
         // });
 
-        runnerPreview.load();
+        // runnerPreview.load();
 
         /**
          * Helper object
@@ -2413,13 +2413,14 @@ class DilationPlayer extends DPBase {
                     }
 
                     progressTimerTooltipImage.css('left', iLeft + 'px');
-                    //progressTimerTooltipImage.active(true);
+                    progressTimerTooltipImage.active(true);
                 } else {
-                    //progressTimerTooltipImage.active(false);
+                    progressTimerTooltipImage.active(false);
                 }
             },
 
             showTime: function(left, time) {
+                progressTimerTooltipText.active(true);
                 let totalWidth = progressBar.width();
                 let width = progressTimerTooltipText.width() / 2;
                 let tLeft = left;
@@ -2471,9 +2472,6 @@ class DilationPlayer extends DPBase {
         // Then get position of mouse, count the time go to and get information
         progressBar.listen("mousemove", function (e) {
             if (!isNaN(runnerDom.duration)) {
-                progressTimerTooltipText.active(true);
-                progressTimerTooltipImage.active(true);
-
                 let offset = __dp.node(this).offset();
                 let left = (e.pageX - offset.left);
                 let totalWidth = progressBar.width();
@@ -2510,7 +2508,7 @@ class DilationPlayer extends DPBase {
         let volumeRange = this.config.get('elements.controlVolumeRange', true);
         let range = this.config.get('volume');
         let icons = this.config.get('icons');
-        let instance = this;
+        // let instance = this;
 
         /**
          * Helper
