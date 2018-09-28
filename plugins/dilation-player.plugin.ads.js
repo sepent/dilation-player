@@ -24,7 +24,7 @@ class DPAdsPlugin extends DPBase {
         let runner = this.app.config.runner(true).node();
         this.isPlay = !runner.paused;
         this.runningAds = null;
-        this.types = {full: 'full', line: 'line'};
+        this.types = {full: 'full', line: 'line', require: 'require'};
 
         // Event when click on button close
         close.listen('click', function () {
@@ -83,20 +83,23 @@ class DPAdsPlugin extends DPBase {
 
         ads.removeClass(this.types.line)
             .removeClass(this.types.full)
+            .removeClass(this.types.require)
             .addClass(this.currentSetting.type);
-        ads.addClass('active');
-        adsClose.addClass('active');
+        ads.active(true);
 
         if (content !== undefined) {
             adsContent.html(content);
         }
 
-        if (this.currentSetting.type === this.types.full) {
+        if (this.currentSetting.type === this.types.require) {
             this.app.source.pause();
+            adsClose.active(false);
 
             this.runningAds = window.setTimeout(function(){
                 instance.close();
             }, this.currentSetting.time);
+        } else {
+            adsClose.active(true);
         }
 
         this.resize();
@@ -114,7 +117,7 @@ class DPAdsPlugin extends DPBase {
         window.clearTimeout(this.runningAds);
         ads.active(false);
 
-        if (this.currentSetting.type === this.types.full && this.isPlay) {
+        if (this.currentSetting.type === this.types.require && this.isPlay) {
             this.app.source.play();
         }
     }
