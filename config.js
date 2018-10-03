@@ -71,5 +71,5 @@ __dp.defaultConfig = {
     type: 'video',
     plugins: {},
     startAt: 0,
-    preview: true
+    preview: {}
 };

@@ -100,7 +100,7 @@ __dp.defaultConfig = {
     type: 'video',
     plugins: {},
     startAt: 0,
-    preview: true
+    preview: {}
 };
 __dp.translateData = {
     en: {
@@ -2447,7 +2447,7 @@ class DilationPlayer extends DPBase {
             },
 
             showImage: function(left){
-                if (this.isShowImage) {
+                if (this.isShowImage !== false && this.isShowImage !== undefined) {
                     let totalWidth = progressBar.width();
                     let width = progressTimerTooltipImage.width() / 2;
                     let iLeft = left;
