@@ -436,6 +436,7 @@ html, body {
     height: 17px;
     width: 17px;
     padding: 0;
+    line-height: 0
 }
 
 .dp .dp-ads .dp-ads-close.active {
